@@ -93,7 +93,7 @@ class MAX2871_LO {
     MAX2871_LO(double refIn = 66000000.0);
 
     // Calculate F, M, N, DIVA from input frequency (MHz)
-    void freq2FMN(uint64_t target_freq_MHz);
+    void freq2FMN(float target_freq_MHz);
 };
 
 #endif
