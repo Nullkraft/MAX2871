@@ -1,11 +1,15 @@
 #ifndef _MAX2871_
 #define _MAX2871_
 
-#include <Arduino.h>
+#ifdef ARDUINO
+  #include <Arduino.h>
+#else
+  #include <cstdint>
+#endif
 
 class MAX2871_LO {
   typedef struct maxRegisters {
-    static constexpr byte numRegisters = 7;
+    static constexpr uint8_t numRegisters = 7;
     uint32_t Reg[numRegisters] = {0x001D47B0,  // R[0] N = Bits[30:15], F = Bits[14:3]
                                   0x40017FE1,  // R[1] M = Bits[14:3]
                                   0x80005F42,  // R[2] Digital Lock detect OFF
