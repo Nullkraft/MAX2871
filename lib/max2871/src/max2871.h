@@ -28,6 +28,8 @@ class MAX2871_LO {
     uint16_t M;     // Modulus
     uint16_t N;     // Integer division
     uint8_t  DIVA;  // Output divider (VCO divider setting)
+    double   Fpfd;
+    int      R;
 
     // Reference input frequency and phase detector freq
     double refInHz;   // Reference clock frequency
@@ -94,6 +96,10 @@ class MAX2871_LO {
 
     // Calculate F, M, N, DIVA from input frequency (MHz)
     void freq2FMN(float target_freq_MHz);
+
+    // Calculate actual frequency that will be generated
+    // by the F, M, and N values returned from freq2FMN()
+    double fmn2freq();
 };
 
 #endif

@@ -1,11 +1,12 @@
 #include "max2871.h"
 
-MAX2871_LO::MAX2871_LO(double refIn) : Frac(0), M(0), N(0), DIVA(0), refInHz(refIn) {}
+// MAX2871_LO::MAX2871_LO(double refIn) : Frac(0), M(0), N(0), DIVA(0), refInHz(refIn) {}
+MAX2871_LO::MAX2871_LO(double refIn) : refInHz(refIn) {}
 
 void MAX2871_LO::freq2FMN(float target_freq_MHz) {
     float floatFrac;
-    float R = 1;
-    float Fpfd = refInHz / R;           // Phase Frequency Detector input frequency
+    R = 1;
+    Fpfd = refInHz / R;           // Phase Frequency Detector input frequency
     float max_error = pow(2, 32);       // Large initial error
     float Fvco = target_freq_MHz;
 
@@ -15,7 +16,7 @@ void MAX2871_LO::freq2FMN(float target_freq_MHz) {
         Fvco *= 2;                      // Double until VCO is in valid range
         DIVA += 1;                      // Track number of doublings to determine DIVA
     }
-    
+
     float NdotF = Fvco / Fpfd;
     N = static_cast<uint8_t>(NdotF);    // Integer portion (N of NdotF)
     floatFrac = NdotF - N;       // Fractional portion (F of NdotF)
@@ -42,3 +43,15 @@ void MAX2871_LO::freq2FMN(float target_freq_MHz) {
     Frac = static_cast<uint16_t>(round(best_F));    // Finalize fractional component
     M = best_M;                                     // Finalize modulus
 }
+
+
+double MAX2871_LO::fmn2freq() {
+    // Compute VCO frequency
+    double fVCO = this->Fpfd * (this->N + (double)this->Frac / this->M);
+
+    // Divide by 2^DIVA to get output frequency
+    double fout = fVCO / (1 << this->DIVA);
+
+    return fout;
+}
+
