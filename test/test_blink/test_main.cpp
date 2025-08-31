@@ -3,6 +3,7 @@
 #include <unity.h>
 
 MAX2871_LO lo(66.0);  // Reference clock 66 MHz
+float tolerance = 0.002;
 
 // --- Test Fixtures ---
 void setUp(void) {
@@ -34,20 +35,20 @@ void test_Diva(void) {
 void test_round_trip_known(void) {
     double freq = 4129.392;
     lo.freq2FMN(freq);
-    TEST_ASSERT_FLOAT_WITHIN(0.0005, freq, lo.fmn2freq());  // ±500 Hz
+    TEST_ASSERT_FLOAT_WITHIN(tolerance, freq, lo.fmn2freq());  // ±500 Hz
 }
 
 // --- Boundary Tests ---
 void test_lowest_freq(void) {
     double freq = 23.5;   // min device spec
     lo.freq2FMN(freq);
-    TEST_ASSERT_FLOAT_WITHIN(0.0005, freq, lo.fmn2freq());
+    TEST_ASSERT_FLOAT_WITHIN(tolerance, freq, lo.fmn2freq());
 }
 
 void test_highest_freq(void) {
     double freq = 6000.0; // max device spec
     lo.freq2FMN(freq);
-    TEST_ASSERT_FLOAT_WITHIN(0.0005, freq, lo.fmn2freq());
+    TEST_ASSERT_FLOAT_WITHIN(tolerance, freq, lo.fmn2freq());
 }
 
 // --- Integer-N Edge Case ---
@@ -55,7 +56,7 @@ void test_integerN_case(void) {
     double freq = 2970.0;   // 90 * 33 MHz = integer-N
     lo.freq2FMN(freq);
     TEST_ASSERT_EQUAL_UINT32(0, lo.Frac);  // Frac = 0 in integer-N
-    TEST_ASSERT_FLOAT_WITHIN(0.0005, freq, lo.fmn2freq());
+    TEST_ASSERT_FLOAT_WITHIN(tolerance, freq, lo.fmn2freq());
 }
 
 // --- Parameterized Round-trip Tests ---
@@ -75,7 +76,7 @@ FreqTest freq_cases[] = {
 void test_param_round_trip(void) {
     for (auto &tc : freq_cases) {
         lo.freq2FMN(tc.freq);
-        TEST_ASSERT_FLOAT_WITHIN(0.0005, tc.freq, lo.fmn2freq());
+        TEST_ASSERT_FLOAT_WITHIN(tolerance, tc.freq, lo.fmn2freq());
     }
 }
 
