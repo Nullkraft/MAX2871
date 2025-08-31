@@ -14,11 +14,11 @@ void tearDown(void) {
 MAX2871_LO lo(66.0);
 
 void test_M(void) {
-    TEST_ASSERT_EQUAL_UINT16(4092, lo.M);
+    TEST_ASSERT_EQUAL_UINT16(4095, lo.M);
 }
 
 void test_Frac(void) {
-    TEST_ASSERT_EQUAL_UINT32(3162, lo.Frac);
+    TEST_ASSERT_EQUAL_UINT32(2320, lo.Frac);
 }
 
 void test_N(void) {
@@ -33,7 +33,7 @@ void setup()
 {
     Serial.begin(115200);
     delay(2000);
-    lo.freq2FMN(4143.0);
+    lo.freq2FMN(4129.392);      // 4129.391941
 
     UNITY_BEGIN();
     RUN_TEST(test_M);
