@@ -1,21 +1,21 @@
-#include <Arduino.h>
+#ifdef ARDUINO
+  #include <Arduino.h>
+#endif
 #include "max2871.h"
 #include <unity.h>
 
-
-
 // Shared test object
-MAX2871_LO lo(66.0);  // Reference clock 66 MHz
+MAX2871_LO lo(66.0);  // Reference clock = 66 MHz
 float tolerance = 0.002;
 
-// --- setUp for Test Fixtures ---
+// --- Uno Test Fixtures ---
 void setUp(void) {
-    Serial.begin(115200);
     // Baseline frequency for the member-variable tests
     lo.freq2FMN(4129.392);  
+#ifdef ARDUINO
+    Serial.begin(115200);
+#endif
 }
-
-
 
 void tearDown(void) {}
 
@@ -85,12 +85,13 @@ void test_param_round_trip(void) {
     }
 }
 
-// --- Unity Boilerplate ---
+// --- Entry Point for Both Runners ---
 void setup() {
-    Serial.begin(115200);
     lo.freq2FMN(4129.392);
+#ifdef ARDUINO
+    Serial.begin(115200);
     delay(2000);
-
+#endif
     UNITY_BEGIN();
     RUN_TEST(test_M);
     RUN_TEST(test_Frac);
@@ -105,5 +106,7 @@ void setup() {
 }
 
 void loop() {
+#ifdef ARDUINO      // Allow Native TDD in PlatformIO and Arduino
     delay(1000);
+#endif
 }
