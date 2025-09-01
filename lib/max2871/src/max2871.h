@@ -1,6 +1,7 @@
 #ifndef _MAX2871_
 #define _MAX2871_
 
+// This guard block allows for developing on PlatformIO
 #ifdef ARDUINO
   #include <Arduino.h>
 #else
