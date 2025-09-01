@@ -8,7 +8,7 @@
 MAX2871_LO lo(66.0);  // Reference clock = 66 MHz
 float tolerance = 0.002;
 
-// --- Uno Test Fixtures ---
+// --- Unity Test Fixtures ---
 void setUp(void) {
     // Baseline frequency for the member-variable tests
     lo.freq2FMN(4129.392);  
@@ -85,13 +85,7 @@ void test_param_round_trip(void) {
     }
 }
 
-// --- Entry Point for Both Runners ---
-void setup() {
-    lo.freq2FMN(4129.392);
-#ifdef ARDUINO
-    Serial.begin(115200);
-    delay(2000);
-#endif
+void runAllTests(void) {
     UNITY_BEGIN();
     RUN_TEST(test_M);
     RUN_TEST(test_Frac);
@@ -105,8 +99,17 @@ void setup() {
     UNITY_END();
 }
 
-void loop() {
-#ifdef ARDUINO      // Allow Native TDD in PlatformIO and Arduino
-    delay(1000);
-#endif
+// --- Entry Point for Both Runners ---
+#ifdef ARDUINO
+void setup() {
+    Serial.begin(115200);
+    delay(2000);
+    runAllTests();
 }
+void loop() { delay(1000); }
+#else
+int main(void) {
+    runAllTests();
+    return 0;
+}
+#endif
