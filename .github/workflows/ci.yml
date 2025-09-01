@@ -5,7 +5,7 @@ on:
   pull_request:
 
 jobs:
-  native-tests:
+  native-build-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -21,7 +21,7 @@ jobs:
       - name: Run native tests
         run: pio test -e native
 
-  build-uno:
+  uno-build-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
