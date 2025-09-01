@@ -2,15 +2,20 @@
 #include "max2871.h"
 #include <unity.h>
 
+
+
+// Shared test object
 MAX2871_LO lo(66.0);  // Reference clock 66 MHz
 float tolerance = 0.002;
 
-// --- Test Fixtures ---
+// --- setUp for Test Fixtures ---
 void setUp(void) {
     Serial.begin(115200);
     // Baseline frequency for the member-variable tests
     lo.freq2FMN(4129.392);  
 }
+
+
 
 void tearDown(void) {}
 
@@ -83,6 +88,7 @@ void test_param_round_trip(void) {
 // --- Unity Boilerplate ---
 void setup() {
     Serial.begin(115200);
+    lo.freq2FMN(4129.392);
     delay(2000);
 
     UNITY_BEGIN();
