@@ -33,7 +33,7 @@ void test_N(void) {
 }
 
 void test_Diva(void) {
-    TEST_ASSERT_TRUE(lo.DIVA < 8);
+    TEST_ASSERT_LESS_THAN_INT8(8, lo.DIVA);
 }
 
 // --- Round-trip Test for Known Case ---
