@@ -1,4 +1,5 @@
 *~
+*csv
 
 .pio/
 .vscode/
@@ -6,6 +7,6 @@ lib/
 
 .editorconfig
 include/
-pickle_to_csv.py
 platformio.ini
 venv_max2871/
+README
