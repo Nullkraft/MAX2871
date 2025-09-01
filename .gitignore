@@ -7,6 +7,5 @@ lib/
 
 .editorconfig
 include/
-platformio.ini
 venv_max2871/
 README
