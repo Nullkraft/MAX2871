@@ -28,7 +28,7 @@ void MAX2871_LO::freq2FMN(float target_freq_MHz) {
     for (uint16_t M_candidate = 4095; M_candidate > 1; --M_candidate) {
         float F_candidate = static_cast<uint16_t>(floatFrac * float(M_candidate));
         float FvcoCalculated = Fpfd * (N + F_candidate / M_candidate);
-        float err = abs(Fvco - FvcoCalculated);
+        float err = fabs(Fvco - FvcoCalculated);
         if (err == 0) {
             best_F = F_candidate;       // Perfect match found
             best_M = M_candidate;
