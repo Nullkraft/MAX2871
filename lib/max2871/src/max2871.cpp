@@ -2,9 +2,9 @@
 #include "max2871.h"
 
 // MAX2871_LO::MAX2871_LO(double refIn) : Frac(0), M(0), N(0), DIVA(0), refInHz(refIn) {}
-MAX2871_LO::MAX2871_LO(double refIn) : refInHz(refIn) {}
+MAX2871::MAX2871(double refIn) : refInHz(refIn) {}
 
-void MAX2871_LO::freq2FMN(float target_freq_MHz) {
+void MAX2871::freq2FMN(float target_freq_MHz) {
     float floatFrac;
     R = 1;
     Fpfd = refInHz / R;           // Phase Frequency Detector input frequency
@@ -46,7 +46,7 @@ void MAX2871_LO::freq2FMN(float target_freq_MHz) {
 }
 
 
-double MAX2871_LO::fmn2freq() {
+double MAX2871::fmn2freq() {
     // Compute VCO frequency
     double fVCO = this->Fpfd * (this->N + (double)this->Frac / this->M);
 

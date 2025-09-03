@@ -3,7 +3,7 @@
 
 #include <stdint.h>   // fixed-width integer types like uint32_t
 
-class MAX2871_LO {
+class MAX2871 {
   typedef struct maxRegisters {
     static constexpr uint8_t numRegisters = 7;
     uint32_t Reg[numRegisters] = {0x001D47B0,  // R[0] N = Bits[30:15], F = Bits[14:3]
@@ -17,8 +17,8 @@ class MAX2871_LO {
   } max2871Registers;
 
 public:
-  MAX2871_LO() : first_init(true) {}
-  MAX2871_LO(double refIn = 66.0);
+  MAX2871() : first_init(true) {}
+  MAX2871(double refIn = 66.0);
 
   max2871Registers Curr;  // Read/Write copy of the registers
 

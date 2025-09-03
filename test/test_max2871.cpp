@@ -5,7 +5,7 @@
 #include <unity.h>
 
 // Shared test object
-MAX2871_LO lo(66.0);  // Reference clock = 66 MHz
+MAX2871 lo(66.0);  // Reference clock = 66 MHz
 float tolerance = 0.002;
 
 // --- Unity Test Fixtures ---
