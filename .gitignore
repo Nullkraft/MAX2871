@@ -3,7 +3,6 @@
 
 .pio/
 .vscode/
-lib/
 
 .editorconfig
 include/
