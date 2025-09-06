@@ -3,6 +3,8 @@
 
 #include <stdint.h>   // fixed-width integer types like uint32_t
 
+class Max2871Hal;   // Forward declare the hardware abstraction layer
+
 class MAX2871 {
   typedef struct maxRegisters {
     static constexpr uint8_t numRegisters = 7;
@@ -37,6 +39,7 @@ public:
 private:
   // The MAX2871 requires a 20 ms delay only on the first init
   bool first_init;
+  Max2871Hal* hal = nullptr;
 
   /* 6 bit mask of Embedded Data from serial Specific Command */
   static constexpr short Data_Mask = 0x3F;
@@ -83,6 +86,13 @@ private:
   uint32_t spiMaxSpeed = 20000000;  // 20 MHz max SPI clock
 
 public:
+  void attachHal(Max2871Hal* halPtr) { hal = halPtr; }
+
+  // Wrapper functions that call the HAL if it was attached...
+  void writeRegister(uint32_t value);
+  void setCE(bool enabled);
+  bool isLocked();
+
   // Calculate F, M, N, DIVA from input frequency (MHz)
   void freq2FMN(float target_freq_MHz);
 

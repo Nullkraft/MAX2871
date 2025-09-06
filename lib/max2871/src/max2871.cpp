@@ -1,5 +1,6 @@
 #include <math.h>
 #include "max2871.h"
+#include "max2871_hal.h"
 
 // MAX2871_LO::MAX2871_LO(double refIn) : Frac(0), M(0), N(0), DIVA(0), refInHz(refIn) {}
 MAX2871::MAX2871(double refIn) : refInHz(refIn) {}
@@ -56,3 +57,15 @@ double MAX2871::fmn2freq() {
     return fout;
 }
 
+
+void MAX2871::writeRegister(uint32_t value) {
+    if (hal) hal->spiWriteRegister(value);
+}
+
+void MAX2871::setCE(bool enabled) {
+    if (hal) hal->setCEPin(enabled);
+}
+
+bool MAX2871::isLocked() {
+    return hal ? hal->readMuxout() : false;
+}
