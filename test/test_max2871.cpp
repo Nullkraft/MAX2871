@@ -3,6 +3,7 @@
 #endif
 #include "max2871.h"
 #include <unity.h>
+#include "mock_hal.h"
 
 // Shared test object
 MAX2871 lo(66.0);  // Reference clock = 66 MHz
@@ -18,6 +19,8 @@ void setUp(void) {
 }
 
 void tearDown(void) {}
+
+
 
 // --- Round-trip Test for Known Case ---
 void test_round_trip_known(void) {
@@ -66,6 +69,17 @@ void test_param_round_trip(void) {
         lo.freq2FMN(tc.freq);
         TEST_ASSERT_FLOAT_WITHIN(tolerance, tc.freq, lo.fmn2freq());
     }
+}
+
+// Interface Test
+void test_interface_begin_and_setFrequency(void) {
+    MockHAL hal;
+    I_PLLSynthesizer* lo_if = new MAX2871(66.0);
+    lo_if->attachHal(&hal);
+    lo_if->begin(17);
+
+    lo_if->setFrequency(4192.392);          // exercise interface to setFrequency()
+    TEST_ASSERT_FALSE(lo_if->isLocked());   // MockHAL returns false
 }
 
 void runAllTests(void) {

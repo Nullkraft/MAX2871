@@ -19,6 +19,10 @@ void MAX2871::begin(uint8_t lePin) {
     }
 }
 
+void MAX2871::attachHal(HAL* halptr) {
+    hal = halptr;
+}
+
 // ---- Frequency Control ----
 
 void MAX2871::setFrequency(double freqMHz) {

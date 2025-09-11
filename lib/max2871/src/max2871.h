@@ -3,8 +3,9 @@
 
 #include <stdint.h>   // fixed-width integer types like uint32_t
 #include "hal.h"      // our HAL interface (ArduinoHAL / MockHAL)
+#include "I_PLLSynthesizer.h"   // Common PLL interface
 
-class MAX2871 {
+class MAX2871 : public I_PLLSynthesizer {
   typedef struct maxRegisters {
     static constexpr uint8_t numRegisters = 7;
     uint32_t Reg[numRegisters] = {
@@ -23,24 +24,24 @@ public:
   MAX2871() : first_init(true) {}   // MAX2871 requires 2 initial programming cycles
   MAX2871(double refIn);
 
-  void attachHal(HAL* halPtr) { hal = halPtr; }
-  void begin(uint8_t lePin);   // new: init with LE pin
+  void attachHal(HAL* halPtr) override;
+  void begin(uint8_t lePin) override;   // new: init with LE pin
 
   // ---- Frequency Control ----
-  void setFrequency(double freqMHz);              // calculates FMN+DIVA
-  void setFrequency(uint32_t fmn, uint8_t diva);  // bypass math
-  void freq2FMN(float target_freq_MHz);           // calculate F,M,N,DIVA
-  double fmn2freq();                              // reverse calc
+  void setFrequency(double freqMHz) override;              // calculates FMN+DIVA
+  void setFrequency(uint32_t fmn, uint8_t diva) override;  // bypass math
+  void freq2FMN(float target_freq_MHz);                    // calculate F,M,N,DIVA
+  double fmn2freq();                                       // reverse calc
 
   // ---- Output Control ----
-  void outputSelect(uint8_t sel);   // A, B, both, or off
-  void outputPower(int dBm);        // -4, -1, +2, +5 dBm
+  void outputSelect(uint8_t sel) override;   // A, B, both, or off
+  void outputPower(int dBm) override;        // -4, -1, +2, +5 dBm
 
   // ---- Mode Control ----
-  void mode(uint8_t type);          // 0=int-N, 1=frac-N
+  void mode(uint8_t type) override;          // 0=int-N, 1=frac-N
 
   // ---- Status ----
-  bool isLocked();
+  bool isLocked() override;
 
   // ---- Register Access ----
   void writeRegister(uint32_t value);
