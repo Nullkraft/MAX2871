@@ -117,7 +117,13 @@ void MAX2871::writeRegister(uint32_t value) {
 }
 
 void MAX2871::setAllRegisters() {
-    // TODO: write all shadow registers R6..R0
+    // Writes all shadow registers R6..R0 to the I.C.
+    for (int reg = 6; reg >= 0; --reg) {
+        writeRegister(Curr.Reg[reg]);
+    }
+
+    // Full clean write completed, clear the dirty mask
+    _dirtyMask = 0;
 }
 
 void MAX2871::updateRegisters() {
