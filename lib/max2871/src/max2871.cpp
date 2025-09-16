@@ -1,4 +1,3 @@
-#include <math.h>
 #include "max2871.h"
 
 // ---- Construction ----

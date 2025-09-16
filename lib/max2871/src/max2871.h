@@ -1,8 +1,7 @@
 #ifndef _MAX2871_
 #define _MAX2871_
 
-#include <stdint.h>   // fixed-width integer types like uint32_t
-#include "hal.h"      // our HAL interface (ArduinoHAL / MockHAL)
+#include <math.h>
 #include "I_PLLSynthesizer.h"   // Common PLL interface
 
 class MAX2871 : public I_PLLSynthesizer {
