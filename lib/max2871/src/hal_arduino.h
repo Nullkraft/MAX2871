@@ -1,9 +1,9 @@
 #ifndef HAL_ARDUINO_H
 #define HAL_ARDUINO_H
 
-#include "hal.h"
 #include <Arduino.h>
 #include <SPI.h>
+#include "hal.h"
 
 class ArduinoHAL : public HAL {
 public:
