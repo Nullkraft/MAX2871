@@ -127,12 +127,57 @@ void MAX2871::setAllRegisters() {
 }
 
 void MAX2871::updateRegisters() {
-    // TODO: write only registers flagged in _dirtyMask
+    if (_dirtyMask == 0) return;
+
+    uint8_t mask = _dirtyMask;
+
+    // If R4 is dirty, force-write R0 as well (without setting its dirty bit).
+    bool forceR0 = (mask & (1UL << 4)) != 0;
+
+    for (int reg = 6; reg >= 0; --reg) {
+        bool shouldWrite = (mask & (1UL << reg)) != 0;
+
+        // If R0 wasn’t dirty but R4 was, include R0
+        if (!shouldWrite && forceR0 && reg == 0) {
+            shouldWrite = true;
+        }
+
+        if (shouldWrite) {
+            writeRegister(Curr.Reg[reg]);
+            // Clear only the bit we actually wrote (don’t clear R0 if it wasn’t set)
+            if ((mask & (1UL << reg)) != 0) {
+                _dirtyMask = (uint8_t)(_dirtyMask & ~(1UL << reg));
+            }
+        }
+    }
 }
 
 void MAX2871::setRegisterField(uint8_t reg, uint8_t bit_hi, uint8_t bit_lo, uint32_t value) {
-    // TODO: update specific field inside Curr.Reg[reg]
+    if (reg > 6 || bit_hi > 31 || bit_lo > bit_hi) return;
+
+    // Preserve the lowest 3 bits (register address)
+    const uint32_t REG_ADDR_MASK = 0x7; // bits [2:0]
+    uint32_t oldVal = Curr.Reg[reg];
+
+    // Clamp field to avoid touching bits [2:0]
+    if (bit_lo < 3) bit_lo = 3;
+    if (bit_lo > bit_hi) return; // nothing to update if below addr bits
+
+    const uint32_t width = (uint32_t)(bit_hi - bit_lo + 1);
+    // const uint32_t fieldMask = ((width == 32) ? 0xFFFFFFFFu : ((1UL << width) - 1UL)) << bit_lo;
+    const uint32_t fieldMask = ((width == 32) ? 0xFFFFFFFF : ((1UL << width) - 1UL)) << bit_lo;
+
+    uint32_t newVal = (oldVal & ~fieldMask) | ((value << bit_lo) & fieldMask);
+
+    // Re-impose correct register index on [2:0]
+    newVal = (newVal & ~REG_ADDR_MASK) | (reg & REG_ADDR_MASK);
+
+    if (newVal != oldVal) {
+        Curr.Reg[reg] = newVal;
+        _dirtyMask |= (uint8_t)(1UL << reg);
+    }
 }
+
 
 // ---- Private Helpers ----
 
