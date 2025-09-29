@@ -98,9 +98,9 @@ void test_setAllRegisters_writes_all_registers_in_order(void) {
     TEST_ASSERT_EQUAL_UINT8(7, mock.writeCount);
 
     // Expect values to be written in reverse order, R6 --> R0
-    for (int regAddr = 6; regAddr >= 0; --regAddr) {
-        uint32_t expectedVal = 0xAAAA0000 | regAddr;
-        TEST_ASSERT_EQUAL_HEX32(expectedVal, regAddr);
+    for (int i = 0; i < 7; ++i) {
+        uint32_t expectedVal = 0xAAAA0000 | (6 - i);
+        TEST_ASSERT_EQUAL_HEX32(expectedVal, mock.regWrites[i]);
     }
 
     // Clear the shadow register dirty mask
@@ -115,6 +115,7 @@ void runAllTests(void) {
     RUN_TEST(test_integerN_case);
     RUN_TEST(test_param_round_trip);
     RUN_TEST(test_interface_begin_and_setFrequency);
+    RUN_TEST(test_setAllRegisters_writes_all_registers_in_order);
     UNITY_END();
 }
 
