@@ -107,6 +107,87 @@ void test_setAllRegisters_writes_all_registers_in_order(void) {
     TEST_ASSERT_EQUAL_UINT8(0, lo.getDirtyMask());
 }
 
+void test_updateRegisters_no_writes_if_clean(void) {
+    MockHAL mock;
+    MAX2871 lo(66.0);
+    lo.attachHal(&mock);
+
+    // Ensure clean
+    TEST_ASSERT_EQUAL_UINT8(0, lo.getDirtyMask());
+
+    lo.updateRegisters();
+
+    TEST_ASSERT_EQUAL_UINT8(0, mock.writeCount);
+    TEST_ASSERT_EQUAL_UINT8(0, lo.getDirtyMask());
+}
+
+void test_updateRegisters_writes_only_dirty_in_descending_order(void) {
+    MockHAL mock;
+    MAX2871 lo(66.0);
+    lo.attachHal(&mock);
+
+    // Fill known patterns
+    for (int r = 0; r <= 6; ++r) lo.Curr.Reg[r] = 0xBBBB0000 | r;
+
+    // Mark R2 and R5 dirty (write order should be R5 then R2)
+    lo.markDirty(2);
+    lo.markDirty(5);
+
+    lo.updateRegisters();
+
+    TEST_ASSERT_EQUAL_UINT8(2, mock.writeCount);
+    TEST_ASSERT_EQUAL_HEX32(0xBBBB0005, mock.regWrites[0]); // R5 first
+    TEST_ASSERT_EQUAL_HEX32(0xBBBB0002, mock.regWrites[1]); // then R2
+
+    // Dirty mask should have cleared bits 5 and 2, but nothing else
+    TEST_ASSERT_EQUAL_UINT8(0, lo.getDirtyMask());
+}
+
+void test_updateRegisters_rewrites_R0_when_R4_dirty(void) {
+    MockHAL mock;
+    MAX2871 lo(66.0);
+    lo.attachHal(&mock);
+
+    // Fill unique patterns
+    for (int r = 0; r <= 6; ++r) lo.Curr.Reg[r] = 0xCCCC0000 | r;
+
+    // Only R4 marked dirty
+    lo.markDirty(4);
+
+    lo.updateRegisters();
+
+    // Expect two writes: R4 first, then R0 (forced)
+    TEST_ASSERT_EQUAL_UINT8(2, mock.writeCount);
+    TEST_ASSERT_EQUAL_HEX32(0xCCCC0004, mock.regWrites[0]); // R4
+    TEST_ASSERT_EQUAL_HEX32(0xCCCC0000, mock.regWrites[1]); // R0
+
+    // Dirty mask should be clear (R4 cleared; R0 was not set and remains clear)
+    TEST_ASSERT_EQUAL_UINT8(0, lo.getDirtyMask());
+}
+
+void test_updateRegisters_mixed_dirty_with_R4_forces_R0(void) {
+    MockHAL mock;
+    MAX2871 lo(66.0);
+    lo.attachHal(&mock);
+
+    for (int r = 0; r <= 6; ++r) lo.Curr.Reg[r] = 0xDDDD0000 | r;
+
+    // Dirty: R6, R4, R1  → expect order: R6, R4, R1, (forced) R0
+    lo.markDirty(6);
+    lo.markDirty(4);
+    lo.markDirty(1);
+
+    lo.updateRegisters();
+
+    TEST_ASSERT_EQUAL_UINT8(4, mock.writeCount);
+    TEST_ASSERT_EQUAL_HEX32(0xDDDD0006, mock.regWrites[0]); // R6
+    TEST_ASSERT_EQUAL_HEX32(0xDDDD0004, mock.regWrites[1]); // R4
+    TEST_ASSERT_EQUAL_HEX32(0xDDDD0001, mock.regWrites[2]); // R1
+    TEST_ASSERT_EQUAL_HEX32(0xDDDD0000, mock.regWrites[3]); // forced R0
+
+    TEST_ASSERT_EQUAL_UINT8(0, lo.getDirtyMask());
+}
+
 void runAllTests(void) {
     UNITY_BEGIN();
     RUN_TEST(test_round_trip_known);
@@ -116,6 +197,10 @@ void runAllTests(void) {
     RUN_TEST(test_param_round_trip);
     RUN_TEST(test_interface_begin_and_setFrequency);
     RUN_TEST(test_setAllRegisters_writes_all_registers_in_order);
+    RUN_TEST(test_updateRegisters_no_writes_if_clean);
+    RUN_TEST(test_updateRegisters_writes_only_dirty_in_descending_order);
+    RUN_TEST(test_updateRegisters_rewrites_R0_when_R4_dirty);
+    RUN_TEST(test_updateRegisters_mixed_dirty_with_R4_forces_R0);
     UNITY_END();
 }
 
