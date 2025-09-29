@@ -48,6 +48,7 @@ public:
   void updateRegisters();
   void setRegisterField(uint8_t reg, uint8_t bit_hi, uint8_t bit_lo, uint32_t value);
   uint32_t getRegister(uint8_t reg) const { return Curr.Reg[reg]; }
+  uint8_t getDirtyMask() const { return _dirtyMask; }
 
   // ---- State ----
   max2871Registers Curr;  // Shadow registers
@@ -69,7 +70,7 @@ private:
   HAL* hal = nullptr;
   uint8_t _lePin;
   bool first_init;
-  uint8_t _dirtyMask;
+  uint8_t _dirtyMask = 0;
 
   // 6 bits of Embedded Data from serial Specific Command
   static constexpr short Data_Mask = 0x3F;
