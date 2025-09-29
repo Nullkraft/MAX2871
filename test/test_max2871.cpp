@@ -89,8 +89,8 @@ void test_setAllRegisters_writes_all_registers_in_order(void) {
     lo.attachHal(&mock);
 
     // Fill shadow registers with known dummy values...
-    for (int reg = 0; reg <= 6; ++reg) {
-        lo.Curr.Reg[reg] = 0xAAAA0000 | reg;    // reg is the register address (3 lsb)
+    for (int regAddr = 0; regAddr <= 6; ++regAddr) {
+        lo.Curr.Reg[regAddr] = 0xAAAA0000 | regAddr;    // reg is the register address (3 lsb)
     }
 
     lo.setAllRegisters();
