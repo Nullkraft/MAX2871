@@ -6,9 +6,11 @@
 
 class MockHAL : public HAL {
 public:
+    static const int LOG_SIZE = 16;
+    uint32_t writeLog[LOG_SIZE];
     static constexpr uint8_t MAX_WRITES = 32;
     uint32_t regWrites[MAX_WRITES];
-    uint8_t writeCount = 0; 
+    uint8_t writeCount = 0;
 
     void spiBegin() override {}
     void spiTransfer(uint8_t) override {}
@@ -20,6 +22,13 @@ public:
             regWrites[writeCount++] = value;
         }
     }
+
+    void logRegister(uint32_t value) {
+        if (writeCount < LOG_SIZE) {
+            writeLog[writeCount++] = value;
+        }
+    }
+    
     void setCEPin(bool) override {}
     bool readMuxout() override { return false; }
 };
