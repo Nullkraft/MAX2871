@@ -82,6 +82,31 @@ void test_interface_begin_and_setFrequency(void) {
     TEST_ASSERT_FALSE(lo_if->isLocked());   // MockHAL returns false
 }
 
+// Test Set All Registers
+void test_setAllRegisters_writes_all_registers_in_order(void) {
+    MockHAL mock;
+    MAX2871 lo;
+    lo.attachHal(&mock);
+
+    // Fill shadow registers with known dummy values...
+    for (int reg = 0; reg <= 6; ++reg) {
+        lo.Curr.Reg[reg] = 0xAAAA0000 | reg;    // reg is the register address (3 lsb)
+    }
+
+    lo.setAllRegisters();
+    // Assert: Expecting exactly 7 writes
+    TEST_ASSERT_EQUAL_UINT8(7, mock.writeCount);
+
+    // Expect values to be written in reverse order, R6 --> R0
+    for (int regAddr = 6; regAddr >= 0; --regAddr) {
+        uint32_t expectedVal = 0xAAAA0000 | regAddr;
+        TEST_ASSERT_EQUAL_HEX32(expectedVal, regAddr);
+    }
+
+    // Clear the shadow register dirty mask
+    TEST_ASSERT_EQUAL_UINT8(0, lo.getDirtyMask());
+}
+
 void runAllTests(void) {
     UNITY_BEGIN();
     RUN_TEST(test_round_trip_known);
@@ -89,6 +114,7 @@ void runAllTests(void) {
     RUN_TEST(test_highest_freq);
     RUN_TEST(test_integerN_case);
     RUN_TEST(test_param_round_trip);
+    RUN_TEST(test_interface_begin_and_setFrequency);
     UNITY_END();
 }
 
