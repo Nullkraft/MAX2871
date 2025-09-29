@@ -85,7 +85,7 @@ void test_interface_begin_and_setFrequency(void) {
 // Test Set All Registers
 void test_setAllRegisters_writes_all_registers_in_order(void) {
     MockHAL mock;
-    MAX2871 lo;
+    MAX2871 lo(66.0);
     lo.attachHal(&mock);
 
     // Fill shadow registers with known dummy values...
