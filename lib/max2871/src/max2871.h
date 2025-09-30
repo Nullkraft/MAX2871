@@ -51,6 +51,22 @@ public:
   uint8_t getDirtyMask() const { return _dirtyMask; }
   inline void markDirty(uint8_t reg) { _dirtyMask |= static_cast<uint8_t>(1UL << reg); } // compiler truncates to 8 bits
 
+  // --- Bitfield helpers ---
+
+  // Return a mask covering bits [bit_lo : bit_hi], inclusive.
+  // Example: bitMask(12, 5) -> 0b00011111100000
+  static inline uint32_t bitMask(uint8_t bit_hi, uint8_t bit_lo) {
+      if (bit_hi > 31 || bit_lo > bit_hi) return 0;
+      return ((0xFFFFFFFFu >> (31 - (bit_hi - bit_lo))) << bit_lo);
+  }
+
+  // Return 'value' aligned into field [bit_lo : bit_hi], with other bits zero.
+  // Example: fieldValue(0b101, 7, 5) -> 0b00000000000000000000001010000000
+  static inline uint32_t fieldValue(uint32_t value, uint8_t bit_hi, uint8_t bit_lo) {
+      if (bit_hi > 31 || bit_lo > bit_hi) return 0;
+      uint32_t mask = bitMask(bit_hi, bit_lo);
+      return (value << bit_lo) & mask;
+  }
 
   // ---- State ----
   max2871Registers Curr;  // Shadow registers
