@@ -153,28 +153,28 @@ void MAX2871::updateRegisters() {
 }
 
 void MAX2871::setRegisterField(uint8_t reg, uint8_t bit_hi, uint8_t bit_lo, uint32_t value) {
+    // Clamp field so we never touch the register address bits [2:0].
+    if (bit_lo < 3) bit_lo = 3;
+
+    // --- Input validation ---
     if (reg > 6 || bit_hi > 31 || bit_lo > bit_hi) return;
 
-    // Preserve the lowest 3 bits (register address)
+    // Preserve register address (3 LSBs)
     const uint32_t REG_ADDR_MASK = 0x7; // bits [2:0]
     uint32_t oldVal = Curr.Reg[reg];
 
-    // Clamp field to avoid touching bits [2:0]
-    if (bit_lo < 3) bit_lo = 3;
-    if (bit_lo > bit_hi) return; // nothing to update if below addr bits
+    uint32_t mask = bitMask(bit_hi, bit_lo);
 
-    const uint32_t width = (uint32_t)(bit_hi - bit_lo + 1);
-    // const uint32_t fieldMask = ((width == 32) ? 0xFFFFFFFFu : ((1UL << width) - 1UL)) << bit_lo;
-    const uint32_t fieldMask = ((width == 32) ? 0xFFFFFFFF : ((1UL << width) - 1UL)) << bit_lo;
+    // Insert new value into the target bitfield
+    uint32_t newVal = (oldVal & ~mask) | fieldValue(value, bit_hi, bit_lo);
 
-    uint32_t newVal = (oldVal & ~fieldMask) | ((value << bit_lo) & fieldMask);
+    // Preserve the register address bits
+    newVal = (newVal & ~REG_ADDR_MASK) | (oldVal & REG_ADDR_MASK);
 
-    // Re-impose correct register index on [2:0]
-    newVal = (newVal & ~REG_ADDR_MASK) | (reg & REG_ADDR_MASK);
-
+    // Only write if something actually changed
     if (newVal != oldVal) {
         Curr.Reg[reg] = newVal;
-        _dirtyMask |= (uint8_t)(1UL << reg);
+        _dirtyMask |= (1 << reg);  // mark this register for update
     }
 }
 
