@@ -86,13 +86,32 @@ double MAX2871::fmn2freq() {
 // ---- Output Control ----
 
 void MAX2871::outputSelect(uint8_t sel) {
-    // TODO: modify R[4] bits to enable A/B outputs
     // sel: 0=off, 1=A, 2=B, 3=both
+    // R4[8] disables RFoutB when set, R4[5] disables RFoutA when set.
+    // We write those single-bit fields via setRegisterField so the dirty bit is set.
+    // R4[8] = 0 => B enabled; =1 => B disabled
+    uint32_t disableB = (sel == 2 || sel == 3) ? 0u : 1u;
+    // R4[5] = 0 => A enabled; =1 => A disabled
+    uint32_t disableA = (sel == 1 || sel == 3) ? 0u : 1u;
+
+    setRegisterField(4, 8, 8, disableB); // R4 bit 8
+    setRegisterField(4, 5, 5, disableA); // R4 bit 5
 }
 
 void MAX2871::outputPower(int dBm) {
-    // TODO: adjust R[4] power level bits
     // Valid values: -4, -1, +2, +5 dBm
+    // R4[7:6] selects RFoutB power level (2-bit field).
+    uint32_t code = 0;
+    switch (dBm) {
+        case -4: code = 0u; break;
+        case -1: code = 1u; break;
+        case  2: code = 2u; break;
+        case  5: code = 3u; break;
+        default:
+            // invalid value - ignore request (could alternatively clamp or assert)
+            return;
+    }
+    setRegisterField(4, 7, 6, code); // write the 2-bit power field into R4
 }
 
 // ---- Mode Control ----
