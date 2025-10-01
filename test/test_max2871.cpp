@@ -8,6 +8,9 @@
 // Shared test object
 MAX2871 lo(66.0);  // Reference clock = 66 MHz
 float tolerance = 0.002;        // +/- 1 kHz
+constexpr uint8_t NUM_REGS = 7;
+static uint32_t defaultCurr[NUM_REGS];
+static bool defaultCurrInited = false;
 
 // --- Unity Test Fixtures ---
 void setUp(void) {
@@ -20,7 +23,25 @@ void setUp(void) {
 
 void tearDown(void) {}
 
+// Capture defaultCurr from lo the first time it's available
+static void capture_default_Curr_if_needed(MAX2871 &lo) {
+    if (defaultCurrInited) return;
+    for (int i = 0; i < NUM_REGS; ++i) {
+        defaultCurr[i] = lo.Curr.Reg[i];
+    }
+    defaultCurrInited = true;
+}
 
+// Reset lo.Curr.Reg from the saved default snapshot
+static void reset_Curr_from_default(MAX2871 &lo) {
+    for (int i = 0; i < NUM_REGS; ++i) lo.Curr.Reg[i] = defaultCurr[i];
+}
+
+// Return bitwise difference between lo.Curr.Reg[idx] and defaultCurr[idx]
+// (1 bits indicate fields that changed)
+static uint32_t reg_diff(MAX2871 &lo, int idx) {
+    return (lo.Curr.Reg[idx] ^ defaultCurr[idx]);
+}
 
 // --- Round-trip Test for Known Case ---
 void test_round_trip_known(void) {
@@ -188,6 +209,72 @@ void test_updateRegisters_mixed_dirty_with_R4_forces_R0(void) {
     TEST_ASSERT_EQUAL_UINT8(0, lo.getDirtyMask());
 }
 
+void test_outputSelect_marks_R4_only_and_sets_expected_bits(void) {
+    MockHAL mock;
+    MAX2871 lo(66.0);
+    lo.attachHal(&mock);
+
+    // Capture default snapshot once, then restore it for this test
+    capture_default_Curr_if_needed(lo);
+    reset_Curr_from_default(lo);
+
+    // write the baseline into the mock then clear writes so we start clean
+    lo.setAllRegisters();
+    // mock.clearWrites();
+
+    // Act: change output select (example: select A)
+    lo.outputSelect(1);
+
+    // Assert: only R4 should be dirty
+    TEST_ASSERT_EQUAL_UINT8((1u << 4), lo.getDirtyMask());
+
+    // Apply change to HW
+    lo.updateRegisters();
+
+    // One write for R4 and forced R0 write expected
+    TEST_ASSERT_EQUAL_INT(2, mock.writeCount);
+
+    // Use regDiff to examine what changed in R4 relative to baseline
+    uint32_t d = (mock.regWrites[0] ^ defaultCurr[4]); // or regDiff(lo,4) after updateRegisters()
+
+    // Specific expectations: R4[8] set (disableB) and R4[5] clear (enableA)
+    TEST_ASSERT_TRUE( (d & (1u << 8)) != 0 );  // bit8 flipped
+    TEST_ASSERT_TRUE( (d & (1u << 5)) == 0 );  // bit5 not flipped compared to baseline
+
+    // Verify forced R0 write equals baseline R0
+    TEST_ASSERT_EQUAL_HEX32(defaultCurr[0], mock.regWrites[1]);
+}
+
+void test_outputPower_marks_R4_only_and_sets_power_bits(void) {
+    MockHAL mock;
+    MAX2871 lo(66.0);
+    lo.attachHal(&mock);
+
+    capture_default_Curr_if_needed(lo);
+    reset_Curr_from_default(lo);
+    lo.setAllRegisters();
+    // mock.clearWrites();
+
+    // Act: set power to +2 dBm (example)
+    lo.outputPower(+2);
+
+    TEST_ASSERT_EQUAL_UINT8((1u << 4), lo.getDirtyMask());
+    lo.updateRegisters();
+    TEST_ASSERT_EQUAL_INT(2, mock.writeCount);
+
+    // Find differences in R4 vs baseline
+    uint32_t d = (mock.regWrites[0] ^ defaultCurr[4]);
+
+    // R4[7:6] should have changed to 0b10 for +2 dBm
+    uint32_t newPower = (mock.regWrites[0] >> 6) & 0x3;
+    uint32_t oldPower = (defaultCurr[4] >> 6) & 0x3;
+    TEST_ASSERT_EQUAL_UINT32(2u, newPower);
+    TEST_ASSERT_TRUE(newPower != oldPower);
+
+    // Check forced R0 write equals baseline R0
+    TEST_ASSERT_EQUAL_HEX32(defaultCurr[0], mock.regWrites[1]);
+}
+
 void runAllTests(void) {
     UNITY_BEGIN();
     RUN_TEST(test_round_trip_known);
@@ -201,6 +288,8 @@ void runAllTests(void) {
     RUN_TEST(test_updateRegisters_writes_only_dirty_in_descending_order);
     RUN_TEST(test_updateRegisters_rewrites_R0_when_R4_dirty);
     RUN_TEST(test_updateRegisters_mixed_dirty_with_R4_forces_R0);
+    RUN_TEST(test_outputSelect_marks_R4_only_and_sets_expected_bits);
+    RUN_TEST(test_outputPower_marks_R4_only_and_sets_power_bits);
     UNITY_END();
 }
 
