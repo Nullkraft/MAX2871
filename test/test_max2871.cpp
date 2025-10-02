@@ -4,6 +4,7 @@
 #include "max2871.h"
 #include <unity.h>
 #include "mock_hal.h"
+#include <stdio.h>
 
 // Shared test object
 MAX2871 lo(66.0);  // Reference clock = 66 MHz
@@ -30,6 +31,14 @@ static void capture_default_Curr_if_needed(MAX2871 &lo) {
         defaultCurr[i] = lo.Curr.Reg[i];
     }
     defaultCurrInited = true;
+}
+
+static void print_registers(void) {
+    char buf[128];
+    for (int regAddr = 0; regAddr <= 6; ++regAddr) {
+        snprintf(buf, sizeof(buf), "reg[%d]=0x%08X", regAddr, lo.Curr.Reg[regAddr]);
+        TEST_MESSAGE(buf);
+    }
 }
 
 // Reset lo.Curr.Reg from the saved default snapshot
