@@ -87,13 +87,14 @@ void MAX2871::outputSelect(uint8_t sel) {
     // sel: 0=off, 1=A, 2=B, 3=both
     // R4[8] disables RFoutB when set, R4[5] disables RFoutA when set.
     // We write those single-bit fields via setRegisterField so the dirty bit is set.
-    // R4[8] = 0 => B enabled; =1 => B disabled
-    uint32_t disableB = (sel == 2 || sel == 3) ? 0u : 1u;
+    // R4[8] == 1 => B enabled; == 0 => B disabled
+    uint32_t disableB = (sel == 2 || sel == 3) ? 1u : 0u;
     // R4[5] = 0 => A enabled; =1 => A disabled
-    uint32_t disableA = (sel == 1 || sel == 3) ? 0u : 1u;
+    uint32_t disableA = (sel == 1 || sel == 3) ? 1u : 0u;
 
     setRegisterField(4, 8, 8, disableB); // R4 bit 8
     setRegisterField(4, 5, 5, disableA); // R4 bit 5
+    _dirtyMask |= 1u << 4;   // Mark register 4 for write to chip
 }
 
 void MAX2871::outputPower(int dBm) {
