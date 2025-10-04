@@ -12,13 +12,17 @@ class MAX2871 : public I_PLLSynthesizer {
       0x40017FE1,  // R[1] M = Bits[14:3]
       0x80005F42,  // R[2] Digital Lock detect OFF
       0x04009F23,  // R[3] Fast Lock enabled
-      0x638E83C4,  // R[4] RFout_B enabled @ +5dBm / RFout_A disabled
+      0x638E83FC,  // R[4] RFout A and B enabled at +5 dBm
       0x00400005,  // R[5]
       0x98005F42   // R[6] Digital Lock detect ON
     };
   } max2871Registers;
 
 public:
+  // ---- JUNK Delete Me When Done ----
+  uint32_t print_val1 = 0;
+  uint32_t print_val2 = 0;
+
   // ---- Construction / Init ----
   MAX2871() : first_init(true) {}   // MAX2871 requires 2 initial programming cycles
   MAX2871(double refIn);
