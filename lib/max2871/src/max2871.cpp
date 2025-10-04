@@ -181,8 +181,7 @@ void MAX2871::updateRegisters() {
 }
 
 void MAX2871::setRegisterField(uint8_t reg, uint8_t bit_hi, uint8_t bit_lo, uint32_t value) {
-    // Reverse bit_lo and bit_hi if they are backwards
-    // bit_lo must always be less than or equal to bit_hi
+    // Swap bit_lo and bit_hi if bit_lo is higher than bit_hi
     if (bit_lo > bit_hi) {
         uint8_t bit_temp = bit_hi;
         bit_hi = bit_lo;
@@ -190,9 +189,9 @@ void MAX2871::setRegisterField(uint8_t reg, uint8_t bit_hi, uint8_t bit_lo, uint
     }
 
     /* --- Input validation ---
-     * bit_lo : Lowest register bit is 3 (bits 2:0 reserved for register address)
-     * bit_hi : Highest register bit is 31 (registers are 32 bits)
-     * reg    : There are 7 registers (register 0 to 6)
+     * bit_lo : 3 or higher (2:0 reserved for register address)
+     * bit_hi : 31 or lower (registers are 32 bits)
+     * reg    : 7 registers (0 to 6)
     */
     if (bit_lo < 3 || bit_hi > 31 || reg > 6) return;
 
