@@ -186,8 +186,6 @@ void MAX2871::setRegisterField(uint8_t reg, uint8_t bit_hi, uint8_t bit_lo, uint
     */
     if (bit_lo < 3 || bit_hi > 31 || reg > 6) return;
 
-    // Preserve register address (3 LSBs)
-    const uint32_t REG_ADDR_MASK = 0x7; // bits [2:0]
     uint32_t oldVal = Curr.Reg[reg];
 
     // Clear oldVal bit range before inserting (ANDing) new values
