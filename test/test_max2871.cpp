@@ -306,7 +306,9 @@ void runAllTests(void) {
 // --- Entry Point for Both Runners ---
 #ifdef ARDUINO
 void setup() {
+    // important: start Serial before tests so PlatformIO can read the stream
     Serial.begin(115200);
+    // give uploader/host time to settle (uploader briefly owns the port)
     delay(2000);
     runAllTests();
 }
