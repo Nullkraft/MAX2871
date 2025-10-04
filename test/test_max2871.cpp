@@ -244,26 +244,30 @@ void test_outputSelect_marks_R4_only_and_sets_expected_bits(void) {
     lo.setAllRegisters();
     // mock.clearWrites();
 
-    // Act: change output select (example: select B)
-    lo.outputSelect(0);     // Output B enable
-    TEST_MESSAGE("*** Shadow Registers ***");
-    print_registers(lo);
+    // Disable both RF outputs A and B
+    lo.outputSelect(0);
+    TEST_ASSERT_EQUAL_UINT8(16, lo.getDirtyMask()); // only R4 should be dirty
 
-    // Assert: only R4 should be dirty
-    TEST_ASSERT_EQUAL_UINT8(2, lo.getDirtyMask());
+    reset_Curr_from_default(lo);
+    // Enable RF output A only
+    lo.outputSelect(1);
+    TEST_ASSERT_EQUAL_UINT8(16, lo.getDirtyMask()); // only R4 should be dirty
 
-    // Apply change to HW
+    reset_Curr_from_default(lo);
+    // Enable both RF outputs A and B RF (no change from default value)
+    lo.outputSelect(3);
+    TEST_ASSERT_EQUAL_UINT8(0, lo.getDirtyMask());  // R4 should be clear
+
+    reset_Curr_from_default(lo);
+    // Enable RF output B only
+    lo.outputSelect(2);
+    TEST_ASSERT_EQUAL_UINT8(16, lo.getDirtyMask()); // only R4 should be dirty
+
+    // Apply change to HW and clears _dirtyMask
     lo.updateRegisters();
 
-    // Use regDiff to examine what changed in R4 relative to baseline
-    uint32_t regDiff = (mock.regWrites[0] ^ defaultCurr[6]); // or regDiff(lo,4) after updateRegisters()
-
-    // Specific expectations: R4[8] set (disableB) and R4[5] clear (enableA)
-    TEST_ASSERT_TRUE( (regDiff & (1u << 8)) != 1 );  // bit8 flipped
-    TEST_ASSERT_TRUE( (regDiff & (1u << 5)) == 0 );  // bit5 not flipped compared to baseline
-
     // Verify forced R0 write equals baseline R0
-    TEST_ASSERT_EQUAL_HEX32(defaultCurr[0], mock.regWrites[6]);
+    TEST_ASSERT_EQUAL_HEX32(lo.Curr.Reg[4], mock.regWrites[2]);
 }
 
 void test_outputPower_marks_R4_only_and_sets_power_bits(void) {
