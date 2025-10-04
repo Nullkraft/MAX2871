@@ -226,6 +226,12 @@ void test_updateRegisters_mixed_dirty_with_R4_forces_R0(void) {
 }
 
 void test_outputSelect_marks_R4_only_and_sets_expected_bits(void) {
+    /* Before the test calls outputSelect()...
+     * 1) By default both outputs are enabled, outputSelect(3)
+     * 2) When outputSelect(3) is called it won't flag Reg[4]
+     *    as dirty because there is no change to the default
+     *    register value.
+     */
     MockHAL mock;
     MAX2871 lo(66.0);
     lo.attachHal(&mock);
