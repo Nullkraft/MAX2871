@@ -84,17 +84,27 @@ double MAX2871::fmn2freq() {
 // ---- Output Control ----
 
 void MAX2871::outputSelect(uint8_t sel) {
-    // sel: 0=off, 1=A, 2=B, 3=both
-    // R4[8] disables RFoutB when set, R4[5] disables RFoutA when set.
-    // We write those single-bit fields via setRegisterField so the dirty bit is set.
-    // R4[8] == 1 => B enabled; == 0 => B disabled
-    uint32_t disableB = (sel == 2 || sel == 3) ? 1u : 0u;
-    // R4[5] = 0 => A enabled; =1 => A disabled
-    uint32_t disableA = (sel == 1 || sel == 3) ? 1u : 0u;
+    /* R4[8] disables RFoutB when 0, R4[5] disables RFoutA when 0.
+     * R4[8] == 1 when B enabled; R4[8] == 0 when B disabled
+     *
+     *  sel |  A  |  B  |
+     * -----+-----+-----+
+     *   0  | off | off |
+     * -----+-----+-----+
+     *   1  | off | on  |
+     * -----+-----+-----+
+     *   2  |  on | off |
+     * -----+-----+-----+
+     *   3  |  on |  on |
+     * -----+-----+-----+
+    */
+    uint32_t enableB = (sel == 2 || sel == 3) ? 1u : 0u;
+    // R4[5] = 1 => A enabled; R4[5] = 0 => A disabled
+    uint32_t enableA = (sel == 1 || sel == 3) ? 1u : 0u;
 
-    setRegisterField(4, 8, 8, disableB); // R4 bit 8
-    setRegisterField(4, 5, 5, disableA); // R4 bit 5
-    _dirtyMask |= 1u << 4;   // Mark register 4 for write to chip
+    // Writing bits via setRegisterField so the dirty bits are set
+    setRegisterField(4, 8, 8, enableB); // R4 bit 8
+    setRegisterField(4, 5, 5, enableA); // R4 bit 5
 }
 
 void MAX2871::outputPower(int dBm) {
