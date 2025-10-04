@@ -47,7 +47,7 @@ static void print_registers(MAX2871 &lo) {
 
 static void print_hex(uint32_t val) {
     char buf[128];
-    snprintf(buf, sizeof(buf), "0x%x", val);
+    snprintf(buf, sizeof(buf), "0x%08X", val);
     TEST_MESSAGE(buf);
 }
 
