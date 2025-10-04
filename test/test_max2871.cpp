@@ -53,7 +53,10 @@ static void print_hex(uint32_t val) {
 
 // Reset lo.Curr.Reg from the saved default snapshot
 static void reset_Curr_from_default(MAX2871 &lo) {
-    for (int i = 0; i < NUM_REGS; ++i) lo.Curr.Reg[i] = defaultCurr[i];
+    for (int i = 0; i < NUM_REGS; ++i) {
+        lo.Curr.Reg[i] = defaultCurr[i];
+    }
+    lo.clearDirtyMask();
 }
 
 // --- Round-trip Test for Known Case ---
