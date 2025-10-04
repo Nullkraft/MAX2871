@@ -4,10 +4,8 @@
 
 MAX2871::MAX2871(double refIn) 
     : refInHz(refIn), hal(nullptr), _lePin(0), first_init(true), _dirtyMask(0) {
-    // Initialize shadow registers to defaults
-    for (int i = 0; i < Curr.numRegisters; i++) {
-        Curr.Reg[i] = Curr.Reg[i];  // already initialized in struct
-    }
+        // Shadown registers already initialized in struct
+        // Could we move the initialization to here...
 }
 
 void MAX2871::begin(uint8_t lePin) {
