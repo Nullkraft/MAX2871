@@ -8,7 +8,7 @@ class MockHAL : public HAL {
 public:
     static const int LOG_SIZE = 16;
     uint32_t writeLog[LOG_SIZE];
-    static constexpr uint8_t MAX_WRITES = 32;
+    static constexpr uint8_t MAX_WRITES = 7;
     uint32_t regWrites[MAX_WRITES];
     uint8_t writeCount = 0;
 
