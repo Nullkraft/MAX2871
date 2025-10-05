@@ -5,7 +5,8 @@
 #include "I_PLLSynthesizer.h"   // Common PLL interface
 
 class MAX2871 : public I_PLLSynthesizer {
-  typedef struct maxRegisters {
+public:
+  struct max2871Registers {
     static constexpr uint8_t numRegisters = 7;
     uint32_t Reg[numRegisters] = {
       0x001D47B0,  // R[0] N = Bits[30:15], F = Bits[14:3]
@@ -16,9 +17,8 @@ class MAX2871 : public I_PLLSynthesizer {
       0x00400005,  // R[5]
       0x98005F42   // R[6] Digital Lock detect ON
     };
-  } max2871Registers;
+  };
 
-public:
   // ---- JUNK Delete Me When Done ----
   uint32_t print_val1 = 0;
   uint32_t print_val2 = 0;
