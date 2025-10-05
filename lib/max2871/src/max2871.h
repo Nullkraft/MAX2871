@@ -8,33 +8,28 @@ class MAX2871 : public I_PLLSynthesizer {
 public:
   struct max2871Registers {
     static constexpr uint8_t numRegisters = 7;
-    uint32_t Reg[numRegisters] = {
-      0x001D47B0,  // R[0] N = Bits[30:15], F = Bits[14:3]
-      0x40017FE1,  // R[1] M = Bits[14:3]
-      0x80005F42,  // R[2] Digital Lock detect OFF
-      0x04009F23,  // R[3] Fast Lock enabled
-      0x638E83FC,  // R[4] RFout A and B enabled at +5 dBm
-      0x00400005,  // R[5]
-      0x98005F42   // R[6] Digital Lock detect ON
-    };
+    uint32_t Reg[numRegisters];
   };
 
   // ---- JUNK Delete Me When Done ----
   uint32_t print_val1 = 0;
   uint32_t print_val2 = 0;
 
-  // ---- Construction / Init ----
-  MAX2871() : first_init(true) {}   // MAX2871 requires 2 initial programming cycles
-  MAX2871(double refIn);
+  // public members
+  HAL* hal = nullptr;
 
-  void attachHal(HAL* halPtr) override;
-  void begin(uint8_t lePin) override;   // new: init with LE pin
+  // ---- Construction / Init ----
+  explicit MAX2871(double refIn);
+  MAX2871() = delete;                                     // Disallow empty constructor
+
+  void attachHal(HAL* halPtr) override {hal = halPtr;}
+  void begin(uint8_t lePin) override;                     // new: init with LE pin
 
   // ---- Frequency Control ----
-  void setFrequency(double freqMHz) override;              // calculates FMN+DIVA
-  void setFrequency(uint32_t fmn, uint8_t diva) override;  // bypass math
-  void freq2FMN(float target_freq_MHz);                    // calculate F,M,N,DIVA
-  double fmn2freq();                                       // reverse calc
+  void setFrequency(double freqMHz) override;             // calculates FMN+DIVA
+  void setFrequency(uint32_t fmn, uint8_t diva) override; // bypass math
+  void freq2FMN(float target_freq_MHz);                   // calculate F,M,N,DIVA
+  double fmn2freq();                                      // reverse calc
 
   // ---- Output Control ----
   void outputSelect(uint8_t sel) override;   // A, B, both, or off
@@ -50,6 +45,7 @@ public:
   void writeRegister(uint32_t value);
   void setAllRegisters();
   void updateRegisters();
+  void resetToDefaultRegisters();
   void setRegisterField(uint8_t reg, uint8_t bit_hi, uint8_t bit_lo, uint32_t value);
   uint32_t getRegister(uint8_t reg) const { return Curr.Reg[reg]; }
   uint8_t getDirtyMask() const { return _dirtyMask; }
@@ -74,7 +70,10 @@ public:
   }
 
   // ---- State ----
-  max2871Registers Curr;  // Shadow registers
+  // Read-only default registers (for dev and reset() only)
+  static const max2871Registers defaultRegisters;
+  // Working copy of registers (mutable shadow registers)
+  max2871Registers Curr;
 
   // Frequency divider values
   uint32_t Frac;  

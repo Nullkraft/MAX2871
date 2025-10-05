@@ -22,15 +22,6 @@ void setUp(void) {
 
 void tearDown(void) {}
 
-// Capture defaultCurr from lo the first time it's available
-static void capture_default_Curr_if_needed(MAX2871 &lo) {
-    if (defaultCurrInited) return;
-    for (int i = 0; i < NUM_REGS; ++i) {
-        defaultCurr[i] = lo.Curr.Reg[i];
-    }
-    defaultCurrInited = true;
-}
-
 static void print_register(MAX2871 &lo, uint8_t regAddr) {
     char buf[128];
     snprintf(buf, sizeof(buf), "reg[%d]=0x%08X", regAddr, lo.Curr.Reg[regAddr]);
@@ -47,14 +38,6 @@ static void print_hex(uint32_t val) {
     char buf[128];
     snprintf(buf, sizeof(buf), "0x%08X", val);
     TEST_MESSAGE(buf);
-}
-
-// Reset lo.Curr.Reg from the saved default snapshot
-static void reset_Curr_from_default(MAX2871 &lo) {
-    for (int i = 0; i < NUM_REGS; ++i) {
-        lo.Curr.Reg[i] = defaultCurr[i];
-    }
-    lo.clearDirtyMask();
 }
 
 // --- Round-trip Test for Known Case ---

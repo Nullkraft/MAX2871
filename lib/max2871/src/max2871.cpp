@@ -1,11 +1,22 @@
 #include "max2871.h"
 
+// ---- Static read-only defaults ----
+const MAX2871::max2871Registers MAX2871::defaultRegisters = {{
+    // note: double braces: struct { array { ... } }
+    0x001D47B0, // R0
+    0x40017FE1, // R1
+    0x80005F42, // R2
+    0x04009F23, // R3
+    0x638E83FC, // R4
+    0x00400005, // R5
+    0x98005F42  // R6
+}};
+
 // ---- Construction ----
 
+/* hal defaults to nullptr */
 MAX2871::MAX2871(double refIn) 
-    : refInHz(refIn), hal(nullptr), _lePin(0), first_init(true), _dirtyMask(0) {
-        // Shadown registers already initialized in struct
-        // Could we move the initialization to here...
+    : refInHz(refIn), _lePin(0), first_init(true), _dirtyMask(0) {
 }
 
 void MAX2871::begin(uint8_t lePin) {
@@ -14,10 +25,8 @@ void MAX2871::begin(uint8_t lePin) {
         hal->pinMode(_lePin, PINMODE_OUTPUT);
         hal->digitalWrite(_lePin, PINLEVEL_HIGH); // idle high
     }
-}
-
-void MAX2871::attachHal(HAL* halptr) {
-    hal = halptr;
+    resetToDefaultRegisters();  // Fill the working (shadow) registers
+    first_init = false;
 }
 
 // ---- Frequency Control ----
@@ -178,6 +187,12 @@ void MAX2871::updateRegisters() {
             }
         }
     }
+}
+
+// Reset working copy of registers, Curr, from the defaultRegisters
+void MAX2871::resetToDefaultRegisters() {
+    Curr = defaultRegisters;
+    _dirtyMask = 0;
 }
 
 void MAX2871::setRegisterField(uint8_t reg, uint8_t bit_hi, uint8_t bit_lo, uint32_t value) {
