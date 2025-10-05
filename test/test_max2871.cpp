@@ -9,9 +9,7 @@
 // Shared test object
 MAX2871 lo(66.0);  // Reference clock = 66 MHz
 float tolerance = 0.002;        // +/- 1 kHz
-constexpr uint8_t NUM_REGS = 7;
-static uint32_t defaultCurr[NUM_REGS];
-static bool defaultCurrInited = false;
+constexpr uint8_t NUM_REGS = MAX2871::max2871Registers::numRegisters;
 
 // --- Unity Test Fixtures ---
 void setUp(void) {
