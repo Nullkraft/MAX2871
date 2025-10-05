@@ -267,7 +267,13 @@ void test_outputSelect_marks_R4_only_and_sets_expected_bits(void) {
     lo.updateRegisters();
 
     // Verify forced R0 write equals baseline R0
-    TEST_ASSERT_EQUAL_HEX32(lo.Curr.Reg[4], mock.regWrites[2]);
+    TEST_ASSERT_EQUAL_HEX32(defaultCurr[4], mock.regWrites[2]);
+    /* defaultCurr[] is not supposed to be used in any functions,
+     * tests, or calculations. It's a one-time copy so lo.Curr.Reg[]
+     * can be restored to its original, operational, default state.
+     * That way it could be used to reset the hardware to a known
+     * good state.
+    */
 }
 
 void test_outputPower_marks_R4_only_and_sets_power_bits(void) {
