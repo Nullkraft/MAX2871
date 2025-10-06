@@ -83,65 +83,18 @@ public:
   double Fpfd;
   int R;
 
-  // Reference clock input frequency and phase detector frequency
-  double refInHz;
-  double fpfdHz;
-
 private:
-  // HAL + control
-  HAL* hal = nullptr;
-  uint8_t _lePin;
+  // control
+  double refInHz;                   // Reference clock input frequency
+  double fpfdHz;                    // phase detector frequency
+  uint8_t _lePin;                   // Per-device chip select pin
   bool first_init;
   uint8_t _dirtyMask = 0;
-
-  // 6 bits of Embedded Data from serial Specific Command
-  static constexpr short Data_Mask = 0x3F;
-  
-  // 12 bits R[1] bits [14:3] for Modulus values, M
-  #define M_set 0x7FF8
-  #define M_clr 0xFFFF8007
-  
-  // 12 bits R[0] bits [14:3] for Frequency division value, F
-  #define F_set 0x7FF8
-  #define F_clr 0xFFFF8007
-  
-  // 8 bits R[0] bits [22:15] for Integer counter, N
-  #define N_set 0x7F8000
-  #define N_clr 0xFFFF8007
-  
-  // 20 bits R[0] bits [22:3] for combining N and F
-  #define NF_set 0x7FFFF8
-  #define NF_clr 0xFF800007
-  
-  // R4[8] and R4[5] disable RFoutB and RFoutA
-  static constexpr uint32_t RFpower_off = 0xFFFFFE07;
-
-  // R4[7:6] Adjust the RFoutB power level. (RFoutA is off by default)
-  static constexpr uint32_t Power_Level_Mask = RFpower_off;
-
-  // RFoutB power levels
-  static constexpr uint32_t neg4dBm = 0x100;
-  static constexpr uint32_t neg1dBm = 0x140;
-  static constexpr uint32_t pos2dBm = 0x180;
-  static constexpr uint32_t pos5dBm = 0x1C0;
-
-  // R4[22:20] Set the RFOut Divider Mode
-  #define RFOUT_DIV_MASK 0xFF8FFFFF
-  
-  
-  /*****  ----------------------- NOTE: --------------------------  *****/
-  /***** | Enabling Tristate, Mux_Set_TRI, automatically disables | *****/
-  /***** | Digital Lock Detect, Mux_Set_DLD, and vice versa.      | *****/
-  /*****  --------------------------------------------------------  *****/
-
-  static constexpr uint32_t Mux_Set_TRI = 0xE3FFFFFF;
-  static constexpr uint32_t Mux_Set_DLD = 0x18000000;
-
   uint32_t spiMaxSpeed = 20000000;  // 20 MHz
 
   // Private helpers
   void spiWrite(uint32_t value);
-  void latch();
+  void selectChip();
 };
 
 #endif
