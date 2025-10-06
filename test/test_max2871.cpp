@@ -22,19 +22,19 @@ void setUp(void) {
 
 void tearDown(void) {}
 
-static void print_register(MAX2871 &lo, uint8_t regAddr) {
+__attribute__((unused)) static void print_register(MAX2871 &lo, uint8_t regAddr) {
     char buf[128];
     snprintf(buf, sizeof(buf), "reg[%d]=0x%08X", regAddr, lo.Curr.Reg[regAddr]);
     TEST_MESSAGE(buf);
 }
 
-static void print_registers(MAX2871 &lo) {
+__attribute__((unused)) static void print_registers(MAX2871 &lo) {
     for (int regAddr = 0; regAddr <= 6; ++regAddr) {
         print_register(lo, regAddr);
     }
 }
 
-static void print_hex(uint32_t val) {
+__attribute__((unused)) static void print_hex(uint32_t val) {
     char buf[128];
     snprintf(buf, sizeof(buf), "0x%08X", val);
     TEST_MESSAGE(buf);
