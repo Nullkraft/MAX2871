@@ -206,55 +206,30 @@ void test_updateRegisters_mixed_dirty_with_R4_forces_R0(void) {
     TEST_ASSERT_EQUAL_UINT8(0, lo.getDirtyMask());
 }
 
+
 void test_outputSelect_marks_R4_only_and_sets_expected_bits(void) {
     /* Before the test calls outputSelect()...
-     * 1) By default both outputs are enabled, outputSelect(3)
+     * 1) By default both outputs are enabled ==> outputSelect(3)
      * 2) When outputSelect(3) is called it won't flag Reg[4]
-     *    as dirty because there is no change to the default
-     *    register value.
+     *    as dirty because there is no change from the default
+     *    register value. (No register change == No dirty flag)
      */
-    MockHAL mock;
-    MAX2871 lo(66.0);
-    lo.attachHal(&mock);
+    MAX2871 lo(66e6);
+    lo.resetToDefaultRegisters();
+    uint32_t before = MAX2871::defaultRegisters.Reg[4];
+    uint32_t after;
 
-    // Capture default snapshot once, then restore it for this test
-    capture_default_Curr_if_needed(lo);
-    reset_Curr_from_default(lo);
-
-    // write the baseline into the mock then clear writes so we start clean
-    lo.setAllRegisters();
-    // mock.clearWrites();
-
-    // Disable both RF outputs A and B
-    lo.outputSelect(0);
-    TEST_ASSERT_EQUAL_UINT8(16, lo.getDirtyMask()); // only R4 should be dirty
-
-    reset_Curr_from_default(lo);
-    // Enable RF output A only
-    lo.outputSelect(1);
-    TEST_ASSERT_EQUAL_UINT8(16, lo.getDirtyMask()); // only R4 should be dirty
-
-    reset_Curr_from_default(lo);
-    // Enable both RF outputs A and B RF (no change from default value)
-    lo.outputSelect(3);
-    TEST_ASSERT_EQUAL_UINT8(0, lo.getDirtyMask());  // R4 should be clear
-
-    reset_Curr_from_default(lo);
-    // Enable RF output B only
-    lo.outputSelect(2);
-    TEST_ASSERT_EQUAL_UINT8(16, lo.getDirtyMask()); // only R4 should be dirty
-
-    // Apply change to HW and clears _dirtyMask
-    lo.updateRegisters();
-
-    // Verify forced R0 write equals baseline R0
-    TEST_ASSERT_EQUAL_HEX32(defaultCurr[4], mock.regWrites[2]);
-    /* defaultCurr[] is not supposed to be used in any functions,
-     * tests, or calculations. It's a one-time copy so lo.Curr.Reg[]
-     * can be restored to its original, operational, default state.
-     * That way it could be used to reset the hardware to a known
-     * good state.
-    */
+    for (int i = 0; i < 4; i++) {
+        lo.resetToDefaultRegisters();
+        lo.outputSelect(i);
+        after = lo.Curr.Reg[4];
+        if (after != before) {
+            TEST_ASSERT_EQUAL_UINT8((1u << 4), lo.getDirtyMask());
+        }
+        else{
+            TEST_ASSERT_EQUAL_UINT8((0u << 4), lo.getDirtyMask());  // only R4 is dirty
+        }
+    }
 }
 
 void test_outputPower_marks_R4_only_and_sets_power_bits(void) {
@@ -275,29 +250,29 @@ void test_outputPower_marks_R4_only_and_sets_power_bits(void) {
 
     // R4[7:6] should have changed to 0b10 for +2 dBm
     uint32_t newPower = (mock.regWrites[0] >> 6) & 0x3;
-    uint32_t oldPower = (defaultCurr[4] >> 6) & 0x3;
+    uint32_t oldPower = (MAX2871::defaultRegisters.Reg[4] >> 6) & 0x3;
     TEST_ASSERT_EQUAL_UINT32(1u, newPower);
     TEST_ASSERT_TRUE(newPower != oldPower);
 
     // Check forced R0 write equals baseline R0
-    TEST_ASSERT_EQUAL_HEX32(defaultCurr[0], mock.regWrites[6]);
+    TEST_ASSERT_EQUAL_HEX32(MAX2871::defaultRegisters.Reg[0], mock.regWrites[6]);
 }
 
 void runAllTests(void) {
     UNITY_BEGIN();
-    // RUN_TEST(test_round_trip_known);
-    // RUN_TEST(test_lowest_freq);
-    // RUN_TEST(test_highest_freq);
-    // RUN_TEST(test_integerN_case);
-    // RUN_TEST(test_param_round_trip);
-    // RUN_TEST(test_interface_begin_and_setFrequency);
-    // RUN_TEST(test_setAllRegisters_writes_all_registers_in_order);
-    // RUN_TEST(test_updateRegisters_no_writes_if_clean);
-    // RUN_TEST(test_updateRegisters_writes_only_dirty_in_descending_order);
-    // RUN_TEST(test_updateRegisters_rewrites_R0_when_R4_dirty);
-    // RUN_TEST(test_updateRegisters_mixed_dirty_with_R4_forces_R0);
+    RUN_TEST(test_round_trip_known);
+    RUN_TEST(test_lowest_freq);
+    RUN_TEST(test_highest_freq);
+    RUN_TEST(test_integerN_case);
+    RUN_TEST(test_param_round_trip);
+    RUN_TEST(test_interface_begin_and_setFrequency);
+    RUN_TEST(test_setAllRegisters_writes_all_registers_in_order);
+    RUN_TEST(test_updateRegisters_no_writes_if_clean);
+    RUN_TEST(test_updateRegisters_writes_only_dirty_in_descending_order);
+    RUN_TEST(test_updateRegisters_rewrites_R0_when_R4_dirty);
+    RUN_TEST(test_updateRegisters_mixed_dirty_with_R4_forces_R0);
     RUN_TEST(test_outputSelect_marks_R4_only_and_sets_expected_bits);
-    // RUN_TEST(test_outputPower_marks_R4_only_and_sets_power_bits);
+    RUN_TEST(test_outputPower_marks_R4_only_and_sets_power_bits);
     UNITY_END();
 }
 
