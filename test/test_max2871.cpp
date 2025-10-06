@@ -237,8 +237,7 @@ void test_outputPower_marks_R4_only_and_sets_power_bits(void) {
     MAX2871 lo(66.0);
     lo.attachHal(&mock);
 
-    capture_default_Curr_if_needed(lo); // This needs to move to setUp() for all the tests
-    reset_Curr_from_default(lo);        // Start with a fresh copy of default registers
+    lo.resetToDefaultRegisters();
     lo.setAllRegisters();               // Writes all registers to mock
     // mock.clearWrites();
 
