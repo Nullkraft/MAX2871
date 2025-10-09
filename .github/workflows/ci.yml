@@ -1,38 +1,73 @@
-name: PlatformIO CI
+name: CI (PlatformIO + Arduino CLI)
 
 on:
   push:
   pull_request:
 
 jobs:
-  native-build-test:
+  # ---------------------------
+  # 1) Fast host-side tests with PlatformIO (MockHAL / native)
+  # ---------------------------
+  pio-native:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: '3.11'
 
       - name: Install PlatformIO
-        run: pip install platformio
+        run: pip install --upgrade platformio
 
-      - name: Run native tests
-        run: pio test -e native
+      - name: Cache PlatformIO
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.platformio/.cache
+            ~/.platformio/packages
+            ~/.platformio/platforms
+            ~/.platformio/penv
+          key: pio-${{ runner.os }}-${{ hashFiles('**/platformio.ini') }}
 
-  uno-build-test:
+      - name: Test (native only)
+        run: pio test -e native -v
+
+  # ---------------------------
+  # 2) Arduino CLI build for UNO (Arduino-toolchain validation)
+  # ---------------------------
+  arduino-cli-uno:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.11"
+      - name: Install Arduino CLI
+        uses: arduino/setup-arduino-cli@v2
 
-      - name: Install PlatformIO
-        run: pip install platformio
+      - name: Install cores & libs
+        run: |
+          arduino-cli core update-index
+          arduino-cli core install arduino:avr
+          # arduino-cli lib install <YourLibraryDepsIfAny>   # if you have Arduino-IDE style deps
 
-      - name: Build Uno firmware (tests included)
-        run: pio test -e uno --without-uploading
+      # If your repo is an Arduino *library*, compile an example; if it's a sketch repo, compile the sketch root.
+      - name: Compile for UNO (choose the right path)
+        run: |
+          # Option A (library repo): compile an example sketch
+          # arduino-cli compile --fqbn arduino:avr:uno examples/ci_smoke
+          #
+          # Option B (sketch repo): compile the sketch at the repo root
+          arduino-cli compile --fqbn arduino:avr:uno .
+
+  # # ---------------------------
+  # # 3) (Optional) arduino_ci: Docker-based library checks
+  # #    - Useful if you publish an Arduino library and want extra validation
+  # # ---------------------------
+  # arduino-ci:
+  #   if: false # flip to 'true' or remove this line to enable
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: Arduino-CI/action@v0.1.6
+  #       # By default it builds examples and runs unit tests if configured.
