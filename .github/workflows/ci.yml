@@ -50,10 +50,12 @@ jobs:
           arduino-cli core update-index
           arduino-cli core install arduino:avr
 
-      # If your repo is an Arduino *library*, compile an example; if it's a sketch repo, compile the sketch root.
-      - name: Compile for UNO (choose the right path)
+      # If your repo is an Arduino *library*, compile an example; if it's a sketch repo.
+      - name: Compile example for Arduino CLI
         run: |
-          arduino-cli compile --fqbn arduino:avr:uno .
+          arduino-cli core update-index
+          arduino-cli core install arduino:avr
+          arduino-cli compile --fqbn arduino:avr:uno examples/ci_smoke
 
   # # ---------------------------
   # # 3) (Optional) arduino_ci: Docker-based library checks
