@@ -49,15 +49,10 @@ jobs:
         run: |
           arduino-cli core update-index
           arduino-cli core install arduino:avr
-          # arduino-cli lib install <YourLibraryDepsIfAny>   # if you have Arduino-IDE style deps
 
       # If your repo is an Arduino *library*, compile an example; if it's a sketch repo, compile the sketch root.
       - name: Compile for UNO (choose the right path)
         run: |
-          # Option A (library repo): compile an example sketch
-          # arduino-cli compile --fqbn arduino:avr:uno examples/ci_smoke
-          #
-          # Option B (sketch repo): compile the sketch at the repo root
           arduino-cli compile --fqbn arduino:avr:uno .
 
   # # ---------------------------
