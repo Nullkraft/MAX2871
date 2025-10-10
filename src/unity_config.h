@@ -241,4 +241,33 @@
  */
 /* #define UNITY_INCLUDE_EXEC_TIME */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void unityOutputStart(unsigned long baudrate);
+void unityOutputChar(unsigned int c);
+void unityOutputFlush(void);
+void unityOutputComplete(void);
+
+#ifdef __cplusplus
+}
+#endif
+
+#ifndef UNITY_OUTPUT_START
+#define UNITY_OUTPUT_START() unityOutputStart((unsigned long)115200)
+#endif
+
+#ifndef UNITY_OUTPUT_CHAR
+#define UNITY_OUTPUT_CHAR(c) unityOutputChar((unsigned int)(c))
+#endif
+
+#ifndef UNITY_OUTPUT_FLUSH
+#define UNITY_OUTPUT_FLUSH() unityOutputFlush()
+#endif
+
+#ifndef UNITY_OUTPUT_COMPLETE
+#define UNITY_OUTPUT_COMPLETE() unityOutputComplete()
+#endif
+
 #endif /* UNITY_CONFIG_H */
