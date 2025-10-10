@@ -20,16 +20,16 @@ public:
 
   // ---- Construction / Init ----
   explicit MAX2871(double refIn);
-  MAX2871() = delete;                                     // Disallow empty constructor
+  MAX2871() = delete;                                       // Disallow empty constructor
 
   void attachHal(HAL* halPtr) override {hal = halPtr;}
-  void begin(uint8_t lePin) override;                     // new: init with LE pin
+  void begin(uint8_t lePin) override;                       // new: init with LE pin
 
   // ---- Frequency Control ----
-  void setFrequency(double freqMHz) override;             // calculates FMN+DIVA
-  void setFrequency(uint32_t fmn, uint8_t diva) override; // bypass math
-  void freq2FMN(float target_freq_MHz);                   // calculate F,M,N,DIVA
-  double fmn2freq();                                      // reverse calc
+  void setFrequency(double freqMHz) override;               // calculates FMN+DIVA
+  void setFrequency(uint32_t fmn, uint8_t diva) override;   // bypass math
+  void freq2FMN(float target_freq_MHz);                     // calculate F,M,N,DIVA
+  double fmn2freq();                                        // reverse calc
 
   // ---- Output Control ----
   void outputSelect(uint8_t sel) override;   // A, B, both, or off
@@ -76,7 +76,7 @@ public:
   max2871Registers Curr;
 
   // Frequency divider values
-  uint32_t Frac;  
+  uint32_t Frac;
   uint16_t M;
   uint16_t N;
   uint8_t DIVA;

@@ -32,9 +32,17 @@ void MAX2871::begin(uint8_t lePin) {
 // ---- Frequency Control ----
 
 void MAX2871::setFrequency(double freqMHz) {
-    // TODO: call freq2FMN() to calculate F, M, N, DIVA
-    // TODO: update shadow registers with those values
-    // TODO: program chip via writeRegister/setAllRegisters
+    uint8_t diva = 1;
+    freq2FMN(freqMHz);
+    while (freqMHz < 3000) {
+        freqMHz *= 2;
+        diva *= 2;
+    }
+    setRegisterField(4, 22, 20, diva);
+    setRegisterField(1, 14, 3, M);
+    setRegisterField(0, 14, 3, Frac);
+    setRegisterField(0, 30, 15, N);
+    updateRegisters();
 }
 
 void MAX2871::setFrequency(uint32_t fmn, uint8_t diva) {
