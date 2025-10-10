@@ -1,7 +1,7 @@
 #if defined(PIO_UNIT_TESTING)
 // Unit tests supply their own entry points; nothing to do here.
 
-#elif defined(ARDUINO) && !defined(CI_SMOKE_BUILD)
+#elif defined(ARDUINO) && defined(MAX2871_STANDALONE)
 #include <Arduino.h>
 
 // Minimal sketch required so the Arduino core links successfully.
