@@ -24,7 +24,7 @@ void tearDown(void) {}
 
 __attribute__((unused)) static void print_register(MAX2871 &lo, uint8_t regAddr) {
     char buf[128];
-    snprintf(buf, sizeof(buf), "reg[%d]=0x%08X", regAddr, lo.Curr.Reg[regAddr]);
+    snprintf(buf, sizeof(buf), "reg[%d]=0x%08lX", regAddr, lo.Curr.Reg[regAddr]);
     TEST_MESSAGE(buf);
 }
 
@@ -36,7 +36,7 @@ __attribute__((unused)) static void print_registers(MAX2871 &lo) {
 
 __attribute__((unused)) static void print_hex(uint32_t val) {
     char buf[128];
-    snprintf(buf, sizeof(buf), "0x%08X", val);
+    snprintf(buf, sizeof(buf), "0x%08lX", val);
     TEST_MESSAGE(buf);
 }
 
