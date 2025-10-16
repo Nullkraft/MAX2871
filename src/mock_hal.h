@@ -23,12 +23,6 @@ public:
         }
     }
 
-    void ioWriteRegister(uint32_t value) override {
-       if (writeCount < MAX_WRITES) {
-            regWrites[writeCount++] = value;
-        }
-     }
-
     void logRegister(uint32_t value) {
         if (writeCount < LOG_SIZE) {
             writeLog[writeCount++] = value;

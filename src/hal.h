@@ -28,7 +28,6 @@ public:
 
     // MAX2871-specific extras
     virtual void spiWriteRegister(uint32_t value) = 0;  // convenience
-    virtual void ioWriteRegister(uint32_t value) = 0;
     virtual void setCEPin(bool enable) = 0;
     virtual bool readMuxout() = 0;
 };
