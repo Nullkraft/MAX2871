@@ -12,6 +12,8 @@ public:
 
     void begin(uint32_t spiHz = 20000000UL) {
         _spiHz = spiHz;
+        _cp = A1;
+        _dp = A2;
         ::pinMode(_le, OUTPUT);
         ::digitalWrite(_le, HIGH);    // LE Pin active-low
         if (_ce != 0xFF) {
@@ -52,6 +54,27 @@ public:
         SPI.endTransaction();
     }
 
+    void ioWriteRegister(uint32_t value) override {
+                    // uint8_t _dp = A2;
+                    // uint8_t _cp = A1;
+                    // uint8_t _le = A3;
+        digitalWrite(_le, PINLEVEL_LOW);
+        shiftOut(_dp, _cp, MSBFIRST, value >> 24);
+        shiftOut(_dp, _cp, MSBFIRST, value >> 16);
+        shiftOut(_dp, _cp, MSBFIRST, value >> 8);
+        shiftOut(_dp, _cp, MSBFIRST, value);
+        delayMicroseconds(10);
+        digitalWrite(_le, PINLEVEL_HIGH);
+        delayMicroseconds(10);
+        digitalWrite(_le, PINLEVEL_LOW);
+        // for (int i = 0; i < 100; i++) {
+        //     digitalWrite(_le, PINLEVEL_HIGH);
+        //     delay(1);
+        //     digitalWrite(_le, PINLEVEL_LOW);
+        //     delay(1);
+        // }
+    }
+
     void setCEPin(bool enable) override {
         if (_ce != 0xFF) {
             ::digitalWrite(_ce, enable ? HIGH : LOW);
@@ -65,6 +88,8 @@ public:
 
 private:
     uint8_t _le;
+    uint8_t _cp;
+    uint8_t _dp;
     uint8_t _ce;
     uint8_t _mux;
     uint32_t _spiHz = 20000000UL;

@@ -88,14 +88,15 @@ void test_set_freq_100MHz_for_scope(void) {
 
 void test_set_freq_66MHz_for_scope(void) {
     // Keep SPI already begun/attached from the prior test, but safe to repeat:
-    hal.begin(4000000UL);
+    hal.begin(20000000UL);
     lo.attachHal(&hal);
-    // No need to call begin() again if your driver doesn’t require it; harmless if you do:
-    // lo.begin(A3);
-    enable_outputs_for_scope();
-
+    lo.resetToDefaultRegisters();
+    print_registers(lo);
     // Program ~66.00 MHz
     lo.setFrequency(66.0);
+    TEST_MESSAGE("*** after set frequency ***");
+    print_registers(lo);
+    lo.setAllRegisters();   // program the chip
 
     TEST_MESSAGE("Set MAX2871 to ~66.000 MHz. Check RFOUTA/B on the scope.");
     delay(3000);
