@@ -5,7 +5,7 @@
 #include <unity.h>
 
 #include "max2871.h"
-#include "hal_arduino.h"
+#include "arduino_hal.h"
 
 // ==== Wiring & config ====
 static constexpr uint8_t PIN_LE  = A3;   // MAX2871 LE (latch)
@@ -89,8 +89,7 @@ void test_set_freq_66MHz_for_scope(void) {
     // Keep SPI already begun/attached from the prior test, but safe to repeat:
     hal.begin(20000000UL);
     lo.attachHal(&hal);
-    lo.resetToDefaultRegisters();
-    print_registers(lo);
+    lo.begin(PIN_LE);
     // Program ~66.00 MHz
     lo.setFrequency(66.0);
     TEST_MESSAGE("*** after set frequency ***");

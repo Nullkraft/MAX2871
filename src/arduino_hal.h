@@ -1,5 +1,5 @@
-#ifndef HAL_ARDUINO_H
-#define HAL_ARDUINO_H
+#ifndef ARDUINO_HAL_H
+#define ARDUINO_HAL_H
 
 #include <Arduino.h>
 #include <SPI.h>
@@ -74,4 +74,4 @@ private:
     uint32_t _spiHz = 20000000UL;
 };
 
-#endif // HAL_ARDUINO_H
+#endif // ARDUINO_HAL_H
