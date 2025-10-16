@@ -27,7 +27,6 @@ __attribute__((unused)) static void print_register(MAX2871 &lo, uint8_t regAddr)
 }
 
 __attribute__((unused)) static void print_registers(MAX2871 &lo) {
-    uint32_t reg;
     for (int regAddr = 0; regAddr <= 6; ++regAddr) {
         print_register(lo, regAddr);
     }
