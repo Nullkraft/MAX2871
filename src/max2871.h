@@ -34,6 +34,7 @@ public:
   // ---- Output Control ----
   void outputSelect(uint8_t sel) override;   // A, B, both, or off
   void outputPower(int dBm) override;        // -4, -1, +2, +5 dBm
+  void outputEnable(uint8_t rfEn) override;  // Enable RF output
 
   // ---- Mode Control ----
   void mode(uint8_t type) override;          // 0=int-N, 1=frac-N
@@ -88,6 +89,7 @@ private:
   double refInHz;                   // Reference clock input frequency
   double fpfdHz;                    // phase detector frequency
   uint8_t _lePin;                   // Per-device chip select pin
+  uint8_t _rfEnPin;
   bool first_init;
   uint8_t _dirtyMask = 0;
   uint32_t spiMaxSpeed = 20000000;  // 20 MHz

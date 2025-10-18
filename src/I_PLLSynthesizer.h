@@ -23,6 +23,7 @@ public:
     //  Output Control 
     virtual void outputSelect(uint8_t sel) = 0;   // A, B, both, or off
     virtual void outputPower(int dBm) = 0;        // -4, -1, +2, +5 dBm
+    virtual void outputEnable(uint8_t rfEn) = 0;  // Enable RF output
 
     //  Mode Control 
     virtual void mode(uint8_t type) = 0;          // 0=int-N, 1=frac-N

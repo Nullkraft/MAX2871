@@ -248,3 +248,10 @@ void MAX2871::selectChip() {
         hal->digitalWrite(_lePin, PINLEVEL_HIGH);
     }
 }
+
+void MAX2871::outputEnable(uint8_t rfEn) {
+    if (hal) {
+        hal->pinMode(rfEn, PINMODE_OUTPUT);
+        hal->digitalWrite(rfEn, PINLEVEL_HIGH);
+    }
+}
