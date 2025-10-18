@@ -1,11 +1,12 @@
 *~
 *csv
 
-docs/
 .pio/
 .vscode/
-
+.venv_max2871/
 .editorconfig
+
+docs/
 include/
-venv_max2871/
+
 README
