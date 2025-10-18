@@ -2,14 +2,13 @@
 
 // ---- Static read-only defaults ----
 const MAX2871::max2871Registers MAX2871::defaultRegisters = {{
-    // note: double braces: struct { array { ... } }
-    0x001D47B0, // R0
-    0x40017FE1, // R1
-    0x80005F42, // R2
-    0x04009F23, // R3
-    0x638E83FC, // R4
-    0x00400005, // R5
-    0x98005F42  // R6
+    0x001A8008,  // Register 0 - Contains F and parts of N
+    0x40010019,  // Register 1 - Contains M
+    0x98005F42,  // Register 2 - Digital Lock Detect (DLD) on
+    0x00001F23,  // Register 3
+    0x63EE81FC,  // Register 4
+    0x00400005,  // Register 5
+    0x98005F42   // Register 6
 }};
 
 // ---- Construction ----
