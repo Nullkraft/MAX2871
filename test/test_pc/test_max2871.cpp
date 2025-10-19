@@ -206,7 +206,6 @@ void test_updateRegisters_mixed_dirty_with_R4_forces_R0(void) {
     TEST_ASSERT_EQUAL_UINT8(0, lo.getDirtyMask());
 }
 
-
 void test_outputSelect_marks_R4_only_and_sets_expected_bits(void) {
     /* Before the test calls outputSelect()...
      * 1) By default both outputs are enabled ==> outputSelect(3)

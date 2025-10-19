@@ -4,15 +4,8 @@
 
 #include <stdint.h>
 
-enum PinMode {
-    PINMODE_INPUT,
-    PINMODE_OUTPUT
-};
-
-enum PinLevel {
-    PINLEVEL_LOW = 0,
-    PINLEVEL_HIGH = 1
-};
+enum PinMode { PINMODE_INPUT, PINMODE_OUTPUT };
+enum PinLevel { PINLEVEL_LOW = 0, PINLEVEL_HIGH = 1 };
 
 class HAL {
 public:
@@ -29,6 +22,12 @@ public:
     // MAX2871-specific extras
     virtual void spiWriteRegister(uint32_t value) = 0;  // convenience
     virtual void setCEPin(bool enable) = 0;
+
+    /* Q. Shouldn't readMuxout() also be in MAX2871?
+     * A. No! It's a HAL method that MAX2871 uses internally
+     * via isLocked(). Exposing it would break abstraction
+     * and separation of concerns.
+     */
     virtual bool readMuxout() = 0;
 };
 
