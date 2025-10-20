@@ -51,44 +51,14 @@ void outputEnable(uint8_t rfEn) {
     digitalWrite(rfEn, PINLEVEL_HIGH);
 }
 
-// Program a single register of the selected LO by sending and latching 4 bytes
-void spiWriteLO(uint32_t reg, uint8_t selectPin) {
-    digitalWrite(selectPin, LOW);
-    shiftOut(PIN_DAT, PIN_CLK, MSBFIRST, reg >> 24);
-    shiftOut(PIN_DAT, PIN_CLK, MSBFIRST, reg >> 16);
-    shiftOut(PIN_DAT, PIN_CLK, MSBFIRST, reg >> 8);
-    shiftOut(PIN_DAT, PIN_CLK, MSBFIRST, reg);
-    delayMicroseconds(10);
-    digitalWrite(selectPin, HIGH);
-    delayMicroseconds(10);
-    digitalWrite(selectPin, LOW);
-}
-
-void writeToRegisters(uint8_t csPin) {
-    hal.spiWriteRegister(lo.Curr.Reg[5]);    // First we program LO Register 5
-    // delay(20);  // wait 20 mSec for MAX2871 internal capacitors to charge
-    hal.spiWriteRegister(lo.Curr.Reg[4]); // Program remaining registers
-    hal.spiWriteRegister(lo.Curr.Reg[3]); // Program remaining registers
-    hal.spiWriteRegister(lo.Curr.Reg[2]); // Program remaining registers
-    hal.spiWriteRegister(lo.Curr.Reg[1]); // Program remaining registers
-    hal.spiWriteRegister(lo.Curr.Reg[0]); // Program remaining registers
-    // delay(1);                               // Short delay before reading Register 6
-    // hal.spiWriteRegister(lo.Curr.Reg[6], csPin);  // Tri-stating the mux output disables LO2 lock detect
-}
-
 void test_init_chip_50MHz_for_scope(void) {
     lo.attachHal(&hal);
     hal.begin();
     lo.begin(PIN_LE);
     // Program ~50.00 MHz
     // lo.setFrequency(50.0);
-    writeToRegisters(PIN_LE);
+    lo.setAllRegisters();
     outputEnable(5);
-
-    // for (int i = 5; i >= 0; --i) {
-    //     hal.ioWriteRegister(lo.Curr.Reg[i]);   // program the chip
-    //     print_hex(lo.Curr.Reg[i]);
-    // }
     print_registers(lo);
     TEST_MESSAGE("Set MAX2871 to ~66.000 MHz. Check RFOUTA/B on the scope.");
     // delay(5000);

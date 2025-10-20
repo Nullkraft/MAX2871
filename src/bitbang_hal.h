@@ -34,11 +34,10 @@ public:
         ::digitalWrite(pin, val == PINLEVEL_HIGH ? HIGH : LOW);
     }
 
-    // Optional helper for 32-bit register
-    void ioWriteRegister(uint32_t value) {
+    void spiWriteRegister(uint32_t regVal) override {
         digitalWrite(pinLE, PINLEVEL_LOW);
         for (int i = 31; i >= 0; --i) {
-            digitalWrite(pinDATA, static_cast<PinLevel>(((value >> i) & 1)));
+            digitalWrite(pinDATA, static_cast<PinLevel>((regVal >> i) & 1));
             digitalWrite(pinCLK, PINLEVEL_HIGH);
             delayMicroseconds(1);
             digitalWrite(pinCLK, PINLEVEL_LOW);
@@ -46,9 +45,6 @@ public:
         digitalWrite(pinLE, PINLEVEL_HIGH);
         delayMicroseconds(1);
         digitalWrite(pinLE, PINLEVEL_LOW);
-    }
-
-    void spiWriteRegister(uint32_t regVal) override {
     }
 
     // Unused virtual functions
