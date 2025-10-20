@@ -51,10 +51,18 @@ void outputEnable(uint8_t rfEn) {
     digitalWrite(rfEn, PINLEVEL_HIGH);
 }
 
+// --- Round-trip Test for Known Case ---
+void test_round_trip_known(void) {
+    float tolerance = 0.002;        // +/- 1 kHz
+    double freq = 42.00;
+    lo.setFrequency(freq);  // Set the frequency by calculating Frac, M, and N
+    lo.freq2FMN(freq);      // Get calculated frequency from on Frac, M, and N
+    TEST_ASSERT_FLOAT_WITHIN(tolerance, freq, lo.fmn2freq());
 }
 
 int runUnityTests() {
     UNITY_BEGIN();
+    RUN_TEST(test_round_trip_known);
     return UNITY_END();
 }
 
