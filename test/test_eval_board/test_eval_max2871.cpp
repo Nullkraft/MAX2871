@@ -61,7 +61,6 @@ void test_init_chip_50MHz_for_scope(void) {
     outputEnable(5);
     print_registers(lo);
     TEST_MESSAGE("Set MAX2871 to ~66.000 MHz. Check RFOUTA/B on the scope.");
-    // delay(5000);
     TEST_PASS();
 }
 
