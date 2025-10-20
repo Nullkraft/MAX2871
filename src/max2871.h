@@ -95,7 +95,6 @@ private:
 
   // Private helpers
   void spiWrite(uint32_t value);
-  void selectChip();
 };
 
 #endif

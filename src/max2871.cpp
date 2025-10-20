@@ -241,10 +241,3 @@ void MAX2871::spiWrite(uint32_t value) {
     // TODO: split 32-bit into 4 bytes, call hal->spiTransfer() for each
     // then toggle selectChip()
 }
-
-void MAX2871::selectChip() {
-    if (hal) {
-        hal->digitalWrite(_lePin, PINLEVEL_LOW);
-        hal->digitalWrite(_lePin, PINLEVEL_HIGH);
-    }
-}
