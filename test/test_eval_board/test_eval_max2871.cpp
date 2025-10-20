@@ -51,22 +51,10 @@ void outputEnable(uint8_t rfEn) {
     digitalWrite(rfEn, PINLEVEL_HIGH);
 }
 
-void test_init_chip_50MHz_for_scope(void) {
-    lo.attachHal(&hal);
-    hal.begin();
-    lo.begin(PIN_LE);
-    // Program ~50.00 MHz
-    // lo.setFrequency(50.0);
-    lo.setAllRegisters();
-    outputEnable(5);
-    print_registers(lo);
-    TEST_MESSAGE("Set MAX2871 to ~66.000 MHz. Check RFOUTA/B on the scope.");
-    TEST_PASS();
 }
 
 int runUnityTests() {
     UNITY_BEGIN();
-    RUN_TEST(test_init_chip_50MHz_for_scope);
     return UNITY_END();
 }
 
