@@ -19,11 +19,6 @@ MAX2871::MAX2871(double refIn)
 }
 
 void MAX2871::begin(uint8_t lePin) {
-    _lePin = lePin;
-    if (hal) {
-        hal->pinMode(_lePin, PINMODE_OUTPUT);
-        hal->digitalWrite(_lePin, PINLEVEL_HIGH); // idle high
-    }
     resetToDefaultRegisters();  // Fill the working (shadow) registers
     first_init = false;
 }
