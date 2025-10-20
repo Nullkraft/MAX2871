@@ -68,6 +68,10 @@ int runUnityTests() {
 
 void setup() {
     delay(2000);     // give serial monitor time to connect
+    hal.begin();
+    lo.attachHal(&hal);
+    lo.begin(PIN_LE);
+    outputEnable(5);
     runUnityTests();
 }
 
