@@ -28,13 +28,9 @@ void MAX2871::begin(uint8_t lePin) {
 void MAX2871::setFrequency(double freqMHz) {
     uint8_t diva = 1;
     freq2FMN(freqMHz);
-    while (freqMHz < 3000) {
-        freqMHz *= 2;
-        diva *= 2;
-    }
-    setRegisterField(4, 22, 20, diva);
-    setRegisterField(1, 14, 3, M);
-    setRegisterField(0, 14, 3, Frac);
+    setRegisterField(4, 22, 20, DIVA);
+    setRegisterField(1, 14,  3, M);
+    setRegisterField(0, 14,  3, Frac);
     setRegisterField(0, 30, 15, N);
     updateRegisters();
 }
