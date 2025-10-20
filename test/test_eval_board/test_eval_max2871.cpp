@@ -46,6 +46,11 @@ __attribute__((unused)) static void print_hex(uint32_t val) {
     TEST_MESSAGE(buf);
 }
 
+void outputEnable(uint8_t rfEn) {
+    pinMode(rfEn, PINMODE_OUTPUT);
+    digitalWrite(rfEn, PINLEVEL_HIGH);
+}
+
 // Program a single register of the selected LO by sending and latching 4 bytes
 void spiWriteLO(uint32_t reg, uint8_t selectPin) {
     digitalWrite(selectPin, LOW);
@@ -78,7 +83,7 @@ void test_init_chip_50MHz_for_scope(void) {
     // Program ~50.00 MHz
     // lo.setFrequency(50.0);
     writeToRegisters(PIN_LE);
-    lo.outputEnable(5);
+    outputEnable(5);
 
     // for (int i = 5; i >= 0; --i) {
     //     hal.ioWriteRegister(lo.Curr.Reg[i]);   // program the chip
