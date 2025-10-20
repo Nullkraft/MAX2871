@@ -49,7 +49,7 @@ public:
     void spiBegin() {}
     void spiTransfer(uint8_t data) {}
     void setCEPin(bool enable) {}
-    bool readMuxout() { return true; }
+    bool readMuxout() { return true; }      // TODO: Implement testing muxOut
 };
 
 #endif
