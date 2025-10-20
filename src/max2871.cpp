@@ -126,7 +126,9 @@ void MAX2871::outputPower(int dBm) {
             // invalid value - ignore request (could alternatively clamp or assert)
             return;
     }
-    setRegisterField(4, 7, 6, code); // write the 2-bit power field into R4
+    setRegisterField(4, 7, 6, code); // write the 2-bit Port B power field into R4
+    setRegisterField(4, 4, 3, code); // write the 2-bit Port A power field into R4
+    updateRegisters();
 }
 
 // ---- Mode Control ----

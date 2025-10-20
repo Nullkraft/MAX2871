@@ -60,9 +60,18 @@ void test_round_trip_known(void) {
     TEST_ASSERT_FLOAT_WITHIN(tolerance, freq, lo.fmn2freq());
 }
 
+void test_set_RF_output_power_level(void) {
+    float tolerance = 0.002;        // +/- 1 kHz
+    double freq = 42.00;
+    lo.setFrequency(freq);  // Set the frequency by calculating Frac, M, and N
+    delay(3000);
+    lo.outputPower(-4);
+}
+
 int runUnityTests() {
     UNITY_BEGIN();
     RUN_TEST(test_round_trip_known);
+    RUN_TEST(test_set_RF_output_power_level);
     return UNITY_END();
 }
 
