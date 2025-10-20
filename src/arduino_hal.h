@@ -1,3 +1,9 @@
+/* arduino_hal.h
+   (Spectrum Analyzer Production board)
+
+   Communicates from Arduino to max2871 over the SPI bus
+ */
+
 #ifndef ARDUINO_HAL_H
 #define ARDUINO_HAL_H
 

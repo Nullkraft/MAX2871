@@ -1,4 +1,9 @@
-// #ifndef ARDUINO
+/* test_eval_max2871.cpp
+    (MAX2871 DIY Evaluation board)
+
+    Provides a platform for programming and testing the operation
+    of the max2871 PLL Synthesizer chip.
+ */
 #ifdef ARDUINO
 
 #include <Arduino.h>
@@ -15,7 +20,7 @@ static constexpr uint8_t PIN_CLK = A1;      // MAX2871 CLK (clock)
 static constexpr uint8_t PIN_MUX = A0;      // MAX2871 MUXOUT (read-only)
 static constexpr double  REF_MHZ = 60.0;    // Reference Clock (MHz)
 
-// CE is tied HIGH on your board, so pass 0xFF to ArduinoHAL so it won't touch it.
+// CE is tied HIGH on the evaluation board
 static BitBangHAL hal(PIN_CLK, PIN_DAT, PIN_LE);
 static MAX2871 lo(REF_MHZ);
 

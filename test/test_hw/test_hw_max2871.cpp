@@ -12,7 +12,7 @@ static constexpr uint8_t PIN_LE  = A3;   // MAX2871 LE (latch)
 static constexpr uint8_t PIN_MUX = A0;   // MAX2871 MUXOUT (read-only)
 static constexpr double  REF_MHZ = 66.0; // your reference MHz
 
-// CE is tied HIGH on your board, so pass 0xFF to ArduinoHAL so it won't touch it.
+// CE is tied HIGH on evaluation board
 static ArduinoHAL hal(PIN_LE, 0xFF /*CE unused*/, PIN_MUX);
 static MAX2871 lo(REF_MHZ);
 

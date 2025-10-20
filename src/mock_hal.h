@@ -1,4 +1,9 @@
-// mock_hal.h (Arduino-safe)
+/* mock_hal.h (Arduino-safe)
+   (Implements fake calls to hardware)
+
+   Fakes communication
+ */
+
 #ifndef MOCK_HAL_H
 #define MOCK_HAL_H
 

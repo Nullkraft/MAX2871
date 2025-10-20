@@ -1,3 +1,9 @@
+/* bitbang_hal.h
+   (MAX2871 DIY Evaluation board)
+
+   Communicates from Arduino to max2871 using IO pins
+ */
+
 #ifndef BITBANG_HAL_H
 #define BITBANG_HAL_H
 

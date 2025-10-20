@@ -1,4 +1,14 @@
-// hal.h
+/* hal.h
+    (Hardware Abstraction Layer)
+    Purpose: Allows the use of different hardware platforms/communication methods
+    without changing your code. It abstracts HOW you communicate with the chip:
+
+    ArduinoHAL - Uses Arduino's hardware SPI peripheral
+    BitBangHAL - Uses bit-banging on GPIO pins (software SPI)
+    MockHAL - Fake hardware for testing on PC
+
+    All talking to the SAME chip (MAX2871), just different ways to send bits!
+ */
 #ifndef HAL_H
 #define HAL_H
 
@@ -23,11 +33,7 @@ public:
     virtual void spiWriteRegister(uint32_t value) = 0;  // convenience
     virtual void setCEPin(bool enable) = 0;
 
-    /* Q. Shouldn't readMuxout() also be in MAX2871?
-     * A. No! It's a HAL method that MAX2871 uses internally
-     * via isLocked(). Exposing it would break abstraction
-     * and separation of concerns.
-     */
+    // Method that MAX2871::isLocked() uses internally
     virtual bool readMuxout() = 0;
 };
 

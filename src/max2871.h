@@ -2,7 +2,7 @@
 #define _MAX2871_
 
 #include <math.h>
-#include "I_PLLSynthesizer.h"   // Common PLL interface
+#include "I_PLLSynthesizer.h"   // Common PLL interface (#includes HAL)
 
 class MAX2871 : public I_PLLSynthesizer {
 public:
