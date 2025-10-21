@@ -67,7 +67,8 @@ static void enable_outputs_for_scope() {
     // If your API mapping is: 0=Off,1=A,2=B,3=Both (per your earlier tests)
     lo.outputSelect(3);      // both outputs ON
     // If your mapping is 0=-4dBm, 1=-1dBm, 2=+2dBm, 3=+5dBm (from earlier work):
-    lo.outputPower(2);       // +2 dBm is a safe middle level for most scopes
+    lo.outputPower(+5, lo.RFOUTA);       // +2 dBm is a safe middle level for most scopes
+    lo.outputPower(+5, lo.RFOUTB);
 }
 
 void test_set_freq_100MHz_for_scope(void) {

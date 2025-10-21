@@ -30,7 +30,7 @@ public:
 
     //  Output Control 
     virtual void outputSelect(uint8_t sel) = 0;     // A, B, both, or off
-    virtual void outputPower(int dBm) = 0;          // -4, -1, +2, +5 dBm
+    virtual void outputPower(int dBm, uint8_t port) = 0;  // -4, -1, +2, +5 dBm
 
     //  Mode Control 
     virtual void mode(uint8_t type) = 0;            // 0=int-N, 1=frac-N

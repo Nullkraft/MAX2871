@@ -61,11 +61,8 @@ void test_round_trip_known(void) {
 }
 
 void test_set_RF_output_power_level(void) {
-    float tolerance = 0.002;        // +/- 1 kHz
-    double freq = 42.00;
-    lo.setFrequency(freq);  // Set the frequency by calculating Frac, M, and N
-    delay(3000);
-    lo.outputPower(-4);
+    lo.setFrequency(42.00);  // Set 42MHz by calculating Frac, M, and N
+    lo.outputPower(-4, lo.RFOUTA);
 }
 
 int runUnityTests() {
