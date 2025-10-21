@@ -1,5 +1,4 @@
 #include "max2871.h"
-#include <unity.h>
 
 // ---- Static read-only defaults ----
 const MAX2871::max2871Registers MAX2871::defaultRegisters = {{
@@ -173,7 +172,6 @@ void MAX2871::updateRegisters() {
     bool forceR0 = (_dirtyMask & (1UL << 4)) != 0;
 
     if (first_init) {
-        TEST_MESSAGE("*** First init ***");
         // First cycle: Special startup sequence
         writeRegister(Curr.Reg[5]);
         if (hal) hal->delayMs(20);
