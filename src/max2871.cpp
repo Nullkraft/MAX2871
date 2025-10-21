@@ -113,9 +113,9 @@ void MAX2871::outputSelect(uint8_t sel) {
     setRegisterField(4, 5, 5, enableA); // R4 bit 5
 }
 
-void MAX2871::outputPower(int dBm) {
-    // Valid values: -4, -1, +2, +5 dBm
-    // R4[7:6] selects RFoutB power level (2-bit field).
+void MAX2871::outputPower(int dBm, uint8_t port) {
+    // dBm:     Valid values: -4, -1, +2, +5 dBm
+    // port:    Power Level - R4[7:6] sets RFoutB and R4[4:3] sets RFoutA
     uint32_t code = 0;
     switch (dBm) {
         case -4: code = 0u; break;
@@ -123,11 +123,14 @@ void MAX2871::outputPower(int dBm) {
         case  2: code = 2u; break;
         case  5: code = 3u; break;
         default:
-            // invalid value - ignore request (could alternatively clamp or assert)
-            return;
+            return; // invalid value - leave power level unchanged
     }
-    setRegisterField(4, 7, 6, code); // write the 2-bit Port B power field into R4
-    setRegisterField(4, 4, 3, code); // write the 2-bit Port A power field into R4
+    if (port == 1 || port == 3) {
+        setRegisterField(4, 4, 3, code); // write the Port A power level into R4[4:3]
+    }
+    if (port == 2 || port == 3) {
+        setRegisterField(4, 7, 6, code); // write the Port B power level into R4[7:6]
+    }
     updateRegisters();
 }
 

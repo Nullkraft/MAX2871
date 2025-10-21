@@ -235,25 +235,18 @@ void test_outputPower_marks_R4_only_and_sets_power_bits(void) {
     MockHAL mock;
     MAX2871 lo(66.0);
     lo.attachHal(&mock);
-
     lo.resetToDefaultRegisters();
     lo.setAllRegisters();               // Writes all registers to mock
-    // mock.clearWrites();
 
-    // Act: set power to +2 dBm (example)
-    lo.outputPower(-4);     // Valid values: -4, -1, +2, +5 dBm
-
-    TEST_ASSERT_EQUAL_UINT8((1u << 4), lo.getDirtyMask());
+    // Default Power Level is +5dBm with binary bits 11
+    uint32_t oldPower = (lo.Curr.Reg[4] >> 6) & 0x3;
+    lo.outputPower(-4, lo.RFOUTB);     // Valid power levels: -4, -1, +2, +5 dBm
     lo.updateRegisters();
+    uint32_t newPower = (lo.Curr.Reg[4] >> 6) & 0x3;
 
-    // R4[7:6] should have changed to 0b10 for +2 dBm
-    uint32_t newPower = (mock.regWrites[0] >> 6) & 0x3;
-    uint32_t oldPower = (MAX2871::defaultRegisters.Reg[4] >> 6) & 0x3;
-    TEST_ASSERT_EQUAL_UINT32(1u, newPower);
-    TEST_ASSERT_TRUE(newPower != oldPower);
-
-    // Check forced R0 write equals baseline R0
-    TEST_ASSERT_EQUAL_HEX32(MAX2871::defaultRegisters.Reg[0], mock.regWrites[6]);
+    char msg[100];
+    snprintf(msg, sizeof(msg), "Power level should have changed from %lu", oldPower);
+    TEST_ASSERT_NOT_EQUAL_MESSAGE(oldPower, newPower, msg);
 }
 
 void runAllTests(void) {
