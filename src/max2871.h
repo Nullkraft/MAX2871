@@ -47,7 +47,6 @@ public:
   void updateRegisters();
   void resetToDefaultRegisters();
   void setRegisterField(uint8_t reg, uint8_t bit_hi, uint8_t bit_lo, uint32_t value);
-  uint32_t getRegister(uint8_t reg) const { return Curr.Reg[reg]; }
   uint8_t getDirtyMask() const { return _dirtyMask; }
   void clearDirtyMask() { _dirtyMask = 0; }
   inline void markDirty(uint8_t reg) { _dirtyMask |= static_cast<uint8_t>(1UL << reg); } // compiler truncates to 8 bits
