@@ -62,7 +62,7 @@ void test_round_trip_known(void) {
 
 void test_set_RF_output_power_level(void) {
     lo.setFrequency(42.00);  // Set 42MHz by calculating Frac, M, and N
-    lo.outputPower(-4, lo.RFOUTA);
+    lo.outputPower(-4, RF_A);
 }
 
 int runUnityTests() {

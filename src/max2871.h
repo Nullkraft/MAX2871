@@ -17,7 +17,6 @@ public:
 
   // public members
   HAL* hal = nullptr;
-  enum {RFOUTA = 0x1, RFOUTB = 0x2, RFBOTH = 0x3 };
 
   // ---- Construction / Init ----
   explicit MAX2871(double refIn);
@@ -34,7 +33,7 @@ public:
 
   // ---- Output Control ----
   void outputSelect(uint8_t sel) override;   // A, B, both, or off
-  void outputPower(int dBm, uint8_t port) override;        // -4, -1, +2, +5 dBm
+  void outputPower(int dBm, RFOutPort port) override;        // -4, -1, +2, +5 dBm
 
   // ---- Mode Control ----
   void mode(uint8_t type) override;          // 0=int-N, 1=frac-N

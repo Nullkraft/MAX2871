@@ -113,7 +113,7 @@ void MAX2871::outputSelect(uint8_t sel) {
     setRegisterField(4, 5, 5, enableA); // R4 bit 5
 }
 
-void MAX2871::outputPower(int dBm, uint8_t port) {
+void MAX2871::outputPower(int dBm, RFOutPort port) {
     // dBm:     Valid values: -4, -1, +2, +5 dBm
     // port:    Power Level - R4[7:6] sets RFoutB and R4[4:3] sets RFoutA
     uint32_t code = 0;

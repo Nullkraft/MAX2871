@@ -16,6 +16,9 @@
 #include <stdint.h>
 #include "hal.h"
 
+// Support chips with up to 4 RF outputs
+enum RFOutPort { RFNONE = 0, RF_A = 1, RF_B = 2, RF_C = 4, RF_D = 8, RF_ALL = 0xFF };
+
 class I_PLLSynthesizer {
 public:
     virtual ~I_PLLSynthesizer() {}
@@ -30,7 +33,7 @@ public:
 
     //  Output Control 
     virtual void outputSelect(uint8_t sel) = 0;     // A, B, both, or off
-    virtual void outputPower(int dBm, uint8_t port) = 0;  // -4, -1, +2, +5 dBm
+    virtual void outputPower(int dBm, RFOutPort port = RF_ALL) = 0;  // -4, -1, +2, +5 dBm
 
     //  Mode Control 
     virtual void mode(uint8_t type) = 0;            // 0=int-N, 1=frac-N

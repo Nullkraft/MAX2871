@@ -240,7 +240,7 @@ void test_outputPower_marks_R4_only_and_sets_power_bits(void) {
 
     // Default Power Level is +5dBm with binary bits 11
     uint32_t oldPower = (lo.Curr.Reg[4] >> 6) & 0x3;
-    lo.outputPower(-4, lo.RFOUTB);     // Valid power levels: -4, -1, +2, +5 dBm
+    lo.outputPower(-4, RF_B);     // Valid power levels: -4, -1, +2, +5 dBm
     lo.updateRegisters();
     uint32_t newPower = (lo.Curr.Reg[4] >> 6) & 0x3;
 
