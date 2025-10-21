@@ -1,4 +1,5 @@
 #include "max2871.h"
+#include <unity.h>
 
 // ---- Static read-only defaults ----
 const MAX2871::max2871Registers MAX2871::defaultRegisters = {{
@@ -19,8 +20,11 @@ MAX2871::MAX2871(double refIn)
 }
 
 void MAX2871::begin(uint8_t lePin) {
+    _lePin = lePin;
     resetToDefaultRegisters();  // Fill the working (shadow) registers
-    first_init = false;
+    first_init = true;          // Run the clean-clock startup once
+    updateRegisters();          // Performs clean-clock startup sequence
+    first_init = false;         // Done running clean-clock startup
 }
 
 // ---- Frequency Control ----
@@ -166,25 +170,37 @@ void MAX2871::setAllRegisters() {
 }
 
 void MAX2871::updateRegisters() {
-    if (_dirtyMask == 0) return;
+    bool forceR0 = (_dirtyMask & (1UL << 4)) != 0;
 
-    uint8_t mask = _dirtyMask;
+    if (first_init) {
+        TEST_MESSAGE("*** First init ***");
+        // First cycle: Special startup sequence
+        writeRegister(Curr.Reg[5]);
+        if (hal) hal->delayMs(20);
+        uint32_t r4_temp = Curr.Reg[4] & ~((1u << 8) | (1u << 5));  // Disable RFOUTA and RFOUTB
+        writeRegister(r4_temp);
 
-    // If R4 is dirty, force-write R0 as well (without setting its dirty bit).
-    bool forceR0 = (mask & (1UL << 4)) != 0;
-
-    for (int reg = 6; reg >= 0; --reg) {
-        bool shouldWrite = (mask & (1UL << reg)) != 0;
-
-        // If R0 wasn’t dirty but R4 was, include R0
-        if (!shouldWrite && forceR0 && reg == 0) {
-            shouldWrite = true;
+        for (int reg = 4; reg >= 0; --reg) {    // Write registers 4, 3, 2, 1, 0
+            writeRegister(Curr.Reg[reg]);
         }
 
-        if (shouldWrite) {
+        // Force a second programming cycle to registers 0-5
+        _dirtyMask = 0x3F;
+    }
+
+    // Early exit if nothing to update
+    if (_dirtyMask == 0) return;
+
+    // If Register 4 is dirty, force Register 0 to be dirty as well
+    _dirtyMask |= (_dirtyMask >> 4) & 1UL;  // Copy bit 4 to bit 0
+
+    // Update dirty registers
+    for (int reg = 5; reg >= 0; --reg) {
+        bool shouldWrite = (_dirtyMask & (1UL << reg)) != 0;
+
+        if (shouldWrite || (forceR0 && reg == 0)) {
             writeRegister(Curr.Reg[reg]);
-            // Clear only the bit we actually wrote (don’t clear R0 if it wasn’t set)
-            if ((mask & (1UL << reg)) != 0) {
+            if ((_dirtyMask & (1UL << reg)) != 0) {
                 _dirtyMask = (uint8_t)(_dirtyMask & ~(1UL << reg));
             }
         }
