@@ -173,12 +173,12 @@ void MAX2871::updateRegisters() {
 
     if (first_init) {
         // First cycle: Special startup sequence
-        writeRegister(Curr.Reg[5]);
+        writeRegister(Curr.Reg[5]);             // Write to register 5
         if (hal) hal->delayMs(20);
         uint32_t r4_temp = Curr.Reg[4] & ~((1u << 8) | (1u << 5));  // Disable RFOUTA and RFOUTB
-        writeRegister(r4_temp);
+        writeRegister(r4_temp);                 // Write to register 4
 
-        for (int reg = 4; reg >= 0; --reg) {    // Write registers 4, 3, 2, 1, 0
+        for (int reg = 3; reg >= 0; --reg) {    // Write registers 3, 2, 1, 0
             writeRegister(Curr.Reg[reg]);
         }
 
