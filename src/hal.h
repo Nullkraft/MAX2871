@@ -29,6 +29,9 @@ public:
     virtual void pinMode(uint8_t pin, PinMode mode) = 0;
     virtual void digitalWrite(uint8_t pin, PinLevel val) = 0;
 
+    // Timing
+    virtual void delayMs(uint32_t ms) = 0;
+
     // MAX2871-specific extras
     virtual void spiWriteRegister(uint32_t value) = 0;  // convenience
     virtual void setCEPin(bool enable) = 0;

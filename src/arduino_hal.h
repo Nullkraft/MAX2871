@@ -45,6 +45,10 @@ public:
         ::pinMode(pin, (mode == PINMODE_OUTPUT ? OUTPUT : INPUT));
     }
 
+    void delayMs(uint32_t ms) override {
+        delay(ms);
+    }
+
     void digitalWrite(uint8_t pin, PinLevel val) override {
         ::digitalWrite(pin, (val == PINLEVEL_HIGH ? HIGH : LOW));
     }

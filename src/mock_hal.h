@@ -17,6 +17,10 @@ public:
     uint32_t regWrites[MAX_WRITES];
     uint8_t writeCount = 0;
 
+    void delayMs(uint32_t ms) override {
+        // delay(ms);
+    }
+
     void spiBegin() override {}
     void spiTransfer(uint8_t) override {}
     void pinMode(uint8_t, PinMode) override {}

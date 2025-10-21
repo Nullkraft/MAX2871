@@ -34,6 +34,10 @@ public:
         ::digitalWrite(pin, val == PINLEVEL_HIGH ? HIGH : LOW);
     }
 
+    void delayMs(uint32_t ms) override {
+        delay(ms);
+    }
+
     void spiWriteRegister(uint32_t regVal) override {
         digitalWrite(pinLE, PINLEVEL_LOW);
         for (int i = 31; i >= 0; --i) {

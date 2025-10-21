@@ -132,7 +132,7 @@ void test_updateRegisters_no_writes_if_clean(void) {
 
     // Ensure clean
     TEST_ASSERT_EQUAL_UINT8(0, lo.getDirtyMask());
-
+    mock.writeCount = 0;
     lo.updateRegisters();
 
     TEST_ASSERT_EQUAL_UINT8(0, mock.writeCount);
