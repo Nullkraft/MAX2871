@@ -7,8 +7,7 @@ const MAX2871::max2871Registers MAX2871::defaultRegisters = {{
     0x98007F42,  // Register 2 - Digital Lock Detect (DLD) on
     0x00001F23,  // Register 3
     0x63EE81FC,  // Register 4
-    0x00400005,  // Register 5
-    0x98005F42   // Register 6
+    0x00400005   // Register 5
 }};
 
 // ---- Construction ----
@@ -186,14 +185,21 @@ void MAX2871::updateRegisters() {
 
     // Early exit if nothing to update
     if (_dirtyMask == 0) return;
-    // I.A.W. the spec sheet if Reg4 gets updated then so must Reg0
-    _dirtyMask |= (_dirtyMask >> 4) & 1UL;  // Copy Reg4 dirty bit to Reg0 dirty bit
+
+    _dirtyMask |= (_dirtyMask >> 1) & 1UL;  // Copy Reg1 dirty bit to Reg0
+
+    // If DIVA changed in register 4 then mark Reg0 as dirty
+    uint8_t currDIVA = (Curr.Reg[4] >> 20) & 0x7;
+    if (currDIVA != _lastDIVA) {
+        _dirtyMask |= 1;    // Mark Reg0 as dirty
+    }
+    _lastDIVA = (Curr.Reg[4] >> 20) & 0x7;                          // Update _lastDIVA to new value
 
     // Update dirty registers
     for (int reg = 5; reg >= 0; --reg) {
         if ((_dirtyMask & (1UL << reg)) != 0) {
             writeRegister(Curr.Reg[reg]);
-            _dirtyMask = (uint8_t)(_dirtyMask & ~(1UL << reg));
+            _dirtyMask = (uint8_t)(_dirtyMask & ~(1UL << reg));     // Clear dirty bit on current register?
         }
     }
 }
