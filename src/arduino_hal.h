@@ -37,10 +37,6 @@ public:
         // (If you want to optimize, you can lift this out.)
     }
 
-    void spiTransfer(uint8_t data) override {
-        SPI.transfer(data);
-    }
-
     void pinMode(uint8_t pin, PinMode mode) override {
         ::pinMode(pin, (mode == PINMODE_OUTPUT ? OUTPUT : INPUT));
     }

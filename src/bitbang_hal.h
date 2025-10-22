@@ -64,7 +64,6 @@ public:
 
     // Unused virtual functions
     void spiBegin() {}
-    void spiTransfer(uint8_t data) {}
     bool readMuxout() { return true; }      // TODO: Implement testing muxOut
 };
 

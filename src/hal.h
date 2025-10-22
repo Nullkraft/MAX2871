@@ -23,7 +23,6 @@ public:
 
     // SPI
     virtual void spiBegin() = 0;
-    virtual void spiTransfer(uint8_t data) = 0;
 
     // GPIO
     virtual void pinMode(uint8_t pin, PinMode mode) = 0;
