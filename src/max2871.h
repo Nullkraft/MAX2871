@@ -92,9 +92,6 @@ private:
   uint8_t _dirtyMask = 0;
   uint8_t _lastDIVA = 0xFF;         // Track last DIVA value (0xFF = uninitialized)
   uint32_t spiMaxSpeed = 20000000;  // 20 MHz
-
-  // Private helpers
-  void spiWrite(uint32_t value);
 };
 
 #endif

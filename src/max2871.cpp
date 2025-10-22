@@ -244,10 +244,3 @@ void MAX2871::setRegisterField(uint8_t regAddr, uint8_t bit_hi, uint8_t bit_lo, 
         _dirtyMask |= (1 << regAddr);  // mark this register for update
     }
 }
-
-// ---- Private Helpers ----
-
-void MAX2871::spiWrite(uint32_t value) {
-    // TODO: split 32-bit into 4 bytes, call hal->spiTransfer() for each
-    // then toggle selectChip()
-}
