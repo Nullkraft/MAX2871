@@ -156,8 +156,8 @@ void MAX2871::writeRegister(uint32_t value) {
 
 void MAX2871::setAllRegisters() {
     // Writes all shadow registers R6..R0 to the I.C.
-    for (int reg = 6; reg >= 0; --reg) {
-        writeRegister(Curr.Reg[reg]);
+    for (int regAddr = 6; regAddr >= 0; --regAddr) {
+        writeRegister(Curr.Reg[regAddr]);
     }
 
     // Full clean write completed, clear the dirty mask
@@ -174,8 +174,8 @@ void MAX2871::updateRegisters() {
         uint32_t r4_temp = Curr.Reg[4] & ~((1u << 8) | (1u << 5));  // Disable RFOUTA and RFOUTB
         writeRegister(r4_temp);                                     // Program register 4
 
-        for (int reg = 3; reg >= 0; --reg) {                        // Program registers 3, 2, 1, 0
-            writeRegister(Curr.Reg[reg]);
+        for (int regAddr = 3; regAddr >= 0; --regAddr) {                        // Program registers 3, 2, 1, 0
+            writeRegister(Curr.Reg[regAddr]);
         }
         // Force a second programming cycle to registers 0-5
         _dirtyMask = 0x3F;
@@ -194,10 +194,10 @@ void MAX2871::updateRegisters() {
     _lastDIVA = (Curr.Reg[4] >> 20) & 0x7;                          // Update _lastDIVA to new value
 
     // Update dirty registers
-    for (int reg = 5; reg >= 0; --reg) {
-        if ((_dirtyMask & (1UL << reg)) != 0) {
-            writeRegister(Curr.Reg[reg]);
-            _dirtyMask = (uint8_t)(_dirtyMask & ~(1UL << reg));     // Clear dirty bit on current register?
+    for (int regAddr = 5; regAddr >= 0; --regAddr) {
+        if ((_dirtyMask & (1UL << regAddr)) != 0) {
+            writeRegister(Curr.Reg[regAddr]);
+            _dirtyMask = (uint8_t)(_dirtyMask & ~(1UL << regAddr));     // Clear dirty bit on current register?
         }
     }
 }
@@ -210,7 +210,12 @@ void MAX2871::reset() {
     first_init = false;         // Done running clean-clock startup
 }
 
-void MAX2871::setRegisterField(uint8_t reg, uint8_t bit_hi, uint8_t bit_lo, uint32_t value) {
+/*  This function provides the expert with the ability to manually change the bits
+    within the registers. You can stack as many calls to setRegisterField as you 
+    like and then make a final call to updateRegisters() to program the chip with
+    your changes.
+ */
+void MAX2871::setRegisterField(uint8_t regAddr, uint8_t bit_hi, uint8_t bit_lo, uint32_t value) {
     // Swap bit_lo and bit_hi if bit_lo is higher than bit_hi
     if (bit_lo > bit_hi) {
         uint8_t bit_temp = bit_hi;
@@ -219,13 +224,13 @@ void MAX2871::setRegisterField(uint8_t reg, uint8_t bit_hi, uint8_t bit_lo, uint
     }
 
     /* --- Input validation ---
-     * bit_lo : 3 or higher (2:0 reserved for register address)
-     * bit_hi : 31 or lower (registers are 32 bits)
-     * reg    : 7 registers (0 to 6)
+     * bit_lo  : 3 or higher (2:0 reserved for register address)
+     * bit_hi  : 31 or lower (registers are 32 bits)
+     * regAddr : 7 registers (0 to 6)
     */
-    if (bit_lo < 3 || bit_hi > 31 || reg > 6) return;
+    if (bit_lo < 3 || bit_hi > 31 || regAddr > 6) return;
 
-    uint32_t oldVal = Curr.Reg[reg];
+    uint32_t oldVal = Curr.Reg[regAddr];
 
     // Clear oldVal bit range before inserting (ANDing) new values
     uint32_t mask = bitMask(bit_hi, bit_lo);
@@ -233,12 +238,12 @@ void MAX2871::setRegisterField(uint8_t reg, uint8_t bit_hi, uint8_t bit_lo, uint
     // TODO: Add mask as an input to fieldValue() to eliminate
     //       the internal call to bitMask() from fieldValue()
     // Insert new value into the target bitfield
-    uint32_t newVal = (Curr.Reg[reg] & ~mask) | fieldValue(value, bit_hi, bit_lo);
+    uint32_t newVal = (Curr.Reg[regAddr] & ~mask) | fieldValue(value, bit_hi, bit_lo);
 
     // Only write if something actually changed
     if (newVal != oldVal) {
-        Curr.Reg[reg] = newVal;
-        _dirtyMask |= (1 << reg);  // mark this register for update
+        Curr.Reg[regAddr] = newVal;
+        _dirtyMask |= (1 << regAddr);  // mark this register for update
     }
 }
 
