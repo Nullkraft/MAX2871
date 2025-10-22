@@ -22,7 +22,6 @@ public:
     }
 
     void spiBegin() override {}
-    void spiTransfer(uint8_t) override {}
     void pinMode(uint8_t, PinMode) override {}
     void digitalWrite(uint8_t, PinLevel) override {}
 
