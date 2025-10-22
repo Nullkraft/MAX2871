@@ -16,6 +16,24 @@
 
 enum PinMode { PINMODE_INPUT, PINMODE_OUTPUT };
 enum PinLevel { PINLEVEL_LOW = 0, PINLEVEL_HIGH = 1 };
+// --- Bitfield Utilities ---
+// Helper functions for register bit manipulation
+
+// Return a mask covering bits [bit_lo : bit_hi], inclusive.
+// Example: bitMask(12, 5) -> 0b00011111100000
+inline uint32_t bitMask(uint8_t bit_hi, uint8_t bit_lo) {
+    if (bit_hi > 31 || bit_lo > bit_hi) return 0;
+    return ((0xFFFFFFFFu >> (31 - (bit_hi - bit_lo))) << bit_lo);
+}
+
+// Return 'value' aligned into field [bit_lo : bit_hi], with other bits zero.
+// Example: fieldValue(0b101, 7, 5) -> 0b00000000000000000000001010000000
+inline uint32_t fieldValue(uint32_t value, uint8_t bit_hi, uint8_t bit_lo) {
+    if (bit_hi > 31 || bit_lo > bit_hi) return 0;
+    uint32_t mask = bitMask(bit_hi, bit_lo);
+    return (value << bit_lo) & mask;
+}
+
 
 class HAL {
 public:
