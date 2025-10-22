@@ -4,7 +4,7 @@
 const MAX2871::max2871Registers MAX2871::defaultRegisters = {{
     0x001A8008,  // Register 0 - Contains F and parts of N
     0x40010019,  // Register 1 - Contains M
-    0x98005F42,  // Register 2 - Digital Lock Detect (DLD) on
+    0x98007F42,  // Register 2 - Digital Lock Detect (DLD) on
     0x00001F23,  // Register 3
     0x63EE81FC,  // Register 4
     0x00400005,  // Register 5
