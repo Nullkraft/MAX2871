@@ -168,39 +168,32 @@ void MAX2871::setAllRegisters() {
     _dirtyMask = 0;
 }
 
+// Only the registers flagged in the _dirtyMask will be programmed.
 void MAX2871::updateRegisters() {
-    bool forceR0 = (_dirtyMask & (1UL << 4)) != 0;
-
     if (first_init) {
-        // First cycle: Special startup sequence
-        writeRegister(Curr.Reg[5]);             // Write to register 5
+        // Clean-clock startup sequence. Runs once after a reset
+        writeRegister(Curr.Reg[5]);                                 // Program register 5
         if (hal) hal->delayMs(20);
         uint32_t r4_temp = Curr.Reg[4] & ~((1u << 8) | (1u << 5));  // Disable RFOUTA and RFOUTB
-        writeRegister(r4_temp);                 // Write to register 4
+        writeRegister(r4_temp);                                     // Program register 4
 
-        for (int reg = 3; reg >= 0; --reg) {    // Write registers 3, 2, 1, 0
+        for (int reg = 3; reg >= 0; --reg) {                        // Program registers 3, 2, 1, 0
             writeRegister(Curr.Reg[reg]);
         }
-
         // Force a second programming cycle to registers 0-5
         _dirtyMask = 0x3F;
     }
 
     // Early exit if nothing to update
     if (_dirtyMask == 0) return;
-
-    // If Register 4 is dirty, force Register 0 to be dirty as well
-    _dirtyMask |= (_dirtyMask >> 4) & 1UL;  // Copy bit 4 to bit 0
+    // I.A.W. the spec sheet if Reg4 gets updated then so must Reg0
+    _dirtyMask |= (_dirtyMask >> 4) & 1UL;  // Copy Reg4 dirty bit to Reg0 dirty bit
 
     // Update dirty registers
     for (int reg = 5; reg >= 0; --reg) {
-        bool shouldWrite = (_dirtyMask & (1UL << reg)) != 0;
-
-        if (shouldWrite || (forceR0 && reg == 0)) {
+        if ((_dirtyMask & (1UL << reg)) != 0) {
             writeRegister(Curr.Reg[reg]);
-            if ((_dirtyMask & (1UL << reg)) != 0) {
-                _dirtyMask = (uint8_t)(_dirtyMask & ~(1UL << reg));
-            }
+            _dirtyMask = (uint8_t)(_dirtyMask & ~(1UL << reg));
         }
     }
 }
