@@ -19,10 +19,7 @@ MAX2871::MAX2871(double refIn)
 
 void MAX2871::begin(uint8_t lePin) {
     _lePin = lePin;
-    resetToDefaultRegisters();  // Fill the working (shadow) registers
-    first_init = true;          // Run the clean-clock startup once
-    updateRegisters();          // Performs clean-clock startup sequence
-    first_init = false;         // Done running clean-clock startup
+    reset();  // Fill the working (shadow) registers
 }
 
 // ---- Frequency Control ----
@@ -167,6 +164,7 @@ void MAX2871::setAllRegisters() {
     _dirtyMask = 0;
 }
 
+
 // Only the registers flagged in the _dirtyMask will be programmed.
 void MAX2871::updateRegisters() {
     if (first_init) {
@@ -205,9 +203,11 @@ void MAX2871::updateRegisters() {
 }
 
 // Reset working copy of registers, Curr, from the defaultRegisters
-void MAX2871::resetToDefaultRegisters() {
-    Curr = defaultRegisters;
-    _dirtyMask = 0;
+void MAX2871::reset() {
+    first_init = true;          // Flag to run the clean-clock startup once
+    Curr = defaultRegisters;    // Reset all registers to their default values
+    updateRegisters();          // Performs clean-clock startup sequence
+    first_init = false;         // Done running clean-clock startup
 }
 
 void MAX2871::setRegisterField(uint8_t reg, uint8_t bit_hi, uint8_t bit_lo, uint32_t value) {
@@ -241,7 +241,6 @@ void MAX2871::setRegisterField(uint8_t reg, uint8_t bit_hi, uint8_t bit_lo, uint
         _dirtyMask |= (1 << reg);  // mark this register for update
     }
 }
-
 
 // ---- Private Helpers ----
 

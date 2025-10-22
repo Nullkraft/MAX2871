@@ -199,12 +199,12 @@ void test_outputSelect_marks_R4_only_and_sets_expected_bits(void) {
      *    register value. (No register change == No dirty flag)
      */
     MAX2871 lo(66e6);
-    lo.resetToDefaultRegisters();
+    lo.reset();
     uint32_t before = MAX2871::defaultRegisters.Reg[4];
     uint32_t after;
 
     for (int i = 0; i < 4; i++) {
-        lo.resetToDefaultRegisters();
+        lo.reset();
         lo.outputSelect(i);
         after = lo.Curr.Reg[4];
         if (after != before) {
@@ -220,7 +220,7 @@ void test_outputPower_marks_R4_only_and_sets_power_bits(void) {
     MockHAL mock;
     MAX2871 lo(66.0);
     lo.attachHal(&mock);
-    lo.resetToDefaultRegisters();
+    lo.reset();
     lo.setAllRegisters();               // Writes all registers to mock
 
     // Default Power Level is +5dBm with binary bits 11

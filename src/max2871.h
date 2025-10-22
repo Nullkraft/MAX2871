@@ -45,7 +45,7 @@ public:
   void writeRegister(uint32_t value);
   void setAllRegisters();
   void updateRegisters();
-  void resetToDefaultRegisters();
+  void reset();
   void setRegisterField(uint8_t reg, uint8_t bit_hi, uint8_t bit_lo, uint32_t value);
   uint8_t getDirtyMask() const { return _dirtyMask; }
   void clearDirtyMask() { _dirtyMask = 0; }
