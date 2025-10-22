@@ -21,7 +21,7 @@ static constexpr uint8_t PIN_MUX = A0;      // MAX2871 MUXOUT (read-only)
 static constexpr double  REF_MHZ = 60.0;    // Reference Clock (MHz)
 
 // CE is tied HIGH on the evaluation board
-static BitBangHAL hal(PIN_CLK, PIN_DAT, PIN_LE);
+static BitBangHAL hal(PIN_CLK, PIN_DAT, PIN_LE, RF_EN);
 static MAX2871 lo(REF_MHZ);
 
 // Unity hooks
@@ -44,11 +44,6 @@ __attribute__((unused)) static void print_hex(uint32_t val) {
     char buf[128];
     snprintf(buf, sizeof(buf), "0x%08lX", val);
     TEST_MESSAGE(buf);
-}
-
-void outputEnable(uint8_t rfEn) {
-    pinMode(rfEn, PINMODE_OUTPUT);
-    digitalWrite(rfEn, PINLEVEL_HIGH);
 }
 
 // --- Round-trip Test for Known Case ---
@@ -77,7 +72,7 @@ void setup() {
     hal.begin();
     lo.attachHal(&hal);
     lo.begin(PIN_LE);
-    outputEnable(5);
+    hal.setCEPin(true);
     runUnityTests();
 }
 

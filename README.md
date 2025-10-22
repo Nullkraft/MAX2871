@@ -42,19 +42,14 @@ static constexpr uint8_t PIN_DAT = A2;      // Data
 static constexpr uint8_t PIN_CLK = A1;      // Clock
 static constexpr double  REF_MHZ = 60.0;    // Reference clock
 
-BitBangHAL hal(PIN_CLK, PIN_DAT, PIN_LE);
+BitBangHAL hal(PIN_CLK, PIN_DAT, PIN_LE, RF_EN);
 MAX2871 lo(REF_MHZ);
-
-void outputEnable(uint8_t pin) {
-    pinMode(pin, OUTPUT);
-    digitalWrite(pin, HIGH);
-}
 
 void setup() {
     hal.begin();
     lo.attachHal(&hal);
     lo.begin(PIN_LE);
-    outputEnable(RF_EN);
+    hal.setCEPin(true);
     lo.setFrequency(42.0);   // Set RFOut to 42 MHz
 }
 

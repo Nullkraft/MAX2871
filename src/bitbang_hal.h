@@ -12,11 +12,11 @@
 
 class BitBangHAL : public HAL {
 private:
-    uint8_t pinCLK, pinDATA, pinLE;
+    uint8_t pinCLK, pinDATA, pinLE, pinCE;
 
 public:
-    BitBangHAL(uint8_t clkPin, uint8_t dataPin, uint8_t lePin)
-        : pinCLK(clkPin), pinDATA(dataPin), pinLE(lePin) {}
+    BitBangHAL(uint8_t clkPin, uint8_t dataPin, uint8_t lePin, uint8_t cePin = 0xFF)
+        : pinCLK(clkPin), pinDATA(dataPin), pinLE(lePin), pinCE(cePin) {}
 
     void begin() {
         pinMode(pinCLK, PINMODE_OUTPUT);
@@ -24,6 +24,10 @@ public:
         pinMode(pinLE, PINMODE_OUTPUT);
         digitalWrite(pinCLK, PINLEVEL_LOW);
         digitalWrite(pinLE, PINLEVEL_LOW);
+        if (pinCE != 0xFF) {
+            ::pinMode(pinCE, OUTPUT);
+            ::digitalWrite(pinCE, LOW);
+        }
     }
 
     void pinMode(uint8_t pin, PinMode mode) override {
@@ -36,6 +40,13 @@ public:
 
     void delayMs(uint32_t ms) override {
         delay(ms);
+    }
+
+    void setCEPin(bool enable) override {
+        if (pinCE == 0xFF) {
+            return;
+        }
+        ::digitalWrite(pinCE, enable ? HIGH : LOW);
     }
 
     void spiWriteRegister(uint32_t regVal) override {
@@ -54,7 +65,6 @@ public:
     // Unused virtual functions
     void spiBegin() {}
     void spiTransfer(uint8_t data) {}
-    void setCEPin(bool enable) {}
     bool readMuxout() { return true; }      // TODO: Implement testing muxOut
 };
 
