@@ -171,36 +171,37 @@ void MAX2871::setAllRegisters() {
 // Only the registers flagged in the _dirtyMask will be programmed.
 void MAX2871::updateRegisters() {
     if (first_init) {
+        // if (hal) hal->delayMs(5);
         // Clean-clock startup sequence. Runs once after a reset
         writeRegister(Curr.Reg[5]);                                 // Program register 5
-        if (hal) hal->delayMs(20);
-        uint32_t r4_temp = Curr.Reg[4] & ~((1u << 8) | (1u << 5));  // Disable RFOUTA and RFOUTB
-        writeRegister(r4_temp);                                     // Program register 4
-
+        if (hal) hal->delayMs(5);
+        writeRegister(Curr.Reg[4] & 0xFFFFFEDF);                    // Disable RFOUTA and RFOUTB
+        // uint32_t r4_temp = Curr.Reg[4] & ~((1u << 8) | (1u << 5));  // Disable RFOUTA and RFOUTB
+        // writeRegister(r4_temp);                                     // Program register 4
         for (int regAddr = 3; regAddr >= 0; --regAddr) {            // Program registers 3, 2, 1, 0
             writeRegister(Curr.Reg[regAddr]);
         }
-        // Force a second programming cycle to registers 0-5
+        // Force a second programming cycle to registers 5-->0
         _dirtyMask = 0x3F;
     }
 
     // Early exit if nothing to update
     if (_dirtyMask == 0) return;
 
-    _dirtyMask |= (_dirtyMask >> 1) & 1UL;                          // Copy Reg1 dirty bit to Reg0
+    _dirtyMask |= (_dirtyMask >> 1) & 1UL;                          // Reg0 buffers Reg1 writes
 
     // If DIVA changed in register 4 then mark Reg0 as dirty
     uint8_t currDIVA = (Curr.Reg[4] >> 20) & 0x7;
     if (currDIVA != _lastDIVA) {
-        _dirtyMask |= 1;                                            // Mark Reg0 as dirty
+        _dirtyMask |= 1;                                            // Reg0 buffers Reg4 DIVA changes
     }
-    _lastDIVA = (Curr.Reg[4] >> 20) & 0x7;                          // Update _lastDIVA to new value
+    _lastDIVA = (Curr.Reg[4] >> 20) & 0x7;                          // Store DIVA value for recall
 
     // Update dirty registers
     for (int regAddr = 5; regAddr >= 0; --regAddr) {
         if ((_dirtyMask & (1UL << regAddr)) != 0) {
             writeRegister(Curr.Reg[regAddr]);
-            _dirtyMask = (uint8_t)(_dirtyMask & ~(1UL << regAddr)); // Clear dirty bit on current register?
+            _dirtyMask = (uint8_t)(_dirtyMask & ~(1UL << regAddr)); // Indicates register was written
         }
     }
 }
