@@ -32,7 +32,7 @@ public:
     virtual void setFrequency(uint32_t fmn, uint8_t diva) = 0;  // bypass math
 
     //  Output Control 
-    virtual void outputSelect(uint8_t sel) = 0;     // A, B, both, or off
+    virtual void outputSelect(RFOutPort port) = 0;     // A, B, both, or off
     virtual void outputPower(int dBm, RFOutPort port = RF_ALL) = 0;  // -4, -1, +2, +5 dBm
 
     //  Mode Control 

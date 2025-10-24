@@ -32,7 +32,7 @@ public:
   double fmn2freq();                                        // reverse calc
 
   // ---- Output Control ----
-  void outputSelect(uint8_t sel) override;   // A, B, both, or off
+  void outputSelect(RFOutPort port) override;   // A, B, both, or off
   void outputPower(int dBm, RFOutPort port) override;        // -4, -1, +2, +5 dBm
 
   // ---- Mode Control ----

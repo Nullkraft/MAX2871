@@ -88,7 +88,8 @@ double MAX2871::fmn2freq() {
 
 // ---- Output Control ----
 
-void MAX2871::outputSelect(uint8_t sel) {
+// RFOutPort = RFNONE, RF_A, RF_B or RF_ALL
+void MAX2871::outputSelect(RFOutPort port) {
     /* R4[8] disables RFoutB when 0, R4[5] disables RFoutA when 0.
      * R4[8] == 1 when B enabled; R4[8] == 0 when B disabled
      *
@@ -103,15 +104,17 @@ void MAX2871::outputSelect(uint8_t sel) {
      *   3  |  on |  on |
      * -----+-----+-----+
     */
-    uint32_t enableB = (sel == 2 || sel == 3) ? 1u : 0u;
+    uint32_t enableB = (port == RF_B || port == RF_ALL) ? 1u : 0u;
     // R4[5] = 1 => A enabled; R4[5] = 0 => A disabled
-    uint32_t enableA = (sel == 1 || sel == 3) ? 1u : 0u;
+    uint32_t enableA = (port == RF_A || port == RF_ALL) ? 1u : 0u;
 
     // Writing bits via setRegisterField so the dirty bits are set
     setRegisterField(4, 8, 8, enableB); // R4 bit 8
     setRegisterField(4, 5, 5, enableA); // R4 bit 5
+    updateRegisters();
 }
 
+// RFOutPort = RFNONE, RF_A, RF_B or RF_ALL
 void MAX2871::outputPower(int dBm, RFOutPort port) {
     // dBm:     Valid values: -4, -1, +2, +5 dBm
     // port:    Power Level - R4[7:6] sets RFoutB and R4[4:3] sets RFoutA
@@ -124,10 +127,10 @@ void MAX2871::outputPower(int dBm, RFOutPort port) {
         default:
             return; // invalid value - leave power level unchanged
     }
-    if (port == 1 || port == 3) {
+    if (port == RF_A || port == RF_ALL) {
         setRegisterField(4, 4, 3, code); // write the Port A power level into R4[4:3]
     }
-    if (port == 2 || port == 3) {
+    if (port == RF_B || port == RF_ALL) {
         setRegisterField(4, 7, 6, code); // write the Port B power level into R4[7:6]
     }
     updateRegisters();
