@@ -167,43 +167,38 @@ void MAX2871::setAllRegisters() {
     _dirtyMask = 0;
 }
 
-
-// Only the registers flagged in the _dirtyMask will be programmed.
+/*  At power-up, the registers should be programmed twice. The first
+ *  write ensures the device is enabled, and the second write starts
+ *  the VCO selection process.
+*/
 void MAX2871::updateRegisters() {
+    // Additional write cycle after a reset
     if (first_init) {
-        // if (hal) hal->delayMs(5);
-        // Clean-clock startup sequence. Runs once after a reset
-        writeRegister(Curr.Reg[5]);                                 // Program register 5
+        writeRegister(Curr.Reg[5]);                         // Program register 5
         if (hal) hal->delayMs(5);
-        writeRegister(Curr.Reg[4] & 0xFFFFFEDF);                    // Disable RFOUTA and RFOUTB
-        // uint32_t r4_temp = Curr.Reg[4] & ~((1u << 8) | (1u << 5));  // Disable RFOUTA and RFOUTB
-        // writeRegister(r4_temp);                                     // Program register 4
-        for (int regAddr = 3; regAddr >= 0; --regAddr) {            // Program registers 3, 2, 1, 0
+        writeRegister(Curr.Reg[4] & 0xFFFFFEDF);            // Disable RFOUTA and RFOUTB
+        for (int regAddr = 3; regAddr >= 0; --regAddr) {    // Program registers 3, 2, 1, 0
             writeRegister(Curr.Reg[regAddr]);
         }
-        // Force a second programming cycle to registers 5-->0
+        // Force register writes 
         _dirtyMask = 0x3F;
     }
 
-    // Early exit if nothing to update
-    if (_dirtyMask == 0) return;
+    if (_dirtyMask == 0) return;                            // Do any registers need updating
 
-    _dirtyMask |= (_dirtyMask >> 1) & 1UL;                          // Reg0 buffers Reg1 writes
-
-    // If DIVA changed in register 4 then mark Reg0 as dirty
-    uint8_t currDIVA = (Curr.Reg[4] >> 20) & 0x7;
+    _dirtyMask |= (_dirtyMask >> 1) & 1UL;                  // Reg1 writes are buffered by Reg0
+    uint8_t currDIVA = (Curr.Reg[4] >> 20) & 0x7;           // Reg0 buffers Reg4 writes for DIVA only
     if (currDIVA != _lastDIVA) {
-        _dirtyMask |= 1;                                            // Reg0 buffers Reg4 DIVA changes
+        _dirtyMask |= 1;
     }
-    _lastDIVA = (Curr.Reg[4] >> 20) & 0x7;                          // Store DIVA value for recall
+    _lastDIVA = (Curr.Reg[4] >> 20) & 0x7;
 
-    // Update dirty registers
     for (int regAddr = 5; regAddr >= 0; --regAddr) {
         if ((_dirtyMask & (1UL << regAddr)) != 0) {
             writeRegister(Curr.Reg[regAddr]);
-            _dirtyMask = (uint8_t)(_dirtyMask & ~(1UL << regAddr)); // Indicates register was written
         }
     }
+    _dirtyMask = 0;
 }
 
 // Reset working copy of registers, Curr, from the defaultRegisters
