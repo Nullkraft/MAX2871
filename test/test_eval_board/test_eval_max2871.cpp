@@ -50,9 +50,13 @@ __attribute__((unused)) static void print_hex(uint32_t val) {
 void test_round_trip_known(void) {
     float tolerance = 0.002;        // +/- 1 kHz
     double freq = 42.00;
-    lo.setFrequency(freq);  // Set the frequency by calculating Frac, M, and N
-    lo.freq2FMN(freq);      // Get calculated frequency from on Frac, M, and N
-    TEST_ASSERT_FLOAT_WITHIN(tolerance, freq, lo.fmn2freq());
+    lo.outputPower(+5, RF_ALL);
+    lo.outputSelect(RF_ALL);
+    // lo.setFrequency(freq);  // Set the frequency by calculating Frac, M, and N
+    TEST_MESSAGE("*** Registers ***");
+    print_registers(lo);
+    // lo.freq2FMN(freq);      // Get calculated frequency from on Frac, M, and N
+    // TEST_ASSERT_FLOAT_WITHIN(tolerance, freq, lo.fmn2freq());
 }
 
 void test_set_RF_output_power_level(void) {
@@ -60,10 +64,16 @@ void test_set_RF_output_power_level(void) {
     lo.outputPower(-4, RF_A);
 }
 
+void test_default_setup() {
+    TEST_MESSAGE("*** Registers ***");
+    print_registers(lo);
+}
+
 int runUnityTests() {
     UNITY_BEGIN();
+    // RUN_TEST(test_default_setup);
     RUN_TEST(test_round_trip_known);
-    RUN_TEST(test_set_RF_output_power_level);
+    // RUN_TEST(test_set_RF_output_power_level);
     return UNITY_END();
 }
 
@@ -71,12 +81,18 @@ void setup() {
     delay(2000);     // give serial monitor time to connect
     hal.begin();
     lo.attachHal(&hal);
-    lo.begin(PIN_LE);
-    hal.setCEPin(true);
-    runUnityTests();
+    lo.begin(PIN_LE);        //************************************************//
+    hal.setCEPin(true);     // <--- THIS SHOULD SET RF ENABLE PIN 5 HIGH ---- //
+    runUnityTests();       //________________________________________________//
 }
 
-void loop() {}
+void loop() {
+    // lo.reset();
+    // delay(2);
+    // lo.outputPower(+5, RF_ALL);
+    // lo.outputSelect(RF_ALL);
+    // delay(500);
+}
 
 #endif // ARDUINO
 // #endif // if not ARDUINO

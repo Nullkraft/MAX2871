@@ -8,9 +8,10 @@
 #include "arduino_hal.h"
 
 // ==== Wiring & config ====
-static constexpr uint8_t PIN_LE  = A3;   // MAX2871 LE (latch)
+static constexpr uint8_t PIN_LE  = 3;    // LO2 Latch Enable (was A3)
 static constexpr uint8_t PIN_MUX = A0;   // MAX2871 MUXOUT (read-only)
-static constexpr double  REF_MHZ = 66.0; // your reference MHz
+static constexpr uint8_t REF_EN1 = 8;    // Reference clock select
+static constexpr double  REF_MHZ = 66.0; // 66 MHz reference
 
 // CE is tied HIGH on evaluation board
 static ArduinoHAL hal(PIN_LE, 0xFF /*CE unused*/, PIN_MUX);
@@ -71,34 +72,20 @@ static void enable_outputs_for_scope() {
     lo.outputPower(+5, RF_B);
 }
 
-void test_set_freq_100MHz_for_scope(void) {
-    hal.begin(4000000UL);
-    lo.attachHal(&hal);
-    lo.begin(A3);                 // your LE = A3
-    enable_outputs_for_scope();
+void test_set_freq_60MHz_for_scope(void) {
+    pinMode(REF_EN1, OUTPUT);       // Scope channel 2
+    digitalWrite(REF_EN1, HIGH);
 
-    // Program ~0.100 GHz (adjust if your API expects Hz or MHz—your tests implied MHz)
-    lo.setFrequency(100.0);
-
-    TEST_MESSAGE("Set MAX2871 to ~100.000 MHz. Check RFOUTA/B on the scope.");
-    // Give you time to measure. Increase if you want more hands-on time.
-    delay(3000);
-    TEST_PASS();
-}
-
-void test_set_freq_66MHz_for_scope(void) {
     // Keep SPI already begun/attached from the prior test, but safe to repeat:
     hal.begin(20000000UL);
     lo.attachHal(&hal);
-    lo.begin(PIN_LE);
-    // Program ~66.00 MHz
-    lo.setFrequency(66.0);
-    TEST_MESSAGE("*** after set frequency ***");
+    lo.begin(PIN_LE);               // Scope channel 1
+    // Program ~60.00 MHz
+    lo.setFrequency(60.0);
+    lo.outputSelect(3);
+    lo.outputPower(+5, RF_A);
+    TEST_MESSAGE("*** Registers ***");
     print_registers(lo);
-    lo.setAllRegisters();   // program the chip
-
-    TEST_MESSAGE("Set MAX2871 to ~66.000 MHz. Check RFOUTA/B on the scope.");
-    delay(3000);
     TEST_PASS();
 }
 
@@ -106,8 +93,7 @@ int runUnityTests() {
     UNITY_BEGIN();
     // RUN_TEST(test_begin_runs_on_hardware);
     // RUN_TEST(test_observe_muxout_level);
-    // RUN_TEST(test_set_freq_100MHz_for_scope);
-    RUN_TEST(test_set_freq_66MHz_for_scope);
+    RUN_TEST(test_set_freq_60MHz_for_scope);
     return UNITY_END();
 }
 

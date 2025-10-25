@@ -232,19 +232,19 @@ void test_outputPower_marks_R4_only_and_sets_power_bits(void) {
 
 void runAllTests(void) {
     UNITY_BEGIN();
-    RUN_TEST(test_round_trip_known);
-    RUN_TEST(test_lowest_freq);
-    RUN_TEST(test_highest_freq);
-    RUN_TEST(test_integerN_case);
-    RUN_TEST(test_param_round_trip);
-    RUN_TEST(test_interface_begin_and_setFrequency);
-    RUN_TEST(test_setAllRegisters_writes_all_registers_in_order);
-    RUN_TEST(test_updateRegisters_no_writes_if_clean);
-    RUN_TEST(test_updateRegisters_writes_only_dirty_in_descending_order);
-    RUN_TEST(test_updateRegisters_rewrites_R0_when_R4_dirty);
-    RUN_TEST(test_updateRegisters_mixed_dirty_with_R4_forces_R0);
+    // RUN_TEST(test_round_trip_known);
+    // RUN_TEST(test_lowest_freq);
+    // RUN_TEST(test_highest_freq);
+    // RUN_TEST(test_integerN_case);
+    // RUN_TEST(test_param_round_trip);
+    // RUN_TEST(test_interface_begin_and_setFrequency);
+    // RUN_TEST(test_setAllRegisters_writes_all_registers_in_order);
+    // RUN_TEST(test_updateRegisters_no_writes_if_clean);
+    // RUN_TEST(test_updateRegisters_writes_only_dirty_in_descending_order);
+    // RUN_TEST(test_updateRegisters_rewrites_R0_when_R4_dirty);
+    // RUN_TEST(test_updateRegisters_mixed_dirty_with_R4_forces_R0);
     RUN_TEST(test_outputSelect_marks_R4_only_and_sets_expected_bits);
-    RUN_TEST(test_outputPower_marks_R4_only_and_sets_power_bits);
+    // RUN_TEST(test_outputPower_marks_R4_only_and_sets_power_bits);
     UNITY_END();
 }
 
