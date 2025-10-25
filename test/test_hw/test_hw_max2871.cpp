@@ -22,7 +22,7 @@ void tearDown() {}
 
 __attribute__((unused)) static void print_register(MAX2871 &lo, uint8_t regAddr) {
     char buf[128];
-    snprintf(buf, sizeof(buf), "reg[%d]=0x%08lX", regAddr, lo.Curr.Reg[regAddr]);
+    snprintf(buf, sizeof(buf), "reg[%d] = 0x%08lX", regAddr, lo.Curr.Reg[regAddr]);
     TEST_MESSAGE(buf);
 }
 
