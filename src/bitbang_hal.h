@@ -50,15 +50,11 @@ public:
     }
 
     void spiWriteRegister(uint32_t regVal) override {
-        digitalWrite(pinLE, PINLEVEL_LOW);
-        for (int i = 31; i >= 0; --i) {
-            digitalWrite(pinDATA, static_cast<PinLevel>((regVal >> i) & 1));
-            digitalWrite(pinCLK, PINLEVEL_HIGH);
-            delayMicroseconds(1);
-            digitalWrite(pinCLK, PINLEVEL_LOW);
-        }
+        shiftOut(pinDATA, pinCLK, MSBFIRST, regVal >> 24);
+        shiftOut(pinDATA, pinCLK, MSBFIRST, regVal >> 16);
+        shiftOut(pinDATA, pinCLK, MSBFIRST, regVal >> 8);
+        shiftOut(pinDATA, pinCLK, MSBFIRST, regVal);
         digitalWrite(pinLE, PINLEVEL_HIGH);
-        delayMicroseconds(1);
         digitalWrite(pinLE, PINLEVEL_LOW);
     }
 
