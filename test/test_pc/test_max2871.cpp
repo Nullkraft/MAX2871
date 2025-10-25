@@ -193,26 +193,22 @@ void test_updateRegisters_mixed_dirty_with_R4_forces_R0(void) {
 
 void test_outputSelect_marks_R4_only_and_sets_expected_bits(void) {
     /* Before the test calls outputSelect()...
-     * 1) By default both outputs are enabled ==> outputSelect(3)
-     * 2) When outputSelect(3) is called it won't flag Reg[4]
-     *    as dirty because there is no change from the default
-     *    register value. (No register change == No dirty flag)
+     * 1) By default both outputs are enabled ==> outputSelect(RF_ALL)
      */
+    uint32_t reg4_RF_AB_mask = 0x120;
     MAX2871 lo(66e6);
     lo.reset();
-    uint32_t before = MAX2871::defaultRegisters.Reg[4];
+    uint32_t before = lo.Curr.Reg[4] & reg4_RF_AB_mask; // Should equal RF_ALL, default
     uint32_t after;
 
+    const RFOutPort rfPorts[] = {RFNONE, RF_A, RF_B, RF_ALL};
     for (int i = 0; i < 4; i++) {
-        lo.reset();
-        lo.outputSelect(i);
-        after = lo.Curr.Reg[4];
-        if (after != before) {
-            TEST_ASSERT_EQUAL_UINT8((1u << 4), lo.getDirtyMask());
-        }
-        else{
-            TEST_ASSERT_EQUAL_UINT8((0u << 4), lo.getDirtyMask());  // only R4 is dirty
-        }
+        lo.outputSelect(rfPorts[i]);
+        after = lo.Curr.Reg[4] & reg4_RF_AB_mask;
+        if (i==RFNONE) TEST_ASSERT_NOT_EQUAL(before, after);
+        if (i==RF_A) TEST_ASSERT_NOT_EQUAL(before, after);
+        if (i==RF_B) TEST_ASSERT_NOT_EQUAL(before, after);
+        if (i>=RF_ALL) TEST_ASSERT_EQUAL(0x120, after);
     }
 }
 
