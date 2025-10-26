@@ -34,9 +34,12 @@ void MAX2871::setFrequency(double freqMHz) {
 }
 
 void MAX2871::setFrequency(uint32_t fmn, uint8_t diva) {
-    // TODO: unpack FMN + DIVA
-    // TODO: update shadow registers directly
-    // TODO: program chip via writeRegister/setAllRegisters
+    Frac = (fmn >> 20) & 0xFFF;
+    M = (fmn >> 8) & 0xFFF;
+    N = fmn & 0xFF;
+    DIVA = diva;
+    float freq = fmn2freq();
+    setFrequency(freq);
 }
 
 void MAX2871::freq2FMN(float target_freq_MHz) {
