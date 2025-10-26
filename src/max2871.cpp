@@ -84,8 +84,8 @@ void MAX2871::freq2FMN(float target_freq_MHz) {
 }
 
 double MAX2871::fmn2freq() {
-    double fVCO = this->Fpfd * (this->N + (double)this->Frac / this->M);
-    double fout = fVCO / (1 << this->DIVA);
+    double fVCO = Fpfd * (N + (double)Frac / M);
+    double fout = fVCO / (1 << DIVA);
     return fout;
 }
 
