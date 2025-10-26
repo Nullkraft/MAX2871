@@ -175,7 +175,7 @@ void MAX2871::updateRegisters() {
     // Additional write cycle after a reset
     if (first_init) {
         writeRegister(Curr.Reg[5]);                         // Program register 5
-        if (hal) hal->delayMs(5);
+        if (hal) hal->delayMs(20);
         writeRegister(Curr.Reg[4] & 0xFFFFFEDF);            // Disable RFOUTA and RFOUTB
         for (int regAddr = 3; regAddr >= 0; --regAddr) {    // Program registers 3, 2, 1, 0
             writeRegister(Curr.Reg[regAddr]);
