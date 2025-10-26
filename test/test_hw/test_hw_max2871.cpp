@@ -41,9 +41,10 @@ __attribute__((unused)) static void print_hex(uint32_t val) {
 
 // SPI speed note: AVR UNO tops out around ~8 MHz reliably.
 void test_begin_runs_on_hardware(void) {
-    hal.begin(4000000UL);       // conservative SPI
-    lo.attachHal(&hal);
-    lo.begin(PIN_LE);           // should issue startup R5..R0 twice in your impl
+    // hal.begin(16000000UL);       // conservative SPI
+    // lo.attachHal(&hal);
+    // lo.begin(PIN_LE);           // Performs clean-clock startup I.A.W. the spec sheet
+    lo.outputPower(+2, RF_ALL);
     TEST_PASS_MESSAGE("begin() executed without errors on hardware.");
 }
 
@@ -66,43 +67,53 @@ void test_observe_muxout_level(void) {
 // Helper to set outputs explicitly (optional but nice for scoping)
 static void enable_outputs_for_scope() {
     // If your API mapping is: 0=Off,1=A,2=B,3=Both (per your earlier tests)
-    lo.outputSelect(3);      // both outputs ON
+    lo.outputSelect(RF_ALL);      // both outputs ON
     // If your mapping is 0=-4dBm, 1=-1dBm, 2=+2dBm, 3=+5dBm (from earlier work):
     lo.outputPower(+5, RF_A);       // +2 dBm is a safe middle level for most scopes
     lo.outputPower(+5, RF_B);
 }
 
-void test_set_freq_60MHz_for_scope(void) {
-    pinMode(REF_EN1, OUTPUT);       // Scope channel 2
+/* Test Frequency  */
+void test_verify_frequency_calculations(void) {
+    pinMode(REF_EN1, OUTPUT);
     digitalWrite(REF_EN1, HIGH);
-
-    // Keep SPI already begun/attached from the prior test, but safe to repeat:
-    hal.begin(20000000UL);
-    lo.attachHal(&hal);
-    lo.begin(PIN_LE);               // Scope channel 1
-    // Program ~60.00 MHz
-    lo.setFrequency(60.0);
-    lo.outputSelect(3);
+    float freq_in = 3213.579;
+    lo.setFrequency(freq_in);
+    float freq_fmn = lo.fmn2freq();
+    lo.outputSelect(RF_ALL);
     lo.outputPower(+5, RF_A);
-    TEST_MESSAGE("*** Registers ***");
-    print_registers(lo);
-    TEST_PASS();
+    TEST_ASSERT_EQUAL_FLOAT_MESSAGE(freq_in, freq_fmn, "*** Verify frequency calculations ***");
+}
+
+void test_default_setup() {
+    // TEST_MESSAGE("*** Registers ***");
+    // print_registers(lo);
 }
 
 int runUnityTests() {
     UNITY_BEGIN();
+    RUN_TEST(test_default_setup);
     // RUN_TEST(test_begin_runs_on_hardware);
     // RUN_TEST(test_observe_muxout_level);
-    RUN_TEST(test_set_freq_60MHz_for_scope);
+    RUN_TEST(test_verify_frequency_calculations);
     return UNITY_END();
 }
 
 void setup() {
-    delay(2000);     // give serial monitor time to connect
+    // delay(2000);             // give serial monitor time to connect
+    hal.begin(16000000UL);
+    lo.attachHal(&hal);
+    lo.begin(PIN_LE);        // Performs clean-clock startup I.A.W. the spec sheet
     runUnityTests();
+    hal.pinMode(LED_BUILTIN, PINMODE_OUTPUT);
 }
 
-void loop() {}
+void loop() {
+    lo.setFrequency(30.0);
+    delay(500);
+    lo.setFrequency(32.0);
+    delay(500);
+}
 
 #endif // ARDUINO
 // #endif // if not ARDUINO
