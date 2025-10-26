@@ -49,21 +49,27 @@ __attribute__((unused)) static void print_hex(uint32_t val) {
 // --- Round-trip Test for Known Case ---
 void test_round_trip_known(void) {
     float tolerance = 0.002;        // +/- 1 kHz
-    double freq = 42.00;
+    double freq = 75.00;
     lo.outputPower(+5, RF_ALL);
     lo.outputSelect(RF_ALL);
-    // lo.setFrequency(freq);  // Set the frequency by calculating Frac, M, and N
-    TEST_MESSAGE("*** Registers ***");
-    print_registers(lo);
-    // lo.freq2FMN(freq);      // Get calculated frequency from on Frac, M, and N
-    // TEST_ASSERT_FLOAT_WITHIN(tolerance, freq, lo.fmn2freq());
+    lo.setFrequency(freq);  // Set the frequency by calculating Frac, M, and N
+    lo.freq2FMN(freq);      // Get calculated frequency from on Frac, M, and N
+    TEST_ASSERT_FLOAT_WITHIN(tolerance, freq, lo.fmn2freq());
 }
 
 void test_set_RF_output_power_level(void) {
-    lo.setFrequency(42.00);  // Set 42MHz by calculating Frac, M, and N
-    lo.outputPower(-4, RF_A);
+    uint8_t mask = 0xD8;
+    lo.outputPower(-4, RF_ALL);
+    TEST_ASSERT_BITS_MESSAGE(mask, 0x0, lo.Curr.Reg[4], "*** -4 dBm ***");
+    lo.outputPower(-1, RF_ALL);
+    TEST_ASSERT_BITS_MESSAGE(mask, 0x48, lo.Curr.Reg[4], "*** -2 dBm ***");
+    lo.outputPower(+2, RF_ALL);
+    TEST_ASSERT_BITS_MESSAGE(mask, 0x90, lo.Curr.Reg[4], "*** +1 dBm ***");
+    lo.outputPower(+5, RF_ALL);
+    TEST_ASSERT_BITS_MESSAGE(mask, 0xD8, lo.Curr.Reg[4], "*** +5 dBm ***");
 }
 
+// To see the printed output run 'pio test -ve eval_board'
 void test_default_setup() {
     TEST_MESSAGE("*** Registers ***");
     print_registers(lo);
@@ -71,9 +77,9 @@ void test_default_setup() {
 
 int runUnityTests() {
     UNITY_BEGIN();
-    // RUN_TEST(test_default_setup);
+    RUN_TEST(test_default_setup);
     RUN_TEST(test_round_trip_known);
-    // RUN_TEST(test_set_RF_output_power_level);
+    RUN_TEST(test_set_RF_output_power_level);
     return UNITY_END();
 }
 
@@ -81,17 +87,14 @@ void setup() {
     delay(2000);     // give serial monitor time to connect
     hal.begin();
     lo.attachHal(&hal);
-    lo.begin(PIN_LE);        //************************************************//
-    hal.setCEPin(true);     // <--- THIS SHOULD SET RF ENABLE PIN 5 HIGH ---- //
-    runUnityTests();       //________________________________________________//
+    lo.begin(PIN_LE);
+    hal.setCEPin(true);     // <--- This sets RF Enable Pin5 High
+    runUnityTests();
 }
 
 void loop() {
-    // lo.reset();
-    // delay(2);
-    // lo.outputPower(+5, RF_ALL);
-    // lo.outputSelect(RF_ALL);
-    // delay(500);
+    lo.reset();
+    delay(500);
 }
 
 #endif // ARDUINO
