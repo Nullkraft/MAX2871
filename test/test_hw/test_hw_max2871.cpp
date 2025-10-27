@@ -106,6 +106,8 @@ void setup() {
     lo.begin(PIN_LE);        // Performs clean-clock startup I.A.W. the spec sheet
     runUnityTests();
     hal.pinMode(LED_BUILTIN, PINMODE_OUTPUT);
+    lo.setFrequency(50.0);
+    lo.outputSelect(RF_ALL);
 }
 
 void loop() {
