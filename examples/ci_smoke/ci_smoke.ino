@@ -1,23 +1,10 @@
 #include <Arduino.h>
 #include "max2871.h"
-#include "arduino_hal.h"    // from your src/
-
-uint8_t PIN_LE = 3;
-MAX2871 lo(66.0);
-ArduinoHAL hal(PIN_LE);
+#include "smoke_hal.h"    // from your src/
 
 void setup() {
-    pinMode(LED_BUILTIN, OUTPUT);
-
-    // hal.begin(16000000UL);
-    // lo.attachHal(&hal);
-    // lo.begin(PIN_LE);
-    // hal.pinMode(LED_BUILTIN, PINMODE_OUTPUT);
-    // lo.setFrequency(50.0);
-    // lo.outputSelect(RF_ALL);
+    MAX2871 lo(66.0);
+    (void) lo;
 }
 
-void loop() {
-    digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
-    delay(1000);
-}
+void loop() {}
