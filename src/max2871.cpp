@@ -213,9 +213,8 @@ void MAX2871::reset() {
 }
 
 /*  This function provides the expert with the ability to manually change the bits
-    within the registers. You can stack as many calls to setRegisterField as you 
-    like and then make a final call to updateRegisters() to program the chip with
-    your changes.
+    within the registers. You can stack as many calls to setRegisterField as you like
+    and then make a call to updateRegisters() to program the chip with your changes.
  */
 void MAX2871::setRegisterField(uint8_t regAddr, uint8_t bit_hi, uint8_t bit_lo, uint32_t value) {
     // Swap bit_lo and bit_hi if bit_lo is higher than bit_hi
