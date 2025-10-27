@@ -3,7 +3,7 @@
 
 .pio/
 .vscode/
-.venv_max2871/
+.venv/
 .editorconfig
 
 docs/
