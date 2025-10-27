@@ -21,6 +21,11 @@ This library provides a clean, Arduino-friendly API for programming the MAX2871 
 
 This is a **PlatformIO** project. While the library is Arduino-compatible, it uses PlatformIO's build system for development, testing, and deployment.
 
+> **Arduino IDE**
+>
+> The repository layout now follows the standard Arduino library structure (`library.properties`, `src/`, `examples/`).
+> Clone or copy the folder into your Arduino `libraries/` directory and open any sketch under `examples/` directly inside the Arduino IDE without moving files. PlatformIO users can continue to work from the same tree with no changes.
+
 ### Requirements
 
 - [PlatformIO Core](https://platformio.org/) or PlatformIO IDE
