@@ -2,6 +2,25 @@
 
 A hardware abstraction library for controlling the MAX2871 wideband PLL synthesizer (23.5-6000 MHz) on Arduino and compatible platforms.
 
+## Design Choices
+
+Arduino pins:
+* PLL_MUX = A2
+* SEL_LO1 = A3
+* SEL_LO3 = A4
+* SEL_ATTEN = A5
+* Serial Port Pins (reserved - not defined in source) = 0 and 1
+* SEL_LO2 = 3
+* PWR_DETECT = 6 (Read-only - detects +3.3V rail on RF board)
+* REF_EN1 = 8
+* REF_EN2 = 9
+* SPI_MOSI/SPI_MISO/SPI_CLK (reserved - not defined in source) = 11, 12, and 13
+
+- Pins are unchangeable but defined in the sketch so they can be seen
+- The SA library and the comms library will be imported into the sketch.
+- There are 2 circuit boards, the Arduino and the RF board.
+- The RF board is nothing without the Arduino. It defines the Spectrum Analyzer by coordinating the control of the components on the RF board.
+
 ## License
 
 This project is licensed under the **GPL-3.0-or-later**. See the LICENSE file for details.
