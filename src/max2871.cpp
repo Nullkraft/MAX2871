@@ -2,11 +2,24 @@
 
 // ---- Static read-only defaults ----
 const MAX2871::max2871Registers MAX2871::defaultRegisters = {{
-    0x001A8008,  // Register 0 - Contains F and parts of N
-    0x40010019,  // Register 1 - Contains M
-    0x98007F42,  // Register 2 - Digital Lock Detect (DLD) on
+    /* 50.0 MHz target with 60.0 MHz refClock
+     * Use for max2871 evaluation board
+     */
+    // 0x001D1740, // R0
+    // 0x4000FFE1, // R1
+    // 0x80005F42, // R2
+    // 0x00009F23, // R3
+    // 0x63EE83FC, // R4    RF_A and RF_B on @ +5 dBm // DIVA = div-by-64
+    // 0x00400005, // R5
+
+    /* 60.0 MHz target with 66.0 Mhz refClock
+     * User for Spectrum Analyzer RF board
+     */
+    0x001AAAA8,  // Register 0 - Contains F and parts of N
+    0x4000FFF9,  // Register 1 - Contains M
+    0x80005F42,  // Register 2 - Digital Lock Detect (DLD) on
     0x00001F23,  // Register 3
-    0x63EE81FC,  // Register 4
+    0x63EE81FC,  // Register 4  RF_A off // RF_B @ +5 dBm // DIVA = div-by-64
     0x00400005   // Register 5
 }};
 
@@ -178,7 +191,7 @@ void MAX2871::updateRegisters() {
     // Additional write cycle after a reset
     if (first_init) {
         writeRegister(Curr.Reg[5]);                         // Program register 5
-        if (hal) hal->delayMs(20);
+        if (hal) hal->delayMs(5);
         writeRegister(Curr.Reg[4] & 0xFFFFFEDF);            // Disable RFOUTA and RFOUTB
         for (int regAddr = 3; regAddr >= 0; --regAddr) {    // Program registers 3, 2, 1, 0
             writeRegister(Curr.Reg[regAddr]);

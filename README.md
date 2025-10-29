@@ -21,6 +21,8 @@ Arduino pins:
 - There are 2 circuit boards, the Arduino and the RF board.
 - The RF board is nothing without the Arduino. It defines the Spectrum Analyzer by coordinating the control of the components on the RF board.
 
+The 2 reference clocks are selected by REF_EN1 and REF_EN2. The selection process for which clock to use will be driven by data from the PC.
+
 ## License
 
 This project is licensed under the **GPL-3.0-or-later**. See the LICENSE file for details.
