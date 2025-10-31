@@ -100,7 +100,6 @@ int runUnityTests() {
 }
 
 void setup() {
-    // delay(2000);             // give serial monitor time to connect
     hal.begin(16000000UL);
     lo.attachHal(&hal);
     lo.begin(PIN_LE);        // Performs clean-clock startup I.A.W. the spec sheet
