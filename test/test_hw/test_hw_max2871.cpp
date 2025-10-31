@@ -106,15 +106,20 @@ void setup() {
     lo.begin(PIN_LE);        // Performs clean-clock startup I.A.W. the spec sheet
     runUnityTests();
     hal.pinMode(LED_BUILTIN, PINMODE_OUTPUT);
-    lo.setFrequency(50.0);
     lo.outputSelect(RF_ALL);
+    lo.outputPower(+5, RF_ALL);
 }
 
+uint16_t freq = 35;
 void loop() {
-    lo.setFrequency(30.0);
-    delay(500);
-    lo.setFrequency(32.0);
-    delay(500);
+    for (freq = 30; freq < 70; freq++) {
+        lo.setFrequency(freq*1.0);
+        // delay(10);
+    }
+    for (freq = 70; freq > 30; freq--) {
+        lo.setFrequency(freq*1.0);
+        // delay(10);
+    }
 }
 
 #endif // ARDUINO
