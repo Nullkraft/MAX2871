@@ -110,14 +110,15 @@ void setup() {
 }
 
 uint16_t freq = 35;
+uint16_t timing = 1500;
 void loop() {
     for (freq = 30; freq < 70; freq++) {
-        lo.setFrequency(freq*1.0);
-        // delay(10);
+        lo.setFrequency(freq*1.0+0.005);
+        delay(timing);
     }
     for (freq = 70; freq > 30; freq--) {
-        lo.setFrequency(freq*1.0);
-        // delay(10);
+        lo.setFrequency(freq*1.0+0.005);
+        delay(timing);
     }
 }
 
