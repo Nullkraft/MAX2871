@@ -15,8 +15,8 @@ const MAX2871::max2871Registers MAX2871::defaultRegisters = {{
     /* 60.0 MHz target with 66.0 Mhz refClock
      * User for Spectrum Analyzer RF board
      */
-    0x001AAAA8,  // Register 0 - Contains F and parts of N
-    0x4000FFF9,  // Register 1 - Contains M
+    0x001D1740,  // Register 0 - Contains F and parts of N
+    0x40017FE1,  // Register 1 - Contains M
     0x80005F42,  // Register 2 - Digital Lock Detect (DLD) on
     0x00001F23,  // Register 3
     0x63EE81FC,  // Register 4  RF_A off // RF_B @ +5 dBm // DIVA = div-by-64

@@ -56,9 +56,8 @@ public:
         // ::digitalWrite(_le, LOW);
         SPI.transfer16((value >> 16) & 0xFFFF);
         SPI.transfer16(value & 0xFFFF);
-        // ::digitalWrite(_le, HIGH);
-        ::digitalWrite(_le, LOW);       // Pulse low to latch data into register
-        ::digitalWrite(_le, HIGH);
+        ::digitalWrite(_le, HIGH);          // HIGH then ...
+        ::digitalWrite(_le, LOW);           // LOW to program the chip
         SPI.endTransaction();
     }
 
