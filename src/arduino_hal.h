@@ -53,7 +53,6 @@ public:
         // Typical MAX2871 write (MSB first, 32 bits)
         SPI.beginTransaction(SPISettings(20000000, MSBFIRST, SPI_MODE0));
         SPI.begin();
-        // ::digitalWrite(_le, LOW);
         SPI.transfer16((value >> 16) & 0xFFFF);
         SPI.transfer16(value & 0xFFFF);
         ::digitalWrite(_le, HIGH);          // HIGH then ...
