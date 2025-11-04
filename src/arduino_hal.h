@@ -51,12 +51,11 @@ public:
 
     void spiWriteRegister(uint32_t value) override {
         // Typical MAX2871 write (MSB first, 32 bits)
-        ::digitalWrite(_le, HIGH);          // HIGH then ...
         SPI.beginTransaction(SPISettings(20000000, MSBFIRST, SPI_MODE0));
         SPI.begin();
         SPI.transfer16((value >> 16) & 0xFFFF);
         SPI.transfer16(value & 0xFFFF);
-        // ::digitalWrite(_le, HIGH);          // HIGH then ...
+        ::digitalWrite(_le, HIGH);          // HIGH then ...
         ::digitalWrite(_le, LOW);           // LOW to program the chip
         SPI.endTransaction();
     }
