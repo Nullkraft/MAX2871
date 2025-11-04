@@ -51,7 +51,7 @@ public:
 
     void spiWriteRegister(uint32_t value) override {
         // Typical MAX2871 write (MSB first, 32 bits)
-        SPI.beginTransaction(SPISettings(20000000, MSBFIRST, SPI_MODE0));
+        SPI.beginTransaction(SPISettings(_spiHz, MSBFIRST, SPI_MODE0));
         SPI.begin();
         SPI.transfer16((value >> 16) & 0xFFFF);
         SPI.transfer16(value & 0xFFFF);

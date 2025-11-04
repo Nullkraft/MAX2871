@@ -43,7 +43,7 @@ __attribute__((unused)) static void print_hex(uint32_t val) {
 void test_begin_runs_on_hardware(void) {
     // hal.begin(16000000UL);       // conservative SPI
     // lo.attachHal(&hal);
-    // lo.begin(PIN_LE);           // Performs clean-clock startup I.A.W. the spec sheet
+    // lo.begin();                 // Performs clean-clock startup I.A.W. the spec sheet
     lo.outputPower(+2, RF_ALL);
     TEST_PASS_MESSAGE("begin() executed without errors on hardware.");
 }
@@ -102,7 +102,7 @@ int runUnityTests() {
 void setup() {
     hal.begin(16000000UL);
     lo.attachHal(&hal);
-    lo.begin(PIN_LE);        // Performs clean-clock startup I.A.W. the spec sheet
+    lo.begin();        // Performs clean-clock startup I.A.W. the spec sheet
     runUnityTests();
     hal.pinMode(LED_BUILTIN, PINMODE_OUTPUT);
     lo.outputSelect(RF_ALL);

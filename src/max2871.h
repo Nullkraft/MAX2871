@@ -23,7 +23,7 @@ public:
   MAX2871() = delete;                                       // Disallow empty constructor
 
   void attachHal(HAL* halPtr) override {hal = halPtr;}
-  void begin(uint8_t lePin) override;                       // new: init with LE pin
+  void begin() override;
 
   // ---- Frequency Control ----
   void setFrequency(double freqMHz) override;               // calculates FMN+DIVA
@@ -69,7 +69,6 @@ private:
   // control
   double refInHz;                   // Reference clock input frequency
   double fpfdHz;                    // phase detector frequency
-  uint8_t _lePin;                   // Per-device chip select pin
   uint8_t _rfEnPin;
   bool first_init;
   uint8_t _dirtyMask = 0;

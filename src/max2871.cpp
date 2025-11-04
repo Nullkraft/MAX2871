@@ -27,11 +27,10 @@ const MAX2871::max2871Registers MAX2871::defaultRegisters = {{
 
 /* hal defaults to nullptr */
 MAX2871::MAX2871(double refIn) 
-    : refInHz(refIn), _lePin(0), first_init(true), _dirtyMask(0) {
+    : refInHz(refIn), fpfdHz(0.0), _rfEnPin(0), first_init(true), _dirtyMask(0) {
 }
 
-void MAX2871::begin(uint8_t lePin) {
-    _lePin = lePin;
+void MAX2871::begin() {
     reset();  // Fill the working (shadow) registers
 }
 

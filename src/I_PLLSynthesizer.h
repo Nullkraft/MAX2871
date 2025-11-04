@@ -25,7 +25,7 @@ public:
 
     //  Initialization 
     virtual void attachHal(HAL* halptr) = 0;        // inject HAL
-    virtual void begin(uint8_t lePin) = 0;
+    virtual void begin() = 0;
 
     //  Frequency Control 
     virtual void setFrequency(double freqMHz) = 0;              // calculates FMN+DIVA

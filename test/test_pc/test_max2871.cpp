@@ -94,7 +94,7 @@ void test_interface_begin_and_setFrequency(void) {
     MockHAL hal;
     I_PLLSynthesizer* lo_if = new MAX2871(66.0);
     lo_if->attachHal(&hal);
-    lo_if->begin(17);
+    lo_if->begin();
 
     lo_if->setFrequency(4192.392);          // exercise interface to setFrequency()
     TEST_ASSERT_FALSE(lo_if->isLocked());   // MockHAL returns false
