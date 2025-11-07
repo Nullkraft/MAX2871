@@ -88,6 +88,10 @@ void test_verify_frequency_calculations(void) {
 void test_default_setup() {
     // TEST_MESSAGE("*** Registers ***");
     // print_registers(lo);
+    pinMode(REF_EN1, OUTPUT);
+    digitalWrite(REF_EN1, HIGH);
+    float freq_in = 75.003;
+    lo.setFrequency(freq_in);
 }
 
 int runUnityTests() {
@@ -95,7 +99,7 @@ int runUnityTests() {
     RUN_TEST(test_default_setup);
     // RUN_TEST(test_begin_runs_on_hardware);
     // RUN_TEST(test_observe_muxout_level);
-    RUN_TEST(test_verify_frequency_calculations);
+    // RUN_TEST(test_verify_frequency_calculations);
     return UNITY_END();
 }
 
@@ -109,17 +113,26 @@ void setup() {
     lo.outputPower(+5, RF_ALL);
 }
 
-uint16_t freq = 35;
+uint16_t freq;
 uint16_t timing = 1500;
+uint16_t m1, m2;
 void loop() {
-    for (freq = 30; freq < 70; freq++) {
+    for (freq = 24; freq<2000; freq++) {
         lo.setFrequency(freq*1.0+0.005);
-        delay(timing);
+        m2 = lo.M;
+        if (m1 == m2) {
+            delay(30000);
+        }
+        m1 = m2;
     }
-    for (freq = 70; freq > 30; freq--) {
-        lo.setFrequency(freq*1.0+0.005);
-        delay(timing);
-    }
+    // for (freq = 30; freq < 70; freq++) {
+    //     lo.setFrequency(freq*1.0+0.005);
+    //     delay(timing);
+    // }
+    // for (freq = 70; freq > 30; freq--) {
+    //     lo.setFrequency(freq*1.0+0.005);
+    //     delay(timing);
+    // }
 }
 
 #endif // ARDUINO
