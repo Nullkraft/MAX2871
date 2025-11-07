@@ -1,6 +1,7 @@
 #ifndef _MAX2871_
 #define _MAX2871_
 
+#include <Arduino.h>
 #include <math.h>
 #include "I_PLLSynthesizer.h"   // Common PLL interface (#includes HAL)
 
@@ -72,7 +73,7 @@ private:
   uint8_t _rfEnPin;
   bool first_init;
   uint8_t _dirtyMask = 0;
-  uint8_t _lastDIVA = 0xFF;         // Track last DIVA value (0xFF = uninitialized)
+  uint8_t _lastDIVA = 0xFF;         // Should reg4 be double buffered (DIVA changed or not) by reg1?
   uint32_t spiMaxSpeed = 20000000;  // 20 MHz
 };
 

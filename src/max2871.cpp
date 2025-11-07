@@ -38,11 +38,12 @@ void MAX2871::begin() {
 
 void MAX2871::setFrequency(double freqMHz) {
     freq2FMN(freqMHz);
-    setRegisterField(4, 22, 20, DIVA);
     setRegisterField(1, 14,  3, M);
     setRegisterField(0, 14,  3, Frac);
     setRegisterField(0, 30, 15, N);
+    setRegisterField(4, 22, 20, DIVA);
     updateRegisters();
+    _lastDIVA = DIVA;   // If DIVA changes then double buffer reg4
 }
 
 void MAX2871::setFrequency(uint32_t fmn, uint8_t diva) {
@@ -199,14 +200,14 @@ void MAX2871::updateRegisters() {
         _dirtyMask = 0x3F;
     }
 
-    if (_dirtyMask == 0) return;                            // Do any registers need updating
+    if (_dirtyMask == 0) return;    // Exit early if no registers to update
 
-    _dirtyMask |= (_dirtyMask >> 1) & 1UL;                  // Reg1 writes are buffered by Reg0
-    uint8_t currDIVA = (Curr.Reg[4] >> 20) & 0x7;           // Reg0 buffers Reg4 writes for DIVA only
-    if (currDIVA != _lastDIVA) {
-        _dirtyMask |= 1;
+    _dirtyMask |= (_dirtyMask >> 1) & 1UL;  // Reg1 updates require reg0 update
+
+    if (DIVA != _lastDIVA) {        // Reg4 double buffering: If DIVA changed then write to reg0
+        _dirtyMask |= (1 << 4);     // mark reg 4 for update
+        _dirtyMask |= 1;            // mark reg 0 for update (double buffers DIVA changes)
     }
-    _lastDIVA = (Curr.Reg[4] >> 20) & 0x7;
 
     for (int regAddr = 5; regAddr >= 0; --regAddr) {
         if ((_dirtyMask & (1UL << regAddr)) != 0) {
