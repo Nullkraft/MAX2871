@@ -43,7 +43,6 @@ void MAX2871::setFrequency(double freqMHz) {
     setRegisterField(0, 30, 15, N);
     setRegisterField(4, 22, 20, DIVA);
     updateRegisters();
-    _lastDIVA = DIVA;   // If DIVA changes then double buffer reg4
 }
 
 void MAX2871::setFrequency(uint32_t fmn, uint8_t diva) {
