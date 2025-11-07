@@ -38,26 +38,11 @@ void MAX2871::begin() {
 
 void MAX2871::setFrequency(double freqMHz) {
     freq2FMN(freqMHz);
-
-    Serial.print("Before call to setRegisterField(): Curr.Reg[");
-    Serial.print(1);
-    Serial.print("] = ");
-    Serial.println(Curr.Reg[1], HEX);
     setRegisterField(1, 14,  3, M);
-    Serial.print("After call to setRegisterField():  Curr.Reg[");
-    Serial.print(1);
-    Serial.print("] = ");
-    Serial.println(Curr.Reg[1], HEX);
-
     setRegisterField(0, 14,  3, Frac);
     setRegisterField(0, 30, 15, N);
     setRegisterField(4, 22, 20, DIVA);
     updateRegisters();
-    Serial.print("After call to updateRegisters():   Curr.Reg[");
-    Serial.print(1);
-    Serial.print("] = ");
-    Serial.println(Curr.Reg[1], HEX);
-
     _lastDIVA = DIVA;   // If DIVA changes then double buffer reg4
 }
 

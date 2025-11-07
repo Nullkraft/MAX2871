@@ -1,7 +1,6 @@
 #ifndef _MAX2871_
 #define _MAX2871_
 
-#include <Arduino.h>
 #include <math.h>
 #include "I_PLLSynthesizer.h"   // Common PLL interface (#includes HAL)
 
