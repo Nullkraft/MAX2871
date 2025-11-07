@@ -38,11 +38,26 @@ void MAX2871::begin() {
 
 void MAX2871::setFrequency(double freqMHz) {
     freq2FMN(freqMHz);
+
+    Serial.print("Before call to setRegisterField(): Curr.Reg[");
+    Serial.print(1);
+    Serial.print("] = ");
+    Serial.println(Curr.Reg[1], HEX);
     setRegisterField(1, 14,  3, M);
+    Serial.print("After call to setRegisterField():  Curr.Reg[");
+    Serial.print(1);
+    Serial.print("] = ");
+    Serial.println(Curr.Reg[1], HEX);
+
     setRegisterField(0, 14,  3, Frac);
     setRegisterField(0, 30, 15, N);
     setRegisterField(4, 22, 20, DIVA);
     updateRegisters();
+    Serial.print("After call to updateRegisters():   Curr.Reg[");
+    Serial.print(1);
+    Serial.print("] = ");
+    Serial.println(Curr.Reg[1], HEX);
+
     _lastDIVA = DIVA;   // If DIVA changes then double buffer reg4
 }
 
@@ -202,13 +217,6 @@ void MAX2871::updateRegisters() {
 
     if (_dirtyMask == 0) return;    // Exit early if no registers to update
 
-    _dirtyMask |= (_dirtyMask >> 1) & 1UL;  // Reg1 updates require reg0 update
-
-    if (DIVA != _lastDIVA) {        // Reg4 double buffering: If DIVA changed then write to reg0
-        _dirtyMask |= (1 << 4);     // mark reg 4 for update
-        _dirtyMask |= 1;            // mark reg 0 for update (double buffers DIVA changes)
-    }
-
     for (int regAddr = 5; regAddr >= 0; --regAddr) {
         if ((_dirtyMask & (1UL << regAddr)) != 0) {
             writeRegister(Curr.Reg[regAddr]);
@@ -237,11 +245,10 @@ void MAX2871::setRegisterField(uint8_t regAddr, uint8_t bit_hi, uint8_t bit_lo, 
         bit_lo = bit_temp;
     }
 
-    /* --- Input validation ---
-     * bit_lo  : 3 or higher (2:0 reserved for register address)
-     * bit_hi  : 31 or lower (registers are 32 bits)
-     * regAddr : 7 registers (0 to 6)
-    */
+    // --- Input validation ---
+    // bit_lo  : 3 or higher (2:0 reserved for register address)
+    // bit_hi  : 31 or lower (registers are 32 bits)
+    // regAddr : 7 registers (0 to 6)
     if (bit_lo < 3 || bit_hi > 31 || regAddr > 6) return;
 
     uint32_t oldVal = Curr.Reg[regAddr];
@@ -256,5 +263,14 @@ void MAX2871::setRegisterField(uint8_t regAddr, uint8_t bit_hi, uint8_t bit_lo, 
     if (newVal != oldVal) {
         Curr.Reg[regAddr] = newVal;
         _dirtyMask |= (1 << regAddr);  // mark this register for update
+    }
+
+    // If reg1 is dirty then mark reg0 as dirty (double buffer)
+    _dirtyMask |= (_dirtyMask >> 1) & 1UL;
+
+    // If DIVA changed then mark reg0 as dirty (double buffer)
+    if (DIVA != _lastDIVA) {        // Reg4 double buffering: If DIVA changed then write to reg0
+        _dirtyMask |= (1 << 4);     // mark reg 4 for update
+        _dirtyMask |= 1;            // mark reg 0 for update (double buffers DIVA changes)
     }
 }
