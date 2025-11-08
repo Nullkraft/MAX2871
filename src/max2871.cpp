@@ -222,39 +222,28 @@ void MAX2871::reset() {
     and then make a call to updateRegisters() to program the chip with your changes.
  */
 void MAX2871::setRegisterField(uint8_t regAddr, uint8_t bit_hi, uint8_t bit_lo, uint32_t value) {
-    // Swap bit_lo and bit_hi if bit_lo is higher than bit_hi
-    if (bit_lo > bit_hi) {
-        uint8_t bit_temp = bit_hi;
-        bit_hi = bit_lo;
-        bit_lo = bit_temp;
-    }
-
     // --- Input validation ---
-    // bit_lo  : 3 or higher (2:0 reserved for register address)
-    // bit_hi  : 31 or lower (registers are 32 bits)
-    // regAddr : 7 registers (0 to 6)
+    // Swap bit_lo <---> bit_hi if bit_lo is higher
+    if (bit_lo > bit_hi) {
+        bit_lo ^= bit_hi,       // bit_lo now holds XOR of both
+        bit_hi ^= bit_lo,       // bit_hi now holds original bit_lo
+        bit_lo ^= bit_hi;       // bit_lo now holds original bit_hi
+    }
+    // bits 2:0 contain register address 6 down to 0. Bits 31:3 register data
     if (bit_lo < 3 || bit_hi > 31 || regAddr > 6) return;
 
-    uint32_t oldVal = Curr.Reg[regAddr];
-
-    // Clear oldVal bit range before inserting (ANDing) new values
-    uint32_t mask = bitMask(bit_hi, bit_lo);
-
-    // Insert new value into the target bitfield
-    uint32_t newVal = (Curr.Reg[regAddr] & ~mask) | fieldValue(value, bit_hi, bit_lo);
-
-    // Only write if something actually changed
-    if (newVal != oldVal) {
-        Curr.Reg[regAddr] = newVal;
-        _dirtyMask |= (1 << regAddr);  // mark this register for update
+    // --- Check Register values ---
+    _lastDIVA = DIVA;                                   // Checking if reg4 is to be double buffered
+    uint32_t oldReg = Curr.Reg[regAddr];                // Checking for Curr.Reg value changes
+    uint32_t mask = bitMask(bit_hi, bit_lo);            // Create mask for clearing bit field
+    uint32_t data = fieldValue(value, bit_hi, bit_lo);  // Create data for filling field
+    uint32_t newReg = (Curr.Reg[regAddr] & ~mask) | data;
+    if (newReg != oldReg) {
+        Curr.Reg[regAddr] = newReg;
+        _dirtyMask |= (1 << regAddr);  // selected register being marked for update
     }
-
-    // If reg1 is dirty then mark reg0 as dirty (double buffer)
-    _dirtyMask |= (_dirtyMask >> 1) & 1UL;
-
-    // If DIVA changed then mark reg0 as dirty (double buffer)
-    if (DIVA != _lastDIVA) {        // Reg4 double buffering: If DIVA changed then write to reg0
-        _dirtyMask |= (1 << 4);     // mark reg 4 for update
+    _dirtyMask |= (_dirtyMask >> 1) & 1UL;  // If reg1 is marked then mark reg0 (double buffer)
+    if (DIVA != _lastDIVA) {
         _dirtyMask |= 1;            // mark reg 0 for update (double buffers DIVA changes)
     }
 }
