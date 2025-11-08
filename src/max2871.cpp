@@ -216,7 +216,6 @@ void MAX2871::setRegisterField(uint8_t regAddr, uint8_t bit_hi, uint8_t bit_lo, 
     if (bit_lo < 3 || bit_hi > 31 || regAddr > 6) return;
 
     // --- Check Register values ---
-    _lastDIVA = DIVA;                                   // Checking if reg4 is to be double buffered
     uint32_t oldReg = Curr.Reg[regAddr];                // Checking for Curr.Reg value changes
     uint32_t mask = bitMask(bit_hi, bit_lo);            // Create mask for clearing bit field
     uint32_t data = fieldValue(value, bit_hi, bit_lo);  // Create data for filling field
@@ -226,7 +225,5 @@ void MAX2871::setRegisterField(uint8_t regAddr, uint8_t bit_hi, uint8_t bit_lo, 
         _dirtyMask |= (1 << regAddr);  // selected register being marked for update
     }
     _dirtyMask |= (_dirtyMask >> 1) & 1UL;  // If reg1 is marked then mark reg0 (double buffer)
-    if (DIVA != _lastDIVA) {
-        _dirtyMask |= 1;            // mark reg 0 for update (double buffers DIVA changes)
-    }
+    _dirtyMask |= (_dirtyMask >> 4) & 1UL;  // If reg4 is marked then mark reg0
 }

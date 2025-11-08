@@ -52,7 +52,6 @@ private:
   uint8_t _rfEnPin;
   bool first_init;
   uint8_t _dirtyMask = 0x3F;        // All 6 registers require initial programming
-  uint8_t _lastDIVA = 0xFF;         // Comparison value - decides if reg4 needs double buffering
   uint32_t spiMaxSpeed = 20000000;
 
   void writeRegister(uint32_t value);

@@ -64,15 +64,6 @@ void test_observe_muxout_level(void) {
 
 // ---- Add below your existing tests in test_hw_max2871.cpp ----
 
-// Helper to set outputs explicitly (optional but nice for scoping)
-static void enable_outputs_for_scope() {
-    // If your API mapping is: 0=Off,1=A,2=B,3=Both (per your earlier tests)
-    lo.outputSelect(RF_ALL);      // both outputs ON
-    // If your mapping is 0=-4dBm, 1=-1dBm, 2=+2dBm, 3=+5dBm (from earlier work):
-    lo.outputPower(+5, RF_A);       // +2 dBm is a safe middle level for most scopes
-    lo.outputPower(+5, RF_B);
-}
-
 /* Test Frequency  */
 void test_verify_frequency_calculations(void) {
     pinMode(REF_EN1, OUTPUT);
