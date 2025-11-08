@@ -121,38 +121,15 @@ void test_outputSelect_marks_R4_only_and_sets_expected_bits(void) {
     }
 }
 
-void test_outputPower_marks_R4_only_and_sets_power_bits(void) {
-    MockHAL mock;
-    MAX2871 lo(66.0);
-    lo.attachHal(&mock);
-    lo.reset();
-
-    // Default Power Level is +5dBm with binary bits 11
-    uint32_t oldPower = (lo.Curr.Reg[4] >> 6) & 0x3;
-    lo.outputPower(-4, RF_B);     // Valid power levels: -4, -1, +2, +5 dBm
-    lo.updateRegisters();
-    uint32_t newPower = (lo.Curr.Reg[4] >> 6) & 0x3;
-
-    char msg[100];
-    snprintf(msg, sizeof(msg), "Power level should have changed from %lu", oldPower);
-    TEST_ASSERT_NOT_EQUAL_MESSAGE(oldPower, newPower, msg);
-}
-
 void runAllTests(void) {
     UNITY_BEGIN();
-    // RUN_TEST(test_round_trip_known);
-    // RUN_TEST(test_lowest_freq);
-    // RUN_TEST(test_highest_freq);
-    // RUN_TEST(test_integerN_case);
-    // RUN_TEST(test_param_round_trip);
-    // RUN_TEST(test_interface_begin_and_setFrequency);
-    // RUN_TEST(test_setAllRegisters_writes_all_registers_in_order);
-    // RUN_TEST(test_updateRegisters_no_writes_if_clean);
-    // RUN_TEST(test_updateRegisters_writes_only_dirty_in_descending_order);
-    // RUN_TEST(test_updateRegisters_rewrites_R0_when_R4_dirty);
-    // RUN_TEST(test_updateRegisters_mixed_dirty_with_R4_forces_R0);
+    RUN_TEST(test_round_trip_known);
+    RUN_TEST(test_lowest_freq);
+    RUN_TEST(test_highest_freq);
+    RUN_TEST(test_integerN_case);
+    RUN_TEST(test_param_round_trip);
+    RUN_TEST(test_interface_begin_and_setFrequency);
     RUN_TEST(test_outputSelect_marks_R4_only_and_sets_expected_bits);
-    // RUN_TEST(test_outputPower_marks_R4_only_and_sets_power_bits);
     UNITY_END();
 }
 

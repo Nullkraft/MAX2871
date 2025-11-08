@@ -39,10 +39,10 @@ public:
   bool isLocked() override;
 
   // ---- Register Access ----
-  void writeRegister(uint32_t value);
-  void updateRegisters();
+  // void writeRegister(uint32_t value);
+  // void updateRegisters();
   void reset();
-  void setRegisterField(uint8_t reg, uint8_t bit_hi, uint8_t bit_lo, uint32_t value);
+  // void setRegisterField(uint8_t reg, uint8_t bit_hi, uint8_t bit_lo, uint32_t value);
 
   // ---- State ----
   // Read-only default registers (for dev and reset() only)
@@ -67,6 +67,10 @@ private:
   uint8_t _dirtyMask = 0;
   uint8_t _lastDIVA = 0xFF;         // Should reg4 be double buffered (DIVA changed or not) by reg1?
   uint32_t spiMaxSpeed = 20000000;  // 20 MHz
+
+  void writeRegister(uint32_t value);
+  void updateRegisters();
+  void setRegisterField(uint8_t reg, uint8_t bit_hi, uint8_t bit_lo, uint32_t value);
 };
 
 #endif
