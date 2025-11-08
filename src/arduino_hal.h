@@ -21,7 +21,7 @@ public:
         _cp = A1;
         _dp = A2;
         ::pinMode(_le, OUTPUT);
-        ::digitalWrite(_le, HIGH);    // LE Pin active-low
+        ::digitalWrite(_le, HIGH);
         if (_ce != 0xFF) {
             ::pinMode(_ce, OUTPUT);
             ::digitalWrite(_ce, LOW);
@@ -50,9 +50,8 @@ public:
     }
 
     void spiWriteRegister(uint32_t value) override {
-        // Typical MAX2871 write (MSB first, 32 bits)
+        // MAX2871 write (MSB first, 32 bits)
         SPI.beginTransaction(SPISettings(_spiHz, MSBFIRST, SPI_MODE0));
-        SPI.begin();
         SPI.transfer16((value >> 16) & 0xFFFF);
         SPI.transfer16(value & 0xFFFF);
         ::digitalWrite(_le, HIGH);          // HIGH then ...
