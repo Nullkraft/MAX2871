@@ -172,16 +172,6 @@ void MAX2871::writeRegister(uint32_t value) {
     }
 }
 
-void MAX2871::setAllRegisters() {
-    // Writes all shadow registers R6..R0 to the I.C.
-    for (int regAddr = 6; regAddr >= 0; --regAddr) {
-        writeRegister(Curr.Reg[regAddr]);
-    }
-
-    // Full clean write completed, clear the dirty mask
-    _dirtyMask = 0;
-}
-
 /*  At power-up, the registers should be programmed twice. The first
  *  write ensures the device is enabled, and the second write starts
  *  the VCO selection process.

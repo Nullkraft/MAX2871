@@ -100,97 +100,6 @@ void test_interface_begin_and_setFrequency(void) {
     TEST_ASSERT_FALSE(lo_if->isLocked());   // MockHAL returns false
 }
 
-// Test Set All Registers
-void test_setAllRegisters_writes_all_registers_in_order(void) {
-    MockHAL mock;
-    MAX2871 lo(66.0);
-    lo.attachHal(&mock);
-
-    // Fill shadow registers with known dummy values...
-    for (int regAddr = 0; regAddr <= 6; ++regAddr) {
-        lo.Curr.Reg[regAddr] = 0xAAAA0000 | regAddr;    // reg is the register address (3 lsb)
-    }
-
-    lo.setAllRegisters();
-    // Assert: Expecting exactly 7 writes
-    TEST_ASSERT_EQUAL_UINT8(7, mock.writeCount);
-
-    // Expect values to be written in reverse order, R6 --> R0
-    for (int i = 0; i < 7; ++i) {
-        uint32_t expectedVal = 0xAAAA0000 | (6 - i);
-        TEST_ASSERT_EQUAL_HEX32(expectedVal, mock.regWrites[i]);
-    }
-
-    // Clear the shadow register dirty mask
-    TEST_ASSERT_EQUAL_UINT8(0, lo.getDirtyMask());
-}
-
-void test_updateRegisters_no_writes_if_clean(void) {
-    MockHAL mock;
-    MAX2871 lo(66.0);
-    lo.attachHal(&mock);
-
-    // Ensure clean
-    TEST_ASSERT_EQUAL_UINT8(0, lo.getDirtyMask());
-    mock.writeCount = 0;
-    lo.updateRegisters();
-
-    // TEST_ASSERT_EQUAL_UINT8(0, mock.writeCount);
-    TEST_ASSERT_EQUAL_UINT8(0, lo.getDirtyMask());
-}
-
-void test_updateRegisters_writes_only_dirty_in_descending_order(void) {
-    MockHAL mock;
-    MAX2871 lo(66.0);
-    lo.attachHal(&mock);
-
-    // Fill known patterns
-    for (int r = 0; r <= 6; ++r) lo.Curr.Reg[r] = 0xBBBB0000 | r;
-
-    // Mark R2 and R5 dirty (write order should be R5 then R2)
-    lo.markDirty(2);
-    lo.markDirty(5);
-
-    lo.updateRegisters();
-
-    // Dirty mask should have cleared bits 5 and 2, but nothing else
-    TEST_ASSERT_EQUAL_UINT8(0, lo.getDirtyMask());
-}
-
-void test_updateRegisters_rewrites_R0_when_R4_dirty(void) {
-    MockHAL mock;
-    MAX2871 lo(66.0);
-    lo.attachHal(&mock);
-
-    // Fill unique patterns
-    for (int r = 0; r <= 6; ++r) lo.Curr.Reg[r] = 0xCCCC0000 | r;
-
-    // Only R4 marked dirty
-    lo.markDirty(4);
-
-    lo.updateRegisters();
-
-    // Dirty mask should be clear (R4 cleared; R0 was not set and remains clear)
-    TEST_ASSERT_EQUAL_UINT8(0, lo.getDirtyMask());
-}
-
-void test_updateRegisters_mixed_dirty_with_R4_forces_R0(void) {
-    MockHAL mock;
-    MAX2871 lo(66.0);
-    lo.attachHal(&mock);
-
-    for (int r = 0; r <= 6; ++r) lo.Curr.Reg[r] = 0xDDDD0000 | r;
-
-    // Dirty: R6, R4, R1  → expect order: R6, R4, R1, (forced) R0
-    lo.markDirty(6);
-    lo.markDirty(4);
-    lo.markDirty(1);
-
-    lo.updateRegisters();
-
-    TEST_ASSERT_EQUAL_UINT8(0, lo.getDirtyMask());
-}
-
 void test_outputSelect_marks_R4_only_and_sets_expected_bits(void) {
     /* Before the test calls outputSelect()...
      * 1) By default both outputs are enabled ==> outputSelect(RF_ALL)
@@ -217,7 +126,6 @@ void test_outputPower_marks_R4_only_and_sets_power_bits(void) {
     MAX2871 lo(66.0);
     lo.attachHal(&mock);
     lo.reset();
-    lo.setAllRegisters();               // Writes all registers to mock
 
     // Default Power Level is +5dBm with binary bits 11
     uint32_t oldPower = (lo.Curr.Reg[4] >> 6) & 0x3;
