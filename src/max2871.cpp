@@ -212,7 +212,7 @@ void MAX2871::setRegisterField(uint8_t regAddr, uint8_t bit_hi, uint8_t bit_lo, 
         bit_hi ^= bit_lo,       // bit_hi now holds original bit_lo
         bit_lo ^= bit_hi;       // bit_lo now holds original bit_hi
     }
-    // bits 2:0 contain register address 6 down to 0. Bits 31:3 register data
+    // Return early if stepping on address bits, exceeding 32 bits or the address range
     if (bit_lo < 3 || bit_hi > 31 || regAddr > 6) return;
 
     // --- Check Register values ---
