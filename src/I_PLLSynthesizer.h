@@ -35,9 +35,6 @@ public:
     virtual void outputSelect(RFOutPort port) = 0;     // A, B, both, or off
     virtual void outputPower(int dBm, RFOutPort port = RF_ALL) = 0;  // -4, -1, +2, +5 dBm
 
-    //  Mode Control 
-    virtual void mode(uint8_t type) = 0;            // 0=int-N, 1=frac-N
-
     //  Status 
     virtual bool isLocked() = 0;
 };
