@@ -15,15 +15,13 @@ public:
   uint32_t print_val1 = 0;
   uint32_t print_val2 = 0;
 
-  // public members
   HAL* hal = nullptr;
-
-  // ---- Construction / Init ----
   explicit MAX2871(double refIn);
   MAX2871() = delete;                                       // Disallow empty constructor
-
   void attachHal(HAL* halPtr) override {hal = halPtr;}
   void begin() override;
+  void reset();
+  bool isLocked() override;
 
   // ---- Frequency Control ----
   void setFrequency(double freqMHz) override;               // calculates FMN+DIVA
@@ -35,16 +33,9 @@ public:
   void outputSelect(RFOutPort port) override;   // A, B, both, or off
   void outputPower(int dBm, RFOutPort port) override;        // -4, -1, +2, +5 dBm
 
-  // ---- Status ----
-  bool isLocked() override;
-
-  // ---- Register Access ----
-  void reset();
-
-  // ---- State ----
-  // Read-only default registers (for dev and reset() only)
+  // Default registers - Read-only
   static const max2871Registers defaultRegisters;
-  // Working copy of registers (mutable shadow registers)
+  // Working registers - Read/Write
   max2871Registers Curr;
 
   // Frequency divider values
@@ -56,14 +47,13 @@ public:
   int R;
 
 private:
-  // control
-  double refInHz;                   // Reference clock input frequency
-  double fpfdHz;                    // phase detector frequency
+  double refInHz;                   // Reference clock input frequency - defined
+  double fpfdHz;                    // phase detector frequency - calculated
   uint8_t _rfEnPin;
   bool first_init;
-  uint8_t _dirtyMask = 0;
-  uint8_t _lastDIVA = 0xFF;         // Should reg4 be double buffered (DIVA changed or not) by reg1?
-  uint32_t spiMaxSpeed = 20000000;  // 20 MHz
+  uint8_t _dirtyMask = 0x3F;        // All 6 registers require initial programming
+  uint8_t _lastDIVA = 0xFF;         // Comparison value - decides if reg4 needs double buffering
+  uint32_t spiMaxSpeed = 20000000;
 
   void writeRegister(uint32_t value);
   void updateRegisters();
