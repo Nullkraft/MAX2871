@@ -16,7 +16,7 @@ public:
     ArduinoHAL(uint8_t lePin, uint8_t cdPin = 0xFF, uint8_t muxPin = 0xFF)
     : _le(lePin), _ce(cdPin), _mux(muxPin) {}
 
-    void begin(uint32_t spiHz = 20000000UL) {
+    void begin(uint32_t spiHz = 8000000UL) {
         _spiHz = spiHz;
         _cp = A1;
         _dp = A2;
@@ -76,7 +76,7 @@ private:
     uint8_t _dp;
     uint8_t _ce;
     uint8_t _mux;
-    uint32_t _spiHz = 20000000UL;
+    uint32_t _spiHz = 8000000UL;    // Arduino Uno Max SPI speed = 8 Mbs
 };
 
 #endif // ARDUINO_HAL_H
