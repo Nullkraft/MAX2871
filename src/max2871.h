@@ -51,7 +51,7 @@ private:
   double fpfdHz;                    // phase detector frequency - calculated
   uint8_t _rfEnPin;
   bool first_init;
-  uint8_t _dirtyMask = 0x3F;        // All 6 registers require initial programming
+  uint8_t _dirtyMask;               // Track which registers require programming
 
   void writeRegister(uint32_t value);
   void updateRegisters();
