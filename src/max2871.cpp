@@ -26,8 +26,9 @@ const MAX2871::max2871Registers MAX2871::defaultRegisters = {{
 // ---- Construction ----
 
 /* hal defaults to nullptr */
+// First use of _dirtyMask marks all 6 registers as requiring updates
 MAX2871::MAX2871(double refIn) 
-    : refInHz(refIn), fpfdHz(0.0), _rfEnPin(0), first_init(true), _dirtyMask(0) {
+    : refInHz(refIn), fpfdHz(0.0), _rfEnPin(0), first_init(true), _dirtyMask(0x3F) {
 }
 
 void MAX2871::begin() {
@@ -170,20 +171,18 @@ void MAX2871::writeRegister(uint32_t value) {
  *  the VCO selection process.
 */
 void MAX2871::updateRegisters() {
-    // Additional write cycle after a reset
+    // First cycle ensures a clean-clock startup
     if (first_init) {
-        writeRegister(Curr.Reg[5]);                         // Program register 5
+        writeRegister(Curr.Reg[5]);                         // Program reg 5
         if (hal) hal->delayMs(20);
-        writeRegister(Curr.Reg[4] & 0xFFFFFEDF);            // Disable RFOUTA and RFOUTB
-        for (int regAddr = 3; regAddr >= 0; --regAddr) {    // Program registers 3, 2, 1, 0
+        writeRegister(Curr.Reg[4] & 0xFFFFFEDF);            // Program reg 4, RFOUTA and B disabled
+        for (int regAddr = 3; regAddr >= 0; --regAddr) {    // Program reg 3, 2, 1, 0
             writeRegister(Curr.Reg[regAddr]);
         }
-        // Force register writes 
-        _dirtyMask = 0x3F;
+        _dirtyMask = 0x3F;                                  // 6 Registers marked for second cycle
     }
 
-    if (_dirtyMask == 0) return;    // Exit early if no registers to update
-
+    // Second/Normal cycle programs only the registers that have changed
     for (int regAddr = 5; regAddr >= 0; --regAddr) {
         if ((_dirtyMask & (1UL << regAddr)) != 0) {
             writeRegister(Curr.Reg[regAddr]);
