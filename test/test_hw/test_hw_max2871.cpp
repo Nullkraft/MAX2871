@@ -108,22 +108,14 @@ uint16_t freq;
 uint16_t timing = 1500;
 uint16_t m1, m2;
 void loop() {
-    for (freq = 24; freq<2000; freq++) {
+    for (freq = 30; freq < 70; freq++) {
         lo.setFrequency(freq*1.0+0.005);
-        m2 = lo.M;
-        if (m1 == m2) {
-            delay(30000);
-        }
-        m1 = m2;
+        delay(timing);
     }
-    // for (freq = 30; freq < 70; freq++) {
-    //     lo.setFrequency(freq*1.0+0.005);
-    //     delay(timing);
-    // }
-    // for (freq = 70; freq > 30; freq--) {
-    //     lo.setFrequency(freq*1.0+0.005);
-    //     delay(timing);
-    // }
+    for (freq = 70; freq > 30; freq--) {
+        lo.setFrequency(freq*1.0+0.005);
+        delay(timing);
+    }
 }
 
 #endif // ARDUINO
