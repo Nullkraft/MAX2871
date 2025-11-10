@@ -51,8 +51,11 @@ void MAX2871::setFrequency(uint32_t fmn, uint8_t diva) {
     M = (fmn >> 8) & 0xFFF;
     N = fmn & 0xFF;
     DIVA = diva;
-    float freq = fmn2freq();
-    setFrequency(freq);
+    setRegisterField(1, 14,  3, M);
+    setRegisterField(0, 14,  3, Frac);
+    setRegisterField(0, 30, 15, N);
+    setRegisterField(4, 22, 20, DIVA);
+    updateRegisters();
 }
 
 void MAX2871::freq2FMN(float target_freq_MHz) {
