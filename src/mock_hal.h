@@ -22,7 +22,7 @@ public:
     }
 
     void spiBegin() override {}
-    void pinMode(uint8_t, PinMode) override {}
+    void pinMode(uint8_t, pin_mode) override {}
     void digitalWrite(uint8_t, PinLevel) override {}
 
     void spiWriteRegister(uint32_t value) override {

@@ -30,7 +30,7 @@ public:
         }
     }
 
-    void pinMode(uint8_t pin, PinMode mode) override {
+    void pinMode(uint8_t pin, pin_mode mode) override {
         ::pinMode(pin, mode == PINMODE_OUTPUT ? OUTPUT : INPUT);
     }
 

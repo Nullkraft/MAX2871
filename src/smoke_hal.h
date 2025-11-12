@@ -13,7 +13,7 @@ public:
     // void spiTransfer(uint8_t /*data*/) override {}
 
     // --- GPIO (no-op) ---
-    void pinMode(uint8_t /*pin*/, PinMode /*mode*/) override {}
+    void pinMode(uint8_t /*pin*/, pin_mode /*mode*/) override {}
     void digitalWrite(uint8_t /*pin*/, PinLevel /*val*/) override {}
 };
 

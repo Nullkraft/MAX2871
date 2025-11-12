@@ -37,7 +37,7 @@ public:
         // (If you want to optimize, you can lift this out.)
     }
 
-    void pinMode(uint8_t pin, PinMode mode) override {
+    void pinMode(uint8_t pin, pin_mode mode) override {
         ::pinMode(pin, (mode == PINMODE_OUTPUT ? OUTPUT : INPUT));
     }
 

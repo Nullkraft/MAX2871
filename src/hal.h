@@ -14,7 +14,7 @@
 
 #include <stdint.h>
 
-enum PinMode { PINMODE_INPUT, PINMODE_OUTPUT };
+enum pin_mode { PINMODE_INPUT, PINMODE_OUTPUT };
 enum PinLevel { PINLEVEL_LOW = 0, PINLEVEL_HIGH = 1 };
 // --- Bitfield Utilities ---
 // Helper functions for register bit manipulation
@@ -43,7 +43,7 @@ public:
     virtual void spiBegin() = 0;
 
     // GPIO
-    virtual void pinMode(uint8_t pin, PinMode mode) = 0;
+    virtual void pinMode(uint8_t pin, pin_mode mode) = 0;
     virtual void digitalWrite(uint8_t pin, PinLevel val) = 0;
 
     // Timing
