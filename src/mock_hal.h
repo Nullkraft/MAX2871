@@ -23,7 +23,7 @@ public:
 
     void spiBegin() override {}
     void pinMode(uint8_t, pin_mode) override {}
-    void digitalWrite(uint8_t, PinLevel) override {}
+    void digitalWrite(uint8_t, pin_level) override {}
 
     void spiWriteRegister(uint32_t value) override {
         if (writeCount < MAX_WRITES) {

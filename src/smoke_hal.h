@@ -14,7 +14,7 @@ public:
 
     // --- GPIO (no-op) ---
     void pinMode(uint8_t /*pin*/, pin_mode /*mode*/) override {}
-    void digitalWrite(uint8_t /*pin*/, PinLevel /*val*/) override {}
+    void digitalWrite(uint8_t /*pin*/, pin_level /*val*/) override {}
 };
 
 #endif // SMOKE_HAL_H

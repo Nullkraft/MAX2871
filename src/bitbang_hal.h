@@ -34,7 +34,7 @@ public:
         ::pinMode(pin, mode == PINMODE_OUTPUT ? OUTPUT : INPUT);
     }
 
-    void digitalWrite(uint8_t pin, PinLevel val) override {
+    void digitalWrite(uint8_t pin, pin_level val) override {
         ::digitalWrite(pin, val == PINLEVEL_HIGH ? HIGH : LOW);
     }
 
