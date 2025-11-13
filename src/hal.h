@@ -14,7 +14,7 @@
 
 #include <stdint.h>
 
-enum pin_mode { PINMODE_INPUT, PINMODE_OUTPUT };
+enum pin_mode { PINMODE_INPUT, PINMODE_INPUT_PULLUP, PINMODE_OUTPUT };
 enum pin_level { PINLEVEL_LOW = 0, PINLEVEL_HIGH = 1 };
 // --- Bitfield Utilities ---
 // Helper functions for register bit manipulation
