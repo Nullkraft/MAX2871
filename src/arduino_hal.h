@@ -13,33 +13,43 @@
 
 class ArduinoHAL : public HAL {
 public:
-    ArduinoHAL(uint8_t lePin, uint8_t cdPin = 0xFF, uint8_t muxPin = 0xFF)
-    : _le(lePin), _ce(cdPin), _mux(muxPin) {}
+    explicit ArduinoHAL(uint8_t lePin, uint8_t cePin = 0xFF, uint8_t muxPin = 0xFF)
+        : _le(lePin), _ce(cePin), _mux(muxPin) {}
 
-    void begin(uint32_t spiHz = 8000000UL) {
-        _spiHz = spiHz;
-        _cp = A1;
-        _dp = A2;
-        ::pinMode(_le, OUTPUT);
-        ::digitalWrite(_le, HIGH);
-        if (_ce != 0xFF) {
-            ::pinMode(_ce, OUTPUT);
-            ::digitalWrite(_ce, LOW);
-        }
-        if (_mux != 0xFF) {
-            ::pinMode(_mux, INPUT);
-        }
-        SPI.begin();
-    }
+void begin() {
+    // Basic pin config
+    if (_le  != 0xFF) ::pinMode(_le, OUTPUT), ::digitalWrite(_le, LOW);
+    if (_ce  != 0xFF) ::pinMode(_ce, OUTPUT), ::digitalWrite(_ce, LOW);
+    if (_mux != 0xFF) ::pinMode(_mux, INPUT);
+
+    SPI.begin();
+}
 
     void spiBegin() override {
         // We’ll begin a transaction around every 32-bit write.
         // (If you want to optimize, you can lift this out.)
     }
 
+    // Optional: pick a faster/slower SPI clock (Hz). Call before beginTransaction.
+    void setSpiClockHz(uint32_t hz) { _spiHz = hz; }
+
+    // GPIO
     void pinMode(uint8_t pin, pin_mode mode) override {
-        ::pinMode(pin, (mode == PINMODE_OUTPUT ? OUTPUT : INPUT));
+        switch (mode) {
+            case pin_mode::PINMODE_INPUT:         ::pinMode(pin, INPUT); break;
+            case pin_mode::PINMODE_OUTPUT:        ::pinMode(pin, OUTPUT); break;
+            case pin_mode::PINMODE_INPUT_PULLUP:  ::pinMode(pin, INPUT_PULLUP); break;
+            case pin_mode::PINMODE_INPUT_PULLDOWN:
+#if defined(INPUT_PULLDOWN)
+                ::pinMode(pin, INPUT_PULLDOWN);
+#else
+                ::pinMode(pin, INPUT);    // fallback
+#endif
+                break;
+            default: ::pinMode(pin, INPUT); break;
+        }
     }
+
 
     void delayMs(uint32_t ms) override {
         delay(ms);
@@ -51,11 +61,22 @@ public:
 
     void spiWriteRegister(uint32_t value) override {
         // MAX2871 write (MSB first, 32 bits)
-        SPI.beginTransaction(SPISettings(_spiHz, MSBFIRST, SPI_MODE0));
+        SPISettings settings(_spiHz, MSBFIRST, SPI_MODE0);
+        SPI.beginTransaction(settings);
+
+        // Drive LE low for shift phase
+        if (_le != 0xFF) ::digitalWrite(_le, LOW);
+
+        // Transfer 32 bits MSB-first
         SPI.transfer16((value >> 16) & 0xFFFF);
         SPI.transfer16(value & 0xFFFF);
-        ::digitalWrite(_le, HIGH);          // HIGH then ...
-        ::digitalWrite(_le, LOW);           // LOW to program the chip
+
+        // Latch on LE rising edge
+        if (_le != 0xFF) {
+            ::digitalWrite(_le, HIGH);
+            ::digitalWrite(_le, LOW);
+        }
+
         SPI.endTransaction();
     }
 
@@ -66,14 +87,12 @@ public:
     }
 
     bool readMuxout() override {
-        if (_mux != 0xFF) return false;
+        if (_mux == 0xFF) return false;
         return ::digitalRead(_mux) == HIGH;
     }
 
 private:
     uint8_t _le;
-    uint8_t _cp;
-    uint8_t _dp;
     uint8_t _ce;
     uint8_t _mux;
     uint32_t _spiHz = 8000000UL;    // Arduino Uno Max SPI speed = 8 Mbs

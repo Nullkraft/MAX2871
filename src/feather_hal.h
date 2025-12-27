@@ -44,28 +44,30 @@ public:
     // Construct with required control pins. You can pass 0xFF for any unused pin.
     // le  = MAX2871 LE (latch enable)
     // ce  = MAX2871 CE (chip enable)
-    // cp  = Optional RF power enable for board (active-high), else 0xFF
-    // dp  = Optional on-board power enable (active-high), else 0xFF
     // mux = MAX2871 MUXOUT pin for lock detect
-    explicit FeatherHAL(uint8_t le, uint8_t ce, uint8_t cp, uint8_t dp, uint8_t mux,
-                        SPIClass &spi = SPI)
-        : _le(le), _ce(ce), _cp(cp), _dp(dp), _mux(mux), _spi(spi) {}
+    explicit FeatherHAL(uint8_t lePin, uint8_t cePin = 0xFF, uint8_t muxPin = 0xFF)
+    : _le(lePin), _ce(cePin), _mux(muxPin) {}
 
     // Call once from setup(): config pins and SPI
     void begin() {
         // Basic pin config
         if (_le  != 0xFF) ::pinMode(_le, OUTPUT), ::digitalWrite(_le, LOW);
         if (_ce  != 0xFF) ::pinMode(_ce, OUTPUT), ::digitalWrite(_ce, LOW);   // keep LO off initially
-        if (_cp  != 0xFF) ::pinMode(_cp, OUTPUT), ::digitalWrite(_cp, LOW);   // board RF power off
-        if (_dp  != 0xFF) ::pinMode(_dp, OUTPUT), ::digitalWrite(_dp, LOW);   // board power off
         if (_mux != 0xFF) ::pinMode(_mux, INPUT);                             // MUXOUT (lock detect)
 
         // Start SPI on default bus (SCK18/MOSI19/MISO16)
-        _spi.begin();
+        SPI.begin();
+    }
+
+    void spiBegin() override {
+        // We'll begin a transaction around every 32-bit write.
+        // (If you want to optimize, you can lift this out.)
     }
 
     // Optional: pick a faster/slower SPI clock (Hz). Call before beginTransaction.
-    void setSpiClockHz(uint32_t hz) { _spiHz = hz; }
+    void setSpiClockHz(uint32_t hz) {
+        _spiHz = hz;
+    }
 
     // ---- HAL virtuals ----
 
@@ -75,7 +77,7 @@ public:
             case pin_mode::PINMODE_INPUT:         ::pinMode(pin, INPUT); break;
             case pin_mode::PINMODE_OUTPUT:        ::pinMode(pin, OUTPUT); break;
             case pin_mode::PINMODE_INPUT_PULLUP:  ::pinMode(pin, INPUT_PULLUP); break;
-            case pin_mode::input_pulldown:
+            case pin_mode::PINMODE_INPUT_PULLDOWN:
 #if defined(INPUT_PULLDOWN)
                 ::pinMode(pin, INPUT_PULLDOWN);
 #else
@@ -87,7 +89,7 @@ public:
     }
 
     void digitalWrite(uint8_t pin, pin_level val) override {
-        ::digitalWrite(pin, (val == pin_level::high) ? HIGH : LOW);
+        ::digitalWrite(pin, (val == PINLEVEL_HIGH) ? HIGH : LOW);
     }
 
     // Timing
@@ -95,37 +97,30 @@ public:
 
     // MAX2871 helpers
     void spiWriteRegister(uint32_t value) override {
-        // MAX2871 latches on LE rising edge after shifting 32 bits MSB-first
+        // MAX2871 write (MSB first, 32 bits)
         SPISettings settings(_spiHz, MSBFIRST, SPI_MODE0);
-        _spi.beginTransaction(settings);
+        SPI.beginTransaction(settings);
 
         // Drive LE low for shift phase
         if (_le != 0xFF) ::digitalWrite(_le, LOW);
 
         // Transfer 32 bits MSB-first
-        // Split into 4 bytes [31:24], [23:16], [15:8], [7:0]
-        uint8_t b3 = (value >> 24) & 0xFF;
-        uint8_t b2 = (value >> 16) & 0xFF;
-        uint8_t b1 = (value >> 8)  & 0xFF;
-        uint8_t b0 = (value >> 0)  & 0xFF;
-        _spi.transfer(b3);
-        _spi.transfer(b2);
-        _spi.transfer(b1);
-        _spi.transfer(b0);
+        SPI.transfer16((value >> 16) & 0xFFFF);
+        SPI.transfer16(value & 0xFFFF);
 
         // Latch on LE rising edge
         if (_le != 0xFF) {
             ::digitalWrite(_le, HIGH);
-            // short hold; RP2040 is fast—ensure LE high > tLEH; a few hundred ns is fine
-            // delayMicroseconds(1);  // uncomment if needed
             ::digitalWrite(_le, LOW);
         }
 
-        _spi.endTransaction();
+        SPI.endTransaction();
     }
 
     void setCEPin(bool enable) override {
-        if (_ce != 0xFF) ::digitalWrite(_ce, enable ? HIGH : LOW);
+        if (_ce != 0xFF) {
+            ::digitalWrite(_ce, enable ? HIGH : LOW);
+        }
     }
 
     bool readMuxout() override {
@@ -133,22 +128,10 @@ public:
         return (::digitalRead(_mux) == HIGH);
     }
 
-    // Convenience board-power toggles if you wired them
-    void setBoardPower(bool on) {
-        if (_dp != 0xFF) ::digitalWrite(_dp, on ? HIGH : LOW);
-    }
-    void setRfPower(bool on) {
-        if (_cp != 0xFF) ::digitalWrite(_cp, on ? HIGH : LOW);
-    }
-
 private:
     uint8_t _le;
     uint8_t _ce;
-    uint8_t _cp;   // optional board RF power enable
-    uint8_t _dp;   // optional general board power enable
     uint8_t _mux;
-
-    SPIClass &_spi;
     uint32_t _spiHz = 8000000UL;  // start conservatively; raise once validated
 };
 

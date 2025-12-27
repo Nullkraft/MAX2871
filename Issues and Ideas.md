@@ -5,15 +5,25 @@
 - Re-evaluate bitMask() function (it's just adding complexity)
 
 
+--------------
+: ──────────────────────────────────────────────────────────────────
+
+--------------
+11/13/25
+# IDEA
+### Proposal
+: desciption
+
 
 --------------
 : ──────────────────────────────────────────────────────────────────
 
 --------------
 11/13/25
-# NEXT ISSUE
-### Problem Name
-: Problem description
+# IDEA
+### Reduce the number of times the value of M changes
+: Program MAX2871 directly from flash with 32 bit register words instead of FMN values
+The first goal is to collect a bunch of data from the freq2FMN function that I've been using for the max2871. Here's that function just because we will need to reference portions of it:
 
 
 --------------
