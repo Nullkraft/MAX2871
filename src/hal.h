@@ -7,7 +7,9 @@
     BitBangHAL - Uses bit-banging on GPIO pins (software SPI)
     MockHAL - Fake hardware for testing on PC
 
-    All talking to the SAME chip (MAX2871), just different ways to send bits!
+    All talking to the SAME hardware, just different ways to send bits!
+
+    (c) 2025 Mark Stanley, GPL-3.0-or-later
  */
 #ifndef HAL_H
 #define HAL_H
@@ -16,6 +18,8 @@
 
 enum pin_mode { PINMODE_INPUT, PINMODE_INPUT_PULLUP, PINMODE_INPUT_PULLDOWN, PINMODE_OUTPUT };
 enum pin_level { PINLEVEL_LOW = 0, PINLEVEL_HIGH = 1 };
+enum ADCChannel { ADC_COARSE = 1, ADC_FINE = 2 };
+
 // --- Bitfield Utilities ---
 // Helper functions for register bit manipulation
 
@@ -49,12 +53,13 @@ public:
     // Timing
     virtual void delayMs(uint32_t ms) = 0;
 
-    // MAX2871-specific extras
-    virtual void spiWriteRegister(uint32_t value) = 0;  // convenience
+    // MAX2871-specific
+    virtual void spiWriteRegister(uint32_t value) = 0;
     virtual void setCEPin(bool enable) = 0;
-
-    // Method that MAX2871::isLocked() uses internally
     virtual bool readMuxout() = 0;
+
+    // ADC - ADS7826 (10-bit, returned left-justified in 12-bit field)
+    virtual uint16_t readADC(ADCChannel channel) = 0;
 };
 
 #endif // HAL_H
