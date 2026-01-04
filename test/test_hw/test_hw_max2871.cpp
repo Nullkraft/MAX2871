@@ -70,10 +70,10 @@ void test_verify_frequency_calculations(void) {
     digitalWrite(REF_EN1, HIGH);
     float freq_in = 3213.579;
     lo.setFrequency(freq_in);
-    float freq_fmn = lo.fmn2freq();
+    float freq_from_fmn = lo.fmn2freq();
     lo.outputSelect(RF_ALL);
     lo.outputPower(+5, RF_A);
-    TEST_ASSERT_EQUAL_FLOAT_MESSAGE(freq_in, freq_fmn, "*** Verify frequency calculations ***");
+    TEST_ASSERT_EQUAL_FLOAT_MESSAGE(freq_in, freq_from_fmn, "*** Verify frequency calculations ***");
 }
 
 void test_default_setup() {
@@ -88,14 +88,14 @@ void test_default_setup() {
 int runUnityTests() {
     UNITY_BEGIN();
     RUN_TEST(test_default_setup);
-    // RUN_TEST(test_begin_runs_on_hardware);
-    // RUN_TEST(test_observe_muxout_level);
-    // RUN_TEST(test_verify_frequency_calculations);
+    RUN_TEST(test_begin_runs_on_hardware);
+    RUN_TEST(test_observe_muxout_level);
+    RUN_TEST(test_verify_frequency_calculations);
     return UNITY_END();
 }
 
 void setup() {
-    hal.begin(16000000UL);
+    hal.begin();
     lo.attachHal(&hal);
     lo.begin();        // Performs clean-clock startup I.A.W. the spec sheet
     runUnityTests();
