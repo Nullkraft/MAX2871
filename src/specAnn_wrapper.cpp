@@ -2,5 +2,5 @@
 // it as part of a standard project
 
 #ifdef PLATFORMIO
-#include "../examples/specAnn/specAnn.ino"
+//#include "../examples/specAnn/specAnn.ino"
 #endif
