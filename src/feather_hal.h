@@ -128,6 +128,27 @@ public:
         return (::digitalRead(_mux) == HIGH);
     }
 
+    uint16_t readADC(ADCChannel channel) override {
+        // ADS7826: 10-bit ADC, SPI Mode 1
+        // Caller must set appropriate SPI clock rate before calling (max 2.8 MHz)
+        // Returns 10-bit data left-justified in 12-bit field
+        uint8_t csPin = (channel == ADC_COARSE) ? _selAdc1 : _selAdc2;
+        if (csPin == 0xFF) return 0;
+
+        SPISettings settings(_spiHz, MSBFIRST, SPI_MODE1);
+        SPI.beginTransaction(settings);
+
+        ::digitalWrite(csPin, LOW);
+        uint16_t raw = SPI.transfer16(0);
+        ::digitalWrite(csPin, HIGH);
+
+        SPI.endTransaction();
+
+        // Bit alignment: 2 sample clocks, 1 null, 10 data bits, 3 trailing
+        // Data sits in bits [12:3], shift right 1 and mask to left-justify in 12-bit field
+        return (raw >> 1) & 0x0FFC;
+    }
+
 private:
     uint8_t _le;
     uint8_t _ce;

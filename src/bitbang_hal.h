@@ -61,6 +61,7 @@ public:
     // Unused virtual functions
     void spiBegin() {}
     bool readMuxout() { return true; }      // TODO: Implement testing muxOut
+    uint16_t readADC(ADCChannel channel) override { return 0; }
 };
 
 #endif
