@@ -1,4 +1,8 @@
 /* feather_hal.h
+    Hardware Abstraction Layer for Adafruit Feather RP2040
+    - Talks to MAX2871 over hardware SPI
+    - Mirrors the ArduinoHAL interface used in your MAX2871 driver
+
     (Spectrum Analyzer Production board)
 
     Communicates from Feather RP2040 to max2871 over the SPI bus
@@ -17,14 +21,6 @@
     REF_EN1         10  // D10
     REF_EN2         11  // D11
     POWER_DETECT    12  // D12 RF board power on/off detection (read-only)
-
-    Initiallly derived from arduino_hal.h
- */
-
-/* feather_hal.h
-   Hardware Abstraction Layer for Adafruit Feather RP2040
-   - Talks to MAX2871 over hardware SPI
-   - Mirrors the ArduinoHAL interface used in your MAX2871 driver
 
    Notes:
    * RP2040 Arduino-Pico default SPI pins:
@@ -153,6 +149,8 @@ private:
     uint8_t _le;
     uint8_t _ce;
     uint8_t _mux;
+    uint8_t _selAdc1;
+    uint8_t _selAdc2;
     uint32_t _spiHz = 8000000UL;  // start conservatively; raise once validated
 };
 
