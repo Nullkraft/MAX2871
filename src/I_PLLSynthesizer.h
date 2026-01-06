@@ -24,7 +24,7 @@ public:
     virtual ~I_PLLSynthesizer() {}
 
     //  Initialization 
-    virtual void attachHal(HAL* halptr) = 0;        // inject HAL
+    virtual void attachHal(HAL* halptr) = 0;    // inject HAL for controlling synth chips
     virtual void begin() = 0;
 
     //  Frequency Control 

@@ -4,6 +4,7 @@
     without changing your code. It abstracts HOW you communicate with the chip:
 
     ArduinoHAL - Uses Arduino's hardware SPI peripheral
+    FeatherRP2040 - Uses Raspberry PI's RP2040 hardware SPI peripheral
     BitBangHAL - Uses bit-banging on GPIO pins (software SPI)
     MockHAL - Fake hardware for testing on PC
 
