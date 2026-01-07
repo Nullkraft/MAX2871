@@ -47,7 +47,7 @@ void setup() {
   
   // Attach HAL to synthesizer and initialize
   synth.attachHal(&hal);
-  synth.begin(PIN_LE);
+  synth.begin();
   Serial.println("MAX2871 initialized");
   
   // Enable the RF output
@@ -59,7 +59,7 @@ void setup() {
   synth.setFrequency(100.0);
   
   // Enable both RF outputs (A and B)
-  synth.outputSelect(3);  // 3 = both outputs on
+  synth.outputSelect(RF_ALL);  // 3 = both outputs on
   Serial.println("Both RF outputs enabled");
   
   // Set output power to +5 dBm on both outputs

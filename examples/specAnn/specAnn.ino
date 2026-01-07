@@ -10,24 +10,21 @@
 // static const uint8_t PIN_REF_EN1 =  8;
 // static const uint8_t PIN_REF_EN2 =  9;
 
-// Metro Mini pinout
-static const uint8_t PIN_ATTEN   = A5;
-static const uint8_t PIN_LE_LO1  = A3;
-static const uint8_t PIN_LE_LO2  =  4;
-static const uint8_t PIN_LE_LO3  = A4;
-static const uint8_t PIN_REF_EN1 =  5;
-static const uint8_t PIN_REF_EN2 =  6;
+// // Metro Mini pinout
+// static const uint8_t PIN_ATTEN   = A5;
+// static const uint8_t PIN_LE_LO1  = A3;
+// static const uint8_t PIN_LE_LO2  =  4;
+// static const uint8_t PIN_LE_LO3  = A4;
+// static const uint8_t PIN_REF_EN1 =  5;
+// static const uint8_t PIN_REF_EN2 =  6;
 
-// // Feather RP2040 pinout
-// static const uint8_t PIN_ATTEN   = 25;  // GP25
-// static const uint8_t PIN_LE_LO1  = 29;  // GP29
-// static const uint8_t PIN_LE_LO2  =  9;  // GP09
-// static const uint8_t PIN_LE_LO3  = 24;  // GP24
-// static const uint8_t PIN_REF_EN1 = 10;  // GP10
-// static const uint8_t PIN_REF_EN2 = 11;  // GP11
-
-static const double  REF_MHZ    = 66.0;
-
+// Feather RP2040 pinout
+static const uint8_t PIN_ATTEN   = 25;  // GP25
+static const uint8_t PIN_LE_LO1  = 29;  // GP29
+static const uint8_t PIN_LE_LO2  =  9;  // GP09
+static const uint8_t PIN_LE_LO3  = 24;  // GP24
+static const uint8_t PIN_REF_EN1 = 10;  // GP10
+static const uint8_t PIN_REF_EN2 = 11;  // GP11
 MAX2871    lo1(REF_MHZ);
 ArduinoHAL hal_lo1(PIN_LE_LO1);     // Attach the latch pin, IO pin 3, to LO2 LE
 MAX2871    lo2(REF_MHZ);
@@ -35,7 +32,7 @@ ArduinoHAL hal_lo2(PIN_LE_LO2);     // Attach the latch pin, IO pin 3, to LO2 LE
 MAX2871    lo3(REF_MHZ);
 ArduinoHAL hal_lo3(PIN_LE_LO3);     // Attach the latch pin, IO pin 3, to LO2 LE
 
-enum class LOInjectionMode : uint8_t { Low, High };
+static const double  REF_MHZ    = 66.0;
 
 FeatherHAL hal_lo1(PIN_LE_LO1);     // Assign the latch pin, IO pin 29, to LO1 LE
 FrequencyCalculator fc(lo1, lo2, lo3);
@@ -51,6 +48,7 @@ void setup() {
   pinMode(PIN_REF_EN1, OUTPUT);
   pinMode(PIN_REF_EN2, OUTPUT);
   digitalWrite(PIN_LE_LO1, LOW);
+  digitalWrite(PIN_LE_LO2, LOW);
   digitalWrite(PIN_LE_LO3, LOW);
   digitalWrite(PIN_ATTEN, LOW);
   digitalWrite(PIN_REF_EN1, HIGH);
