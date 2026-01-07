@@ -37,49 +37,8 @@ ArduinoHAL hal_lo3(PIN_LE_LO3);     // Attach the latch pin, IO pin 3, to LO2 LE
 
 enum class LOInjectionMode : uint8_t { Low, High };
 
-class FrequencyCalculator {
-  public:
-    uint8_t R = 1;
-    double IF1;        // Corrected based on LO1 integer step size
-    double IF1_center = 3600.0;
-    double IF2 = 315.0;
-    double IF3 = 45.0;
-    double RefClock1 = 66.000;
-    double RefClock2 = 66.666;
-    LOInjectionMode LO1InjectionMode;
-    LOInjectionMode LO2InjectionMode;
-    LOInjectionMode LO3InjectionMode;
-
-  // private:
-    // HiMode injection defaults for LO2 and LO3
-    double FreqRFin = 0.0;
-    double FreqLO1  = 0.0;
-    double FreqLO2  = 0.0;
-    double FreqLO3  = 0.0;
-
-  public:
-    void set_LO_frequencies(double rfin, double fref, int R);
-};
-
-void FrequencyCalculator::set_LO_frequencies(double rfin, double RefClock, int R) {
-  LO2InjectionMode = LOInjectionMode::High;   // TODO: Refactor so this gets set during calibration (spur mitigation)
-  LO3InjectionMode = LOInjectionMode::High;
-  double threshold = (RefClock == RefClock1) ? 2343.0001 : 2403.2731;
-  double fpfd = RefClock / R;
-  double IF1_step = fpfd * round(IF1_center / fpfd);
-  LO1InjectionMode = (rfin < threshold) ? LOInjectionMode::High : LOInjectionMode::Low;
-  int sign = (rfin < threshold) ? 1 : -1;
-  
-  FreqLO1 = fpfd * round((IF1_step + sign * rfin) / fpfd);
-  lo1.setFrequency(FreqLO1);
-  
-  IF1 = FreqLO1 - (sign * rfin);  // IF1 is the corrected value
-  FreqLO2 = (LO2InjectionMode==LOInjectionMode::High) ? IF1 + IF2 : IF1 - IF2;
-  lo2.setFrequency(FreqLO2);
-
-  FreqLO3 = (LO3InjectionMode==LOInjectionMode::High) ? IF2 + IF3 : IF2 - IF3;
-  lo3.setFrequency(FreqLO3);
-}
+FeatherHAL hal_lo1(PIN_LE_LO1);     // Assign the latch pin, IO pin 29, to LO1 LE
+FrequencyCalculator fc(lo1, lo2, lo3);
 
 void setup() {
   delay(5000);
@@ -108,7 +67,6 @@ void setup() {
   digitalWrite(LED_BUILTIN, HIGH);
 }
 
-FrequencyCalculator fc;
 uint32_t delta = 0;
 void loop() {
   if (Serial.available()) {
