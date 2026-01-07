@@ -47,8 +47,8 @@ public:
   int R;
 
 private:
-  HAL& _hal;
   double _refMHz;                   // Reference clock input frequency - defined
+  HAL& _hal;
   double fpfdHz;                    // phase detector frequency - calculated
   uint8_t _rfEnPin;
   bool first_init;
