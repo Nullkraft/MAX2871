@@ -55,11 +55,18 @@ void setup() {
   digitalWrite(PIN_REF_EN1, HIGH);
   digitalWrite(PIN_REF_EN2, LOW);
 
+  lo1.begin();
+  lo1.outputSelect(RF_ALL);   // enable A+B
+  lo1.outputPower(+5, RF_ALL);    // +5 dBm (per your mapping)
+
   lo2.attachHal(&hal_lo2);
   lo2.begin();
   lo2.outputSelect(RF_ALL);   // enable A+B
   lo2.outputPower(+5, RF_ALL);    // +5 dBm (per your mapping)
 
+  lo3.begin();
+  lo3.outputSelect(RF_ALL);   // enable A+B
+  lo3.outputPower(+5, RF_ALL);    // +5 dBm (per your mapping)
   Serial.println("Enter LO2 frequency in MHz (23.5 to 6000). Example: 2412.5");
   Serial.setTimeout(15); // makes parseFloat() snappy without long blocking
   pinMode(LED_BUILTIN, OUTPUT);
