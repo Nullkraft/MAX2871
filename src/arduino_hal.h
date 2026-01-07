@@ -22,8 +22,7 @@ class ArduinoHAL : public HAL {
 public:
     explicit ArduinoHAL(uint8_t lePin, uint8_t cePin = 0xFF, uint8_t muxPin = 0xFF,
                         uint8_t selAdc1 = 0xFF, uint8_t selAdc2 = 0xFF)
-        : _le(lePin), _ce(cePin), _mux(muxPin),
-          _selAdc1(selAdc1), _selAdc2(selAdc2) {}
+        : _le(lePin), _ce(cePin), _mux(muxPin), _selAdc1(selAdc1), _selAdc2(selAdc2) {}
 
     void begin() {
         // MAX2871 pins
