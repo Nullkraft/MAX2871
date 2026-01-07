@@ -30,8 +30,8 @@ public:
   double fmn2freq();                                        // reverse calc
 
   // ---- Output Control ----
-  void outputSelect(RFOutPort port) override;   // A, B, both, or off
-  void outputPower(int dBm, RFOutPort port) override;        // -4, -1, +2, +5 dBm
+  void outputSelect(RFOutPort port = RF_ALL) override;          // A, B, both, or off
+  void outputPower(int dBm, RFOutPort port = RF_ALL) override;  // -4, -1, +2, +5 dBm
 
   // Default registers - Read-only
   static const max2871Registers defaultRegisters;
