@@ -41,9 +41,6 @@ __attribute__((unused)) static void print_hex(uint32_t val) {
 
 // SPI speed note: AVR UNO tops out around ~8 MHz reliably.
 void test_begin_runs_on_hardware(void) {
-    // hal.begin(16000000UL);       // conservative SPI
-    // lo.attachHal(&hal);
-    // lo.begin();                 // Performs clean-clock startup I.A.W. the spec sheet
     lo.outputPower(+2, RF_ALL);
     TEST_PASS_MESSAGE("begin() executed without errors on hardware.");
 }

@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include "max2871.h"
-#include "arduino_hal.h"
+#include "feather_hal.h"
 
 // // Arduino Uno pinout
 // static const uint8_t PIN_ATTEN   = A5;
