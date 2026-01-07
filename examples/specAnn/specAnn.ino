@@ -50,12 +50,12 @@ void setup() {
   pinMode(PIN_ATTEN, OUTPUT);
   pinMode(PIN_REF_EN1, OUTPUT);
   pinMode(PIN_REF_EN2, OUTPUT);
-  digitalWrite(PIN_LE_LO1, LOW);
-  digitalWrite(PIN_LE_LO2, LOW);
-  digitalWrite(PIN_LE_LO3, LOW);
-  digitalWrite(PIN_ATTEN, LOW);
-  digitalWrite(PIN_REF_EN1, HIGH);
-  digitalWrite(PIN_REF_EN2, LOW);
+  hal_lo1.digitalWrite(PIN_LE_LO1, PINLEVEL_LOW);
+  hal_lo1.digitalWrite(PIN_LE_LO2, PINLEVEL_LOW);
+  hal_lo1.digitalWrite(PIN_LE_LO3, PINLEVEL_LOW);
+  hal_lo1.digitalWrite(PIN_ATTEN, PINLEVEL_LOW);
+  hal_lo1.digitalWrite(PIN_REF_EN1, PINLEVEL_HIGH);
+  hal_lo1.digitalWrite(PIN_REF_EN2, PINLEVEL_LOW);
 
   lo1.begin();
   lo1.outputSelect(RF_ALL);   // enable A+B
