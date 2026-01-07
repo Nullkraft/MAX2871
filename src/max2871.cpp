@@ -61,7 +61,7 @@ void MAX2871::setFrequency(uint32_t fmn, uint8_t diva) {
 void MAX2871::freq2FMN(float target_freq_MHz) {
     float floatFrac;
     R = 1;
-    Fpfd = refInHz / R;                // Phase Frequency Detector input frequency
+    Fpfd = _refMHz / R;                // Phase Frequency Detector input frequency
     float max_error = pow(2, 32);      // Large initial error
     float Fvco = target_freq_MHz;
 
