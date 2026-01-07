@@ -39,7 +39,7 @@ public:
     
     void setCEPin(bool) override {}
     bool readMuxout() override { return false; }
-    uint16_t readADC(ADCChannel channel) override { return 0; }
+    uint16_t readADC(ADCChannel channel = ADC_COARSE) override { return 0; }
 };
 
 #endif // MOCK_HAL_H

@@ -103,7 +103,7 @@ public:
         return ::digitalRead(_mux) == HIGH;
     }
 
-    uint16_t readADC(ADCChannel channel) override {
+    uint16_t readADC(ADCChannel channel = ADC_COARSE) override {
         // ADS7826: 10-bit ADC, SPI Mode 1
         // Caller must set appropriate SPI clock rate before calling (max 2.8 MHz)
         // Returns 10-bit data left-justified in 12-bit field

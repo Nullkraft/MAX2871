@@ -124,7 +124,7 @@ public:
         return (::digitalRead(_mux) == HIGH);
     }
 
-    uint16_t readADC(ADCChannel channel) override {
+    uint16_t readADC(ADCChannel channel = ADC_COARSE) override {
         // ADS7826: 10-bit ADC, SPI Mode 1
         // Caller must set appropriate SPI clock rate before calling (max 2.8 MHz)
         // Returns 10-bit data left-justified in 12-bit field
@@ -149,8 +149,8 @@ private:
     uint8_t _le;
     uint8_t _ce;
     uint8_t _mux;
-    uint8_t _selAdc1;
-    uint8_t _selAdc2;
+    uint8_t _selAdc1 = 0xFF;
+    uint8_t _selAdc2 = 0xFF;
     uint32_t _spiHz = 8000000UL;  // start conservatively; raise once validated
 };
 

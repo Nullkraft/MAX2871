@@ -60,7 +60,7 @@ public:
     virtual bool readMuxout() = 0;
 
     // ADC - ADS7826 (10-bit, returned left-justified in 12-bit field)
-    virtual uint16_t readADC(ADCChannel channel) = 0;
+    virtual uint16_t readADC(ADCChannel channel = ADC_COARSE) = 0;
 };
 
 #endif // HAL_H
