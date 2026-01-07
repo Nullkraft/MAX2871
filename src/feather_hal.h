@@ -41,8 +41,9 @@ public:
     // le  = MAX2871 LE (latch enable)
     // ce  = MAX2871 CE (chip enable)
     // mux = MAX2871 MUXOUT pin for lock detect
-    explicit FeatherHAL(uint8_t lePin, uint8_t cePin = 0xFF, uint8_t muxPin = 0xFF)
-    : _le(lePin), _ce(cePin), _mux(muxPin) {}
+    explicit FeatherHAL(uint8_t lePin, uint8_t cePin = 0xFF, uint8_t muxPin = 0xFF,
+                        uint8_t selAdc1 = 0xFF, uint8_t selAdc2 = 0xFF)
+        : _le(lePin), _ce(cePin), _mux(muxPin), _selAdc1(selAdc1), _selAdc2(selAdc2) {}
 
     // Call once from setup(): config pins and SPI
     void begin() {
