@@ -23,6 +23,30 @@ Arduino pins:
 
 The 2 reference clocks are selected by REF_EN1 and REF_EN2. The selection process for which clock to use will be driven by data from the PC.
 
+Software Stack:
++----------------------------------------------------------------------------------+
+| Arduino sketch (application)                                                     |
+|   - includes only SpecAnn.h                                                      |
+|   - calls sa.begin(), sa.setRFin(), sa.readAmplitude(), etc.                     |
+|----------------------------------------------------------------------------------|
+| SpecAnn hardware module (composition / orchestration)                            |
+|   - owns LO1/LO2/LO3 objects via I_PLLSynthesizer                                |
+|   - owns attenuator, ADC, ref enables, mode selection                            |
+|   - implements “instrument behaviors” (sweep, calibration states, etc.)          |
+|----------------------------------------------------------------------------------|
+| Device interfaces (capabilities)                                                 |
+|   - I_PLLSynthesizer (setFrequency(FMN), outputSelect, outputPower, isLocked)    |
+|   - I_Attenuator, I_ADC, I_Memory (optional future)                              |
+|----------------------------------------------------------------------------------|
+| Chip drivers (implement device interfaces)                                       |
+|   - MAX2871 : I_PLLSynthesizer                                                   |
+|   - ADF4356 : I_PLLSynthesizer (future)                                          |
+|----------------------------------------------------------------------------------|
+| Board IO HAL (electrical primitives)                                             |
+|   - HAL (spiWriteRegister, digitalWrite, pinMode, delay, readMuxout, etc.)       |
+|   - FeatherHAL/ArduinoHAL implement HAL                                          |
++----------------------------------------------------------------------------------+
+
 ## License
 
 This project is licensed under the **GPL-3.0-or-later**. See the LICENSE file for details.
