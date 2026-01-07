@@ -32,7 +32,7 @@ const double REF_FREQ_MHZ = 60.0;
 
 // Create HAL and synthesizer objects
 BitBangHAL hal(PIN_CLK, PIN_DAT, PIN_LE, PIN_CE);
-MAX2871 synth(REF_FREQ_MHZ);
+MAX2871 synth(REF_FREQ_MHZ, hal);
 
 void setup() {
   Serial.begin(115200);
@@ -46,7 +46,6 @@ void setup() {
   Serial.println("HAL initialized");
   
   // Attach HAL to synthesizer and initialize
-  synth.attachHal(&hal);
   synth.begin();
   Serial.println("MAX2871 initialized");
   

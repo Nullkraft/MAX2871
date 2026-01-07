@@ -26,22 +26,24 @@ static const uint8_t PIN_LE_LO2  =  9;  // GP09
 static const uint8_t PIN_LE_LO3  = 24;  // GP24
 static const uint8_t PIN_REF_EN1 = 10;  // GP10
 static const uint8_t PIN_REF_EN2 = 11;  // GP11
-MAX2871    lo1(REF_MHZ);
-ArduinoHAL hal_lo1(PIN_LE_LO1);     // Attach the latch pin, IO pin 3, to LO2 LE
-MAX2871    lo2(REF_MHZ);
-ArduinoHAL hal_lo2(PIN_LE_LO2);     // Attach the latch pin, IO pin 3, to LO2 LE
-MAX2871    lo3(REF_MHZ);
-ArduinoHAL hal_lo3(PIN_LE_LO3);     // Attach the latch pin, IO pin 3, to LO2 LE
 
 static const double  REF_MHZ    = 66.0;
 
 FeatherHAL hal_lo1(PIN_LE_LO1);     // Assign the latch pin, IO pin 29, to LO1 LE
+MAX2871    lo1(REF_MHZ, hal_lo1);
+FeatherHAL hal_lo2(PIN_LE_LO2);     // Assign the latch pin, IO pin 9, to LO2 LE
+MAX2871    lo2(REF_MHZ, hal_lo2);
+FeatherHAL hal_lo3(PIN_LE_LO3);     // Assign the latch pin, IO pin 24, to LO3 LE
+MAX2871    lo3(REF_MHZ, hal_lo3);
+
 FrequencyCalculator fc(lo1, lo2, lo3);
 
 void setup() {
   delay(5000);
   Serial.begin(115200);
+
   SPI.begin();
+
   pinMode(PIN_LE_LO1, OUTPUT);
   pinMode(PIN_LE_LO2, OUTPUT);
   pinMode(PIN_LE_LO3, OUTPUT);
@@ -59,7 +61,6 @@ void setup() {
   lo1.outputSelect(RF_ALL);   // enable A+B
   lo1.outputPower(+5, RF_ALL);    // +5 dBm (per your mapping)
 
-  lo2.attachHal(&hal_lo2);
   lo2.begin();
   lo2.outputSelect(RF_ALL);   // enable A+B
   lo2.outputPower(+5, RF_ALL);    // +5 dBm (per your mapping)
@@ -67,6 +68,7 @@ void setup() {
   lo3.begin();
   lo3.outputSelect(RF_ALL);   // enable A+B
   lo3.outputPower(+5, RF_ALL);    // +5 dBm (per your mapping)
+
   Serial.println("Enter LO2 frequency in MHz (23.5 to 6000). Example: 2412.5");
   Serial.setTimeout(15); // makes parseFloat() snappy without long blocking
   pinMode(LED_BUILTIN, OUTPUT);

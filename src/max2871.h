@@ -2,7 +2,8 @@
 #define _MAX2871_
 
 #include <math.h>
-#include "I_PLLSynthesizer.h"   // Common PLL interface (#includes HAL)
+#include "I_PLLSynthesizer.h"   // Common PLL interface
+#include "hal.h"
 
 class MAX2871 : public I_PLLSynthesizer {
 public:
@@ -15,10 +16,9 @@ public:
   uint32_t print_val1 = 0;
   uint32_t print_val2 = 0;
 
-  HAL* hal = nullptr;
-  explicit MAX2871(double refIn);
+  // explicit MAX2871(double refIn);
+  explicit MAX2871(double refMHz, HAL& hal);
   MAX2871() = delete;                                       // Disallow empty constructor
-  void attachHal(HAL* halPtr) override {hal = halPtr;}
   void begin() override;
   void reset();
   bool isLocked() override;

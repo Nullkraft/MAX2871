@@ -15,7 +15,7 @@ static constexpr double  REF_MHZ = 66.0; // 66 MHz reference
 
 // CE is tied HIGH on evaluation board
 static ArduinoHAL hal(PIN_LE, 0xFF /*CE unused*/, PIN_MUX);
-static MAX2871 lo(REF_MHZ);
+static MAX2871 lo(REF_MHZ, hal);
 
 // Unity hooks
 void setUp() {}
@@ -93,7 +93,6 @@ int runUnityTests() {
 
 void setup() {
     hal.begin();
-    lo.attachHal(&hal);
     lo.begin();        // Performs clean-clock startup I.A.W. the spec sheet
     runUnityTests();
     hal.pinMode(LED_BUILTIN, PINMODE_OUTPUT);

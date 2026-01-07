@@ -27,8 +27,8 @@ const MAX2871::max2871Registers MAX2871::defaultRegisters = {{
 
 /* hal defaults to nullptr */
 // First use of _dirtyMask marks all 6 registers as requiring updates
-MAX2871::MAX2871(double refIn) 
-    : refInHz(refIn), fpfdHz(0.0), _rfEnPin(0), first_init(true), _dirtyMask(0x3F) {
+MAX2871::MAX2871(double refMHz, HAL& hal)
+    : _refMHz(refMHz), _hal(hal), fpfdHz(0.0), _rfEnPin(0), first_init(true), _dirtyMask(0x3F) {
 }
 
 void MAX2871::begin() {
@@ -158,15 +158,13 @@ void MAX2871::outputPower(int dBm, RFOutPort port) {
 // ---- Status ----
 
 bool MAX2871::isLocked() {
-    return hal ? hal->readMuxout() : false;
+    return _hal.readMuxout();
 }
 
 // ---- Register Access ----
 
 void MAX2871::writeRegister(uint32_t value) {
-    if (hal) {
-        hal->spiWriteRegister(value);
-    }
+    _hal.spiWriteRegister(value);
 }
 
 /*  At power-up, the registers should be programmed twice. The first
@@ -177,7 +175,7 @@ void MAX2871::updateRegisters() {
     // First cycle ensures a clean-clock startup
     if (first_init) {
         writeRegister(Curr.Reg[5]);                         // Program reg 5
-        if (hal) hal->delayMs(20);
+        _hal.delayMs(20);
         writeRegister(Curr.Reg[4] & 0xFFFFFEDF);            // Program reg 4, RFOUTA and B disabled
         for (int regAddr = 3; regAddr >= 0; --regAddr) {    // Program reg 3, 2, 1, 0
             writeRegister(Curr.Reg[regAddr]);

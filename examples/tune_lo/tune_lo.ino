@@ -13,8 +13,8 @@ static const uint8_t PIN_REF_EN2 = 9;
 
 static const double  REF_MHZ    = 66.0;
 
-MAX2871    lo2(REF_MHZ);
 ArduinoHAL hal_lo2(PIN_LE_LO2);
+MAX2871    lo2(REF_MHZ, hal_lo2);
 
 // Tune helper
 static void tune_lo2(double mhz) {
@@ -37,7 +37,6 @@ void setup() {
   digitalWrite(PIN_REF_EN1, HIGH);
   digitalWrite(PIN_REF_EN2, LOW);
 
-  lo2.attachHal(&hal_lo2);
   lo2.begin();
   lo2.outputSelect(RF_ALL);   // enable A+B
   lo2.outputPower(+5, RF_ALL);    // +5 dBm (per your mapping)

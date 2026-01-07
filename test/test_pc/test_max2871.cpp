@@ -7,7 +7,8 @@
 #include <stdio.h>
 
 // Shared test object
-MAX2871 lo(66.0);  // Reference clock = 66 MHz
+MockHAL hal;
+MAX2871 lo(66.0, hal);  // Reference clock = 66 MHz
 float tolerance = 0.002;        // +/- 1 kHz
 constexpr uint8_t NUM_REGS = MAX2871::max2871Registers::numRegisters;
 
@@ -92,8 +93,7 @@ void test_param_round_trip(void) {
 // Interface Test
 void test_interface_begin_and_setFrequency(void) {
     MockHAL hal;
-    I_PLLSynthesizer* lo_if = new MAX2871(66.0);
-    lo_if->attachHal(&hal);
+    I_PLLSynthesizer* lo_if = new MAX2871(66.0, hal);
     lo_if->begin();
 
     lo_if->setFrequency(4192.392);          // exercise interface to setFrequency()
@@ -105,7 +105,7 @@ void test_outputSelect_marks_R4_only_and_sets_expected_bits(void) {
      * 1) By default both outputs are enabled ==> outputSelect(RF_ALL)
      */
     uint32_t reg4_RF_AB_mask = 0x120;
-    MAX2871 lo(66e6);
+    MAX2871 lo(66e6, hal);
     lo.reset();
     uint32_t before = lo.Curr.Reg[4] & reg4_RF_AB_mask; // Should equal RF_ALL, default
     uint32_t after;

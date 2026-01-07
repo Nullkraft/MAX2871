@@ -1,9 +1,10 @@
 #include <Arduino.h>
 #include "max2871.h"
-#include "smoke_hal.h"    // from your src/
+#include "smoke_hal.h"
 
 void setup() {
-    MAX2871 lo(66.0);
+    SmokeHAL hal(0);
+    MAX2871 lo(66.0, hal);
     (void) lo;
 }
 

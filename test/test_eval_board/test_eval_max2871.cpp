@@ -22,7 +22,7 @@ static constexpr double  REF_MHZ = 60.0;    // Reference Clock (MHz)
 
 // CE is tied HIGH on the evaluation board
 static BitBangHAL hal(PIN_CLK, PIN_DAT, PIN_LE, RF_EN);
-static MAX2871 lo(REF_MHZ);
+static MAX2871 lo(REF_MHZ, hal);
 
 // Unity hooks
 void setUp() {}
@@ -86,7 +86,6 @@ int runUnityTests() {
 void setup() {
     delay(2000);     // give serial monitor time to connect
     hal.begin();
-    lo.attachHal(&hal);
     lo.begin();
     hal.setCEPin(true);     // <--- This sets RF Enable Pin5 High
     runUnityTests();

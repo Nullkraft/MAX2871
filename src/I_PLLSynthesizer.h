@@ -14,7 +14,6 @@
 #define I_PLLSYNTHESIZER_H
 
 #include <stdint.h>
-#include "hal.h"
 
 // Support chips with up to 4 RF outputs
 enum RFOutPort { RFNONE = 0, RF_A = 1, RF_B = 2, RF_C = 4, RF_D = 8, RF_ALL = 0xFF };
@@ -23,8 +22,7 @@ class I_PLLSynthesizer {
 public:
     virtual ~I_PLLSynthesizer() {}
 
-    //  Initialization 
-    virtual void attachHal(HAL* halptr) = 0;    // inject HAL for controlling synth chips
+    //  Initialization
     virtual void begin() = 0;
 
     //  Frequency Control 
