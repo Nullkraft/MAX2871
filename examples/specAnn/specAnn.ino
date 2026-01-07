@@ -115,6 +115,4 @@ void loop() {
     // Clear serial buffer after every use
     while (Serial.available()) Serial.read();
   }
-
-  digitalWrite(PIN_LE_LO2, !digitalRead(PIN_LE_LO2));
 }
