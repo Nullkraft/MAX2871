@@ -32,10 +32,11 @@ jobs:
           key: pio-${{ runner.os }}-${{ hashFiles('**/platformio.ini') }}
 
       - name: Show runner info
-         run: cat /etc/os-release
-              uname -a
-              echo "PATH=$PATH"
-              env | sort
+        run: |
+          cat /etc/os-release
+          uname -a
+          echo "PATH=$PATH"
+          env | sort
 
       - name: Test (native only)
         run: pio test -e native -v
@@ -57,14 +58,13 @@ jobs:
           arduino-cli core install arduino:avr
 
       - name: Show runner info
-         run: cat /etc/os-release
-              uname -a
-              echo "PATH=$PATH"
-              env | sort
+        run: |
+          cat /etc/os-release
+          uname -a
+          echo "PATH=$PATH"
+          env | sort
 
       # If your repo is an Arduino *library*, compile an example; if it's a sketch repo.
       - name: Compile example for Arduino CLI
         run: |
-          arduino-cli core update-index
-          arduino-cli core install arduino:avr
           arduino-cli compile --fqbn arduino:avr:uno --library . examples/ci_smoke
