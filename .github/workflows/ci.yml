@@ -81,8 +81,17 @@ jobs:
       - name: Show runner info
         run: |
           cat /etc/os-release
+
+      - name: Show Linux Kernel
+        run: |
           uname -a
+
+      - name: Show PATH
+        run: |
           echo "PATH=$PATH"
+
+      - name: Show Environment Variables
+        run: |
           env | sort
 
       # If your repo is an Arduino *library*, compile an example; if it's a sketch repo.
