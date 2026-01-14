@@ -67,6 +67,13 @@ jobs:
       - name: Install Arduino CLI
         uses: arduino/setup-arduino-cli@v2
 
+      - name: Cache Arduino data
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.arduino15
+          key: arduino-${{ runner.os }}-${{ hashFiles('.github/workflows/ci.yml') }}
+
       - name: Install cores & libs
         run: |
           arduino-cli core update-index
