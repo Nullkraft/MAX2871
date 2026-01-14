@@ -34,8 +34,17 @@ jobs:
       - name: Show runner info
         run: |
           cat /etc/os-release
+
+      - name: Show Linux Kernel
+        run: |
           uname -a
+
+      - name: Show PATH
+        run: |
           echo "PATH=$PATH"
+
+      - name: Show Environment Variables
+        run: |
           env | sort
 
       - name: Test (native only)
