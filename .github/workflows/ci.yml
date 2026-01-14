@@ -76,7 +76,6 @@ jobs:
 
       - name: Install cores & libs
         run: |
-          arduino-cli core update-index
           arduino-cli core install arduino:avr
 
       - name: Show runner info
