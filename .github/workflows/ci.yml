@@ -22,10 +22,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-
-      - name: Install PlatformIO
-        run: pip install --upgrade platformio
+          python-version: "3.11"
 
       - name: Cache PlatformIO
         uses: actions/cache@v4
@@ -36,6 +33,9 @@ jobs:
             ~/.platformio/platforms
             ~/.platformio/penv
           key: pio-${{ runner.os }}-${{ hashFiles('**/platformio.ini') }}
+
+      - name: Install PlatformIO
+        run: pip install --upgrade platformio
 
       - name: Show runner info
         run: |
@@ -54,7 +54,7 @@ jobs:
           env | sort
 
       - name: Test (native only)
-        run: pio test -e native -v
+        run: make test-native
 
   # ---------------------------
   # 2) Arduino CLI build for UNO (Arduino-toolchain validation)
@@ -74,9 +74,11 @@ jobs:
             ~/.arduino15
           key: arduino-${{ runner.os }}-${{ hashFiles('.github/workflows/ci.yml') }}
 
-      - name: Install cores & libs
-        run: |
-          arduino-cli core install arduino:avr
+      - name: Cache project tools
+        uses: actions/cache@v4
+        with:
+          path: .tools
+          key: tools-${{ runner.os }}-${{ hashFiles('Makefile') }}
 
       - name: Show runner info
         run: |
@@ -94,7 +96,5 @@ jobs:
         run: |
           env | sort
 
-      # If your repo is an Arduino *library*, compile an example; if it's a sketch repo.
-      - name: Compile example for Arduino CLI
-        run: |
-          arduino-cli compile --fqbn arduino:avr:uno --library . examples/ci_smoke
+      - name: Build UNO example
+        run: make arduino-uno
