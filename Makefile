@@ -41,7 +41,7 @@ test-native:
 	pio test -e native -v
 
 arduino-uno: check-arduino-cli
-	@echo "arduino-uno: build (Arduino CLI)"
+	@echo "arduino-uno built using Arduino CLI (arduino-cli)"
 	arduino-cli core install arduino:avr
 	arduino-cli compile --fqbn arduino:avr:uno --library . examples/ci_smoke
 
