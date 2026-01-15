@@ -54,7 +54,7 @@ jobs:
           env | sort
 
       - name: Test (native only)
-        run: make test-native
+        run: pio test -e native -v
 
   # ---------------------------
   # 2) Arduino CLI build for UNO (Arduino-toolchain validation)
@@ -74,12 +74,6 @@ jobs:
             ~/.arduino15
           key: arduino-${{ runner.os }}-${{ hashFiles('.github/workflows/ci.yml') }}
 
-      - name: Cache project tools
-        uses: actions/cache@v4
-        with:
-          path: .tools
-          key: tools-${{ runner.os }}-${{ hashFiles('Makefile') }}
-
       - name: Show runner info
         run: |
           cat /etc/os-release
@@ -96,5 +90,10 @@ jobs:
         run: |
           env | sort
 
-      - name: Build UNO example
-        run: make arduino-uno
+      - name: Install cores & libs
+        run: |
+          arduino-cli core install arduino:avr
+
+      - name: Compile example for Arduino CLI
+        run: |
+          arduino-cli compile --fqbn arduino:avr:uno --library . examples/ci_smoke
