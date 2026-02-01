@@ -5,6 +5,7 @@
 *_old*
 
 .pio/
+.idea/
 .vscode/
 .maxlib/
 .tools/
