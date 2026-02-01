@@ -8,10 +8,16 @@ ARDUINO_CLI_BIN := $(BIN_DIR)/arduino-cli
 # Prefer project-local tools if present
 export PATH := $(BIN_DIR):$(PATH)
 
-.PHONY: tools check-arduino-cli doctor test-native arduino-uno ci
+.PHONY: banner tools check-arduino-cli doctor test-native arduino-uno ci
+
+banner:
+	@echo
+	@echo "     ┌───────────────────────────────────────────────────────────────────────┐"
+	@echo "     │                               NEW BUILD                               │"
+	@echo "     └───────────────────────────────────────────────────────────────────────┘"
 
 # Explicit install target (only runs when you call `make tools`)
-tools:
+tools: banner
 	@mkdir -p $(BIN_DIR)
 	@echo "Installing Arduino CLI into $(BIN_DIR)..."
 	@{ \
@@ -25,7 +31,7 @@ tools:
 	} | BINDIR="$(BIN_DIR)" sh
 	@echo "Installed: $(ARDUINO_CLI_BIN)"
 
-check-arduino-cli:
+check-arduino-cli: banner
 	@command -v arduino-cli >/dev/null 2>&1 || { \
 	  echo "ERROR: arduino-cli not found on PATH."; \
 	  echo "Run: make tools"; \
@@ -33,16 +39,24 @@ check-arduino-cli:
 	  exit 1; \
 	}
 
-doctor: check-arduino-cli
+check-pio: banner
+	@command -v pio >/dev/null 2>&1 || { \
+	  echo "ERROR: pio (PlatformIO) not found on PATH."; \
+	  echo "Install PlatformIO, then retry."; \
+	  exit 1; \
+	}
+
+doctor: banner check-arduino-cli check-pio
 	arduino-cli version
 	pio --version
 
-test-native:
+test-native: banner check-pio
 	pio test -e native -v
 
-arduino-uno: check-arduino-cli
+arduino-uno: banner check-arduino-cli
+	@echo
 	@echo "arduino-uno built using Arduino CLI (arduino-cli)"
 	arduino-cli core install arduino:avr
 	arduino-cli compile --fqbn arduino:avr:uno --library . examples/ci_smoke
 
-ci: test-native arduino-uno
+ci: arduino-uno test-native
