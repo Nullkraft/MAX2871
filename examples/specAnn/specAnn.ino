@@ -2,6 +2,7 @@
 #include "max2871.h"
 #include "feather_hal.h"
 #include "frequency_calculator.h"
+#include "specAnn.h"
 
 // // Arduino Uno pinout
 // static const uint8_t PIN_ATTEN   = A5;
@@ -37,6 +38,7 @@ FeatherHAL hal_lo3(PIN_LE_LO3);     // Assign the latch pin, IO pin 24, to LO3 L
 MAX2871    lo3(REF_MHZ, hal_lo3);
 
 FrequencyCalculator fc(lo1, lo2, lo3);
+void show_LO_Frequencies();
 
 void setup() {
   delay(5000);
@@ -85,42 +87,46 @@ void loop() {
     else {
       fc.set_LO_frequencies(mhz, fc.RefClock1, 1);    // Set LO1, LO2, and LO3
       // lo2.outputPower(+5, RF_ALL);
-
-      Serial.print("\nIF1 = ");
-      Serial.print(fc.IF1, 3);
-      Serial.println(" MHz\n");
-
-      Serial.println("    | Freq MHz |  M   |  F   | N");
-      Serial.println("----+----------+------+------+----");
-
-      Serial.print("LO1 | ");
-      Serial.print(fc.FreqLO1, 3);
-      Serial.print(" | ");
-      Serial.print(lo1.M);
-      Serial.print(" |    ");
-      Serial.print(lo1.Frac);
-      Serial.print(" | ");
-      Serial.println(lo1.N);
-
-      Serial.print("LO2 | ");
-      Serial.print(fc.FreqLO2, 3);
-      Serial.print(" | ");
-      Serial.print(lo2.M);
-      Serial.print(" | ");
-      Serial.print(lo2.Frac);
-      Serial.print(" | ");
-      Serial.println(lo2.N);
-
-      Serial.print("LO3 |  ");
-      Serial.print(fc.FreqLO3, 3);
-      Serial.print(" | ");
-      Serial.print(lo3.M);
-      Serial.print(" | ");
-      Serial.print(lo3.Frac);
-      Serial.print(" | ");
-      Serial.println(lo3.N);
+      show_LO_Frequencies();
     }
     // Clear serial buffer after every use
     while (Serial.available()) Serial.read();
   }
+}
+
+void show_LO_Frequencies()
+{
+  Serial.print("\nIF1 = ");
+  Serial.print(fc.IF1, 3);
+  Serial.println(" MHz\n");
+
+  Serial.println("    | Freq MHz |  M   |  F   | N");
+  Serial.println("----+----------+------+------+----");
+
+  Serial.print("LO1 | ");
+  Serial.print(fc.FreqLO1, 3);
+  Serial.print(" | ");
+  Serial.print(lo1.M);
+  Serial.print(" |    ");
+  Serial.print(lo1.Frac);
+  Serial.print(" | ");
+  Serial.println(lo1.N);
+
+  Serial.print("LO2 | ");
+  Serial.print(fc.FreqLO2, 3);
+  Serial.print(" | ");
+  Serial.print(lo2.M);
+  Serial.print(" | ");
+  Serial.print(lo2.Frac);
+  Serial.print(" | ");
+  Serial.println(lo2.N);
+
+  Serial.print("LO3 |  ");
+  Serial.print(fc.FreqLO3, 3);
+  Serial.print(" | ");
+  Serial.print(lo3.M);
+  Serial.print(" | ");
+  Serial.print(lo3.Frac);
+  Serial.print(" | ");
+  Serial.println(lo3.N);
 }
