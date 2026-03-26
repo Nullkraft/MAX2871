@@ -76,17 +76,15 @@ public:
         SPI.beginTransaction(settings);
 
         // Drive LE low for shift phase
-        if (_le != 0xFF) ::digitalWrite(_le, LOW);
+        ::digitalWrite(_le, LOW);
 
         // Transfer 32 bits MSB-first
         SPI.transfer16((value >> 16) & 0xFFFF);
         SPI.transfer16(value & 0xFFFF);
 
         // Latch on LE rising edge
-        if (_le != 0xFF) {
-            ::digitalWrite(_le, HIGH);
-            ::digitalWrite(_le, LOW);
-        }
+        ::digitalWrite(_le, HIGH);
+        ::digitalWrite(_le, LOW);
 
         SPI.endTransaction();
     }
