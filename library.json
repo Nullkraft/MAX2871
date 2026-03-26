@@ -1,0 +1,21 @@
+{
+  "name": "MAX2871_PLL",
+  "version": "0.1.0",
+  "description": "MAX2871 PLL/VCO driver library",
+  "keywords": ["MAX2871", "PLL", "VCO", "frequency synthesizer", "SPI"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Nullkraft/MAX2871"
+  },
+  "authors": [
+    {
+      "name": "Mark Stanley"
+    }
+  ],
+  "license": "GPL-2.0-only",
+  "frameworks": ["arduino"],
+  "platforms": "*",
+  "dependencies": [
+    { "name": "SPI" }
+  ]
+}
