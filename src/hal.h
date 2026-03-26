@@ -21,6 +21,14 @@ enum pin_mode { PINMODE_INPUT, PINMODE_INPUT_PULLUP, PINMODE_INPUT_PULLDOWN, PIN
 enum pin_level { PINLEVEL_LOW = 0, PINLEVEL_HIGH = 1 };
 enum ADCChannel { ADC_COARSE = 1, ADC_FINE = 2 };
 
+inline bool hasInputPulldown() {
+#if defined(INPUT_PULLDOWN)
+    return true;
+#else
+    return false;
+#endif
+}
+
 // --- Bitfield Utilities ---
 // Helper functions for register bit manipulation
 
