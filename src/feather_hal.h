@@ -56,9 +56,7 @@ public:
     }
 
     // Optional: pick a faster/slower SPI clock (Hz). Call before beginTransaction.
-    void setSpiClockHz(uint32_t hz) {
-        _spiHz = hz;
-    }
+    void setSpiClockHz(uint32_t hz) { _spiHz = hz; }
 
     // ---- HAL virtuals ----
 

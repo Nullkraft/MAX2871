@@ -30,8 +30,7 @@ public:
         SPI.begin();
     }
 
-    // Set SPI clock rate before device operations
-    // e.g. setSpiClockHz(lo1.spiHz) or setSpiClockHz(adc.spiHz)
+    // Optional: pick a faster/slower SPI clock (Hz). Call before beginTransaction.
     void setSpiClockHz(uint32_t hz) { _spiHz = hz; }
 
     // GPIO
