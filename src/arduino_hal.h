@@ -56,7 +56,7 @@ public:
     }
 
     // Timing
-    void delayMs(uint32_t ms) override { delay(ms); }
+    void delayMs(uint32_t ms) override { ::delay(ms); }
 
     // MAX2871 helpers
     void spiWriteRegister(uint32_t value) override {

@@ -39,7 +39,7 @@ public:
     }
 
     void delayMs(uint32_t ms) override {
-        delay(ms);
+        ::delay(ms);
     }
 
     void setCEPin(bool enable) override {
