@@ -17,17 +17,15 @@
 
 #include <stdint.h>
 
+#if !defined(HAL_INPUT_PULLDOWN) && defined(INPUT_PULLDOWN)
+#define HAL_INPUT_PULLDOWN INPUT_PULLDOWN
+#elif !defined(HAL_INPUT_PULLDOWN) && defined(INPUT)
+#define HAL_INPUT_PULLDOWN INPUT
+#endif
+
 enum pin_mode { PINMODE_INPUT, PINMODE_INPUT_PULLUP, PINMODE_INPUT_PULLDOWN, PINMODE_OUTPUT };
 enum pin_level { PINLEVEL_LOW = 0, PINLEVEL_HIGH = 1 };
 enum ADCChannel { ADC_COARSE = 1, ADC_FINE = 2 };
-
-inline bool hasInputPulldown() {
-#if defined(INPUT_PULLDOWN)
-    return true;
-#else
-    return false;
-#endif
-}
 
 // --- Bitfield Utilities ---
 // Helper functions for register bit manipulation

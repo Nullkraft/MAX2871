@@ -71,16 +71,10 @@ public:
     // GPIO
     void pinMode(uint8_t pin, pin_mode mode) override {
         switch (mode) {
-            case pin_mode::PINMODE_INPUT:         ::pinMode(pin, INPUT); break;
-            case pin_mode::PINMODE_OUTPUT:        ::pinMode(pin, OUTPUT); break;
-            case pin_mode::PINMODE_INPUT_PULLUP:  ::pinMode(pin, INPUT_PULLUP); break;
-            case pin_mode::PINMODE_INPUT_PULLDOWN:
-#if defined(INPUT_PULLDOWN)
-                ::pinMode(pin, INPUT_PULLDOWN);
-#else
-                ::pinMode(pin, INPUT);    // fallback
-#endif
-                break;
+            case pin_mode::PINMODE_INPUT:           ::pinMode(pin, INPUT); break;
+            case pin_mode::PINMODE_OUTPUT:          ::pinMode(pin, OUTPUT); break;
+            case pin_mode::PINMODE_INPUT_PULLUP:    ::pinMode(pin, INPUT_PULLUP); break;
+            case pin_mode::PINMODE_INPUT_PULLDOWN:  ::pinMode(pin, HAL_INPUT_PULLDOWN); break;
             default: ::pinMode(pin, INPUT); break;
         }
     }
