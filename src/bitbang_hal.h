@@ -58,8 +58,6 @@ public:
         digitalWrite(pinLE, PINLEVEL_LOW);
     }
 
-    // Unused virtual functions
-    void spiBegin() {}
     bool readMuxout() { return true; }      // TODO: Implement testing muxOut
     uint16_t readADC(ADCChannel channel = ADC_COARSE) override { return 0; }
 };

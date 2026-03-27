@@ -9,10 +9,6 @@ public:
     explicit SmokeHAL(uint8_t /*pinLE*/) {}
 
     void doNothing() {}
-    // --- SPI (no-op) ---
-    void spiBegin() override {}
-    // void spiTransfer(uint8_t /*data*/) override {}
-
     // --- GPIO (no-op) ---
     void pinMode(uint8_t /*pin*/, pin_mode /*mode*/) override {}
     void digitalWrite(uint8_t /*pin*/, pin_level /*val*/) override {}

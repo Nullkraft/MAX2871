@@ -37,10 +37,6 @@ public:
         SPI.begin();
     }
 
-    void spiBegin() override {
-        // Transaction started around each device access
-    }
-
     // Set SPI clock rate before device operations
     // e.g. setSpiClockHz(lo1.spiHz) or setSpiClockHz(adc.spiHz)
     void setSpiClockHz(uint32_t hz) { _spiHz = hz; }

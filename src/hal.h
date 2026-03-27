@@ -50,9 +50,6 @@ class HAL {
 public:
     virtual ~HAL() {}
 
-    // SPI
-    virtual void spiBegin() = 0;
-
     // GPIO
     virtual void pinMode(uint8_t pin, pin_mode mode) = 0;
     virtual void digitalWrite(uint8_t pin, pin_level val) = 0;

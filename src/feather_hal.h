@@ -56,11 +56,6 @@ public:
         SPI.begin();
     }
 
-    void spiBegin() override {
-        // We'll begin a transaction around every 32-bit write.
-        // (If you want to optimize, you can lift this out.)
-    }
-
     // Optional: pick a faster/slower SPI clock (Hz). Call before beginTransaction.
     void setSpiClockHz(uint32_t hz) {
         _spiHz = hz;

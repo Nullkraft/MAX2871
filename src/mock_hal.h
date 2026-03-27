@@ -21,7 +21,6 @@ public:
         // delay(ms);
     }
 
-    void spiBegin() override {}
     void pinMode(uint8_t, pin_mode) override {}
     void digitalWrite(uint8_t, pin_level) override {}
 
