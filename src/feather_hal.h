@@ -79,7 +79,7 @@ public:
 
     // MAX2871 helpers
     void spiWriteRegister(uint32_t value) override {
-        // MAX2871 write (MSB first, 32 bits)
+        // MAX2871 write (MSB first, 32 bits, Mode 0)
         SPISettings settings(_spiHz, MSBFIRST, SPI_MODE0);
         SPI.beginTransaction(settings);
 
@@ -112,7 +112,7 @@ private:
     uint8_t _le;
     uint8_t _ce;
     uint8_t _mux;
-    uint32_t _spiHz = 8000000UL;  // start conservatively; raise once validated
+    uint32_t _spiHz = 8000000UL;    // Default: Arduino Uno max = 8 MHz
 };
 
 #endif // FEATHER_HAL_H
