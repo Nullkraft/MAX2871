@@ -83,22 +83,20 @@ The synthesizer equivalent of the classic LED blink - generate a 42 MHz signal:
 ```cpp
 #include <Arduino.h>
 #include "max2871.h"
-#include "bitbang_hal.h"
+#include "arduino_hal.h"
 
 // Pin definitions
 static constexpr uint8_t RF_EN   = 5;       // RF output enable
 static constexpr uint8_t PIN_LE  = A3;      // Latch enable
-static constexpr uint8_t PIN_DAT = A2;      // Data
-static constexpr uint8_t PIN_CLK = A1;      // Clock
+static constexpr uint8_t PIN_MUX = A2;      // Lock detect
 static constexpr double  REF_MHZ = 60.0;    // Reference clock
 
-BitBangHAL hal(PIN_CLK, PIN_DAT, PIN_LE, RF_EN);
-MAX2871 lo(REF_MHZ);
+ArduinoHAL hal(PIN_LE, RF_EN, PIN_MUX);
+MAX2871 lo(REF_MHZ, hal);
 
 void setup() {
     hal.begin();
-    lo.attachHal(&hal);
-    lo.begin(PIN_LE);
+    lo.begin();
     hal.setCEPin(true);
     lo.setFrequency(42.0);   // Set RFOut to 42 MHz
 }
@@ -120,11 +118,6 @@ pio run -e uno
 ### Upload to board
 ```bash
 pio run -e uno --target upload
-```
-
-### Run tests on hardware
-```bash
-pio test -e eval_board
 ```
 
 ### Run PC-native tests
@@ -154,9 +147,8 @@ bool locked = lo.isLocked();    // Check PLL lock status
 
 The library supports multiple communication methods:
 
-- **BitBangHAL** - Software SPI using GPIO pins (included)
-- **ArduinoHAL** - Hardware SPI peripheral (future)
-- **MockHAL** - Testing on PC without hardware (future)
+- **ArduinoHAL** - Hardware SPI peripheral
+- **MockHAL** - Testing on PC without hardware
 
 All HALs implement the same interface, so switching is transparent to your application code.
 
@@ -165,8 +157,7 @@ All HALs implement the same interface, so switching is transparent to your appli
 The project includes comprehensive tests using Unity test framework:
 
 - **PC-native tests** - Run on your development machine
-- **Hardware tests** - Run on actual Arduino hardware
-- **Evaluation board tests** - Specific to MAX2871 eval board
+- **Hardware tests** - Run on supported Arduino hardware
 
 ## Contributing
 

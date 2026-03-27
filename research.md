@@ -34,7 +34,6 @@
 - `HAL` defines virtual hooks for SPI, GPIO, timing, MAX2871 register writes, chip-enable control, lock detect, and ADS7826 ADC reads.
 - Helper inline functions `bitMask` and `fieldValue` (32-bit) are generalized bitfield utilities used throughout the driver.
 - Implementations:
-  - `BitBangHAL` (GPIO bit-banging; examples/EvalBoardBasic & `test_eval_board`): manages CLK/DATA/LE pins via Arduino core `shiftOut`, optional CE line, but stubs `readMuxout()` (always `true`) and `readADC()`.
   - `ArduinoHAL` (classic AVR SPI): `SPI.beginTransaction` with latch pulsing; optional CE and MUX pins, supports dual ADS7826 chip selects. Exposes `setSpiClockHz()` (default 8 MHz). `readMuxout()` returns digital read of the configured pin. ADC read shifts data for a 10-bit result left-justified in 12 bits.
   - `MockHAL` (PC tests): logs up to seven register writes for assertions, returns `false` for lock detect, implements no-delay/digital side effects.
   - `SmokeHAL` (CI smoke build): pure no-op HAL fulfilling interface for minimal compilation.
@@ -61,7 +60,6 @@
 - `Makefile` adds a non-PlatformIO workflow: downloads `arduino-cli` locally, provides `make ci` target that compiles the smoke sketch with Arduino CLI and runs native tests via `pio test`.
 
 ## Examples and Usage Patterns (`examples/`)
-- `EvalBoardBasic/EvalBoardBasic.ino`: Bit-banged SPI on an Arduino with 60 MHz reference. Demonstrates initialization, enabling RF outputs, power selection, and a simple frequency sweep. Highlights requirement to call `hal.begin()`, `lo.begin()`, `hal.setCEPin(true)`.
 - `ci_smoke/ci_smoke.ino`: Minimal smoke test to verify compilation linkage; instantiated via `ci_smoke_wrapper.cpp`.
 
 ## Test Coverage (`test/`)
@@ -73,7 +71,6 @@
 - `test_hw` and `test_feather` (Arduino targets):
   - Shared structure verifying `begin()` on hardware, observing MUXOUT (informational), checking frequency round-trip (`setFrequency` vs `fmn2freq`).
   - Configure board-specific pins and ensure reference enables are asserted before tuning.
-- `test_eval_board/test_eval_max2871.cpp`: Tailored to the DIY eval board with `BitBangHAL`. Adds register dump helpers and a power-level verification suite using `TEST_ASSERT_BITS`.
 - All tests rely on Unity, with Arduino-friendly timeouts and optional serial messaging (`TEST_MESSAGE`).
 
 ## Supporting Assets and Data
@@ -87,7 +84,6 @@
 - `requirements.txt`: Reserved for Python 3.11.0 tooling needs during development automation or analysis.
 
 ## Known Limitations, TODOs, and Observations
-- `BitBangHAL::readMuxout()` is hardcoded to `true`; lock-detect dependent logic (e.g., `isLocked()`) is meaningless when using this HAL until implemented.
 - Example sketches manually call non-virtual `begin()` on HALs; there is no compile-time guard enforcing this, so forgetting to call it leaves pins unconfigured.
 - `freq2FMN()` currently uses floating point and O(4095) loop per tune; this will remain the interim path until precomputed FMN tables (derived from artifacts like `LO2_ref1_hi_fmn_list.csv`) are generated after board bring-up.
 - Default register set chooses RF_B enabled, RF_A disabled at +5 dBm with divide-by-64. Users wanting different defaults must adjust `defaultRegisters`.
