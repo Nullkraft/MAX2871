@@ -44,7 +44,7 @@ Software Stack:
 |----------------------------------------------------------------------------------|
 | Board IO HAL (electrical primitives)                                             |
 |   - HAL (spiWriteRegister, digitalWrite, pinMode, delay, readMuxout, etc.)       |
-|   - FeatherHAL/ArduinoHAL implement HAL                                          |
+|   - ArduinoHAL implements HAL                                                    |
 +----------------------------------------------------------------------------------+
 
 ## License

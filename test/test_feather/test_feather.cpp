@@ -5,7 +5,7 @@
 #include <unity.h>
 
 #include "max2871.h"
-#include "feather_hal.h"
+#include "arduino_hal.h"
 
 // ==== Wiring & config ====
 static constexpr uint8_t PIN_LE  = 3;    // LO2 Latch Enable (was A3)
@@ -14,7 +14,7 @@ static constexpr uint8_t REF_EN1 = 8;    // Reference clock select
 static constexpr double  REF_MHZ = 66.0; // 66 MHz reference
 
 // CE is tied HIGH on evaluation board
-static FeatherHAL hal(PIN_LE, 0xFF /*CE unused*/, PIN_MUX);
+static ArduinoHAL hal(PIN_LE, 0xFF /*CE unused*/, PIN_MUX);
 static MAX2871 lo(REF_MHZ, hal);
 
 // Unity hooks

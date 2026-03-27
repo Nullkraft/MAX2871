@@ -17,6 +17,6 @@ The next focus is testing.
 - Removed the unused `spiBegin()` HAL hook.
 - Removed dead helper methods from `MockHAL` and `SmokeHAL`.
 - Removed ADC-related HAL API and implementation spillover.
-- Normalized several HAL style inconsistencies across `arduino_hal.h`, `feather_hal.h`, and related files.
+- Normalized several HAL style inconsistencies across `arduino_hal.h` and related files.
 - Fixed the `ci_smoke_wrapper.cpp` preprocessor warning.
 - Created the `pre-hal-unification` tag as a checkpoint before HAL unification work.

@@ -35,7 +35,7 @@
 - Helper inline functions `bitMask` and `fieldValue` (32-bit) are generalized bitfield utilities used throughout the driver.
 - Implementations:
   - `BitBangHAL` (GPIO bit-banging; examples/EvalBoardBasic & `test_eval_board`): manages CLK/DATA/LE pins via Arduino core `shiftOut`, optional CE line, but stubs `readMuxout()` (always `true`) and `readADC()`.
-  - `ArduinoHAL` (classic AVR SPI) and `FeatherHAL` (RP2040 SPI): identical patterns—`SPI.beginTransaction` with latch pulsing; optional CE and MUX pins, supports dual ADS7826 chip selects. Both expose `setSpiClockHz()` (default 8 MHz). `readMuxout()` returns digital read of the configured pin. ADC read shifts data for a 10-bit result left-justified in 12 bits.
+  - `ArduinoHAL` (classic AVR SPI): `SPI.beginTransaction` with latch pulsing; optional CE and MUX pins, supports dual ADS7826 chip selects. Exposes `setSpiClockHz()` (default 8 MHz). `readMuxout()` returns digital read of the configured pin. ADC read shifts data for a 10-bit result left-justified in 12 bits.
   - `MockHAL` (PC tests): logs up to seven register writes for assertions, returns `false` for lock detect, implements no-delay/digital side effects.
   - `SmokeHAL` (CI smoke build): pure no-op HAL fulfilling interface for minimal compilation.
 - HALs typically offer an ad-hoc `begin()` method (not in `HAL` interface) to initialize board pins; sketches/tests must remember to call it.
