@@ -44,14 +44,13 @@ public:
     explicit FeatherHAL(uint8_t lePin, uint8_t cePin = 0xFF, uint8_t muxPin = 0xFF)
         : _le(lePin), _ce(cePin), _mux(muxPin) {}
 
-    // Call once from setup(): config pins and SPI
     void begin() {
         // Basic pin config
         if (_le  != 0xFF) ::pinMode(_le, OUTPUT), ::digitalWrite(_le, LOW);
         if (_ce  != 0xFF) ::pinMode(_ce, OUTPUT), ::digitalWrite(_ce, LOW);   // keep LO off initially
         if (_mux != 0xFF) ::pinMode(_mux, INPUT);                             // MUXOUT (lock detect)
 
-        // Start SPI on the default bus (SCK18/MOSI19/MISO16)
+        // Start SPI on the default bus
         SPI.begin();
     }
 

@@ -14,24 +14,31 @@
 
 #include <Arduino.h>
 #include <SPI.h>
-#include "hal.h"
+#include "hal.h"   // defines pin_mode, pin_level, HAL base class
 
 class ArduinoHAL : public HAL {
 public:
+    // Construct with required control pins. You can pass 0xFF for any unused pin.
+    // le  = MAX2871 LE (latch enable)
+    // ce  = MAX2871 CE (chip enable)
+    // mux = MAX2871 MUXOUT pin for lock detect
     explicit ArduinoHAL(uint8_t lePin, uint8_t cePin = 0xFF, uint8_t muxPin = 0xFF)
         : _le(lePin), _ce(cePin), _mux(muxPin) {}
 
     void begin() {
-        // MAX2871 pins
+        // Basic pin config
         if (_le  != 0xFF) ::pinMode(_le, OUTPUT), ::digitalWrite(_le, LOW);
-        if (_ce  != 0xFF) ::pinMode(_ce, OUTPUT), ::digitalWrite(_ce, LOW);
-        if (_mux != 0xFF) ::pinMode(_mux, INPUT);
+        if (_ce  != 0xFF) ::pinMode(_ce, OUTPUT), ::digitalWrite(_ce, LOW);   // keep LO off initially
+        if (_mux != 0xFF) ::pinMode(_mux, INPUT);                             // MUXOUT (lock detect)
 
+        // Start SPI on the default bus
         SPI.begin();
     }
 
     // Optional: pick a faster/slower SPI clock (Hz). Call before beginTransaction.
     void setSpiClockHz(uint32_t hz) { _spiHz = hz; }
+
+    // ---- HAL virtuals ----
 
     // GPIO
     void pinMode(uint8_t pin, pin_mode mode) override {
@@ -44,14 +51,14 @@ public:
         }
     }
 
-    void delayMs(uint32_t ms) override {
-        delay(ms);
-    }
-
     void digitalWrite(uint8_t pin, pin_level val) override {
         ::digitalWrite(pin, (val == PINLEVEL_HIGH ? HIGH : LOW));
     }
 
+    // Timing
+    void delayMs(uint32_t ms) override { delay(ms); }
+
+    // MAX2871 helpers
     void spiWriteRegister(uint32_t value) override {
         // MAX2871 write (MSB first, 32 bits, Mode 0)
         SPISettings settings(_spiHz, MSBFIRST, SPI_MODE0);
