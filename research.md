@@ -3,7 +3,7 @@
 ## Project Purpose and Scope
 - Arduino-focused library that drives the MAX2871 wideband PLL/VCO (23.5 MHz – 6 GHz) with an extensible hardware abstraction layer (HAL) so multiple boards and communication back-ends share the same synthesizer logic (`README.md`, `library.properties`).
 - PlatformIO project layout with dual life as an Arduino library: `src/` holds implementation, `examples/` contain sketches, `test/` hosts Unity suites for PC-native and on-device validation, and `platformio.ini` defines build/test environments.
-- Positioned as a building block for a broader spectrum-analyzer stack (README software stack diagram, `examples/specAnn` usage), with future placeholders for additional PLL chips (`I_PLLSynthesizer` mentions ADF4356, LMX2594, etc.).
+- Positioned as a building block for a broader spectrum-analyzer stack, with future placeholders for additional PLL chips (`I_PLLSynthesizer` mentions ADF4356, LMX2594, etc.).
 
 ## Code Architecture
 
@@ -51,20 +51,17 @@
 ## Build and Integration Surface
 - `platformio.ini` defines multiple environments:
   - `native`: PC tests (`test_pc`) with `MockHAL`.
-  - `uno`/`mega`: AVR board tests (`test_hw`), `MAX2871_STANDALONE` macro, default serial-based Unity config.
+  - `uno`/`mega`: AVR build targets with `MAX2871_STANDALONE`.
   - `smoke`: Lightweight Arduino build bundling `examples/ci_smoke`.
-  - `feather`: RP2040 target compiling the SpecAn stack (`SPECANN_BUILD`).
-- Source filters exclude `specann_wrapper.cpp` except when explicitly enabled to avoid duplicate `setup()/loop()` definitions.
+  - `feather`: RP2040 standalone build target (`MAX2871_STANDALONE`).
 - `src/main_entry.cpp` neutralizes entry points depending on `PIO_UNIT_TESTING`, `ARDUINO`, and `MAX2871_STANDALONE` macros so PlatformIO/Arduino coexist.
-- `ci_smoke_wrapper.cpp`, `specann_wrapper.cpp`, and `examples/tune_lo/tune_lo_wrapper.cpp` inline sketches into compilation units for PlatformIO builds without needing Arduino’s sketch preprocessor.
+- `ci_smoke_wrapper.cpp` inlines the smoke sketch into a compilation unit for PlatformIO builds without needing Arduino’s sketch preprocessor.
 - `unity_config.cpp/h` provide conditional serial output shims: when PlatformIO runs tests (`PIO_UNIT_TESTING` defined) its own transport takes over; otherwise, Arduino `Serial` or `stdout` is wired up.
 - `library.properties` advertises the library as `MAX2871_EvalBoard` version `0.1.0`, architecture `*`, with a short feature summary.
 - `Makefile` adds a non-PlatformIO workflow: downloads `arduino-cli` locally, provides `make ci` target that compiles the smoke sketch with Arduino CLI and runs native tests via `pio test`.
 
 ## Examples and Usage Patterns (`examples/`)
 - `EvalBoardBasic/EvalBoardBasic.ino`: Bit-banged SPI on an Arduino with 60 MHz reference. Demonstrates initialization, enabling RF outputs, power selection, and a simple frequency sweep. Highlights requirement to call `hal.begin()`, `lo.begin()`, `hal.setCEPin(true)`.
-- `tune_lo/tune_lo.ino`: Serial-driven CLI to tune LO2 via `ArduinoHAL`. Configures IO pins for an RF front-end (attenuator, reference enables) and loops on user input for dynamic tuning.
-- `specAnn/specAnn.ino`: Multi-LO orchestration for the spectrum analyzer target (Feather RP2040). Initializes three `MAX2871` instances with dedicated HALs, configures board control pins, and uses `FrequencyCalculator` to derive LO frequencies in response to user input. Dumps IF and FMN parameters for debugging.
 - `ci_smoke/ci_smoke.ino`: Minimal smoke test to verify compilation linkage; instantiated via `ci_smoke_wrapper.cpp`.
 
 ## Test Coverage (`test/`)
@@ -97,12 +94,12 @@
 - Debug members (`print_val1`, `print_val2`) are stale; header comment explicitly marks them for removal.
 - Threshold constants in `FrequencyCalculator` are magic numbers tied to specific reference clocks; documentation suggests these will change post-calibration.
 - `FrequencyCalculator` only supports R-divider values that fit in `uint8_t`; there’s no guard against invalid `R_in`.
-- Some tests (`test_feather`, `test_hw`) duplicate large blocks; future refactor might share fixtures but current instructions discourage multi-file edits.
+- Some tests (`test_feather` and the old `test_hw` path) duplicated large blocks; future refactor might share fixtures but current instructions discourage multi-file edits.
 - Lock-detect behavior via `readMuxout()` is intentionally deferred; HAL stubs may return fixed values until the RF board bring-up defines the expected semantics.
 
 ## Decisions and Forward Work
 - **HAL initialization:** The base `HAL` contract will be extended with a virtual `begin()` so every implementation exposes a consistent setup entry point.
 - **FMN strategy:** Brute-force FMN solving remains in place temporarily; once the RF board and individual PLLs are characterized, precomputed tables (e.g., derived from `LO2_ref1_hi_fmn_list.csv`) will replace the runtime search. Continued-fraction optimizations are no longer planned.
-- **SpecAnn system role:** The SpecAnn hardware mounts three MAX2871 devices; coordinated tuning of LO1/LO2/LO3 forms the foundation of the target spectrum analyzer.
-- **SpecAnn workflow:** Operational tests for the upcoming `SpecAnn.cpp` sketch will follow after the individual PLL validation work wraps, aligning with the new standalone sketch folder.
+- **SpecAnn system role:** The SpecAnn hardware concept mounts three MAX2871 devices; coordinated tuning of LO1/LO2/LO3 forms the foundation of the target spectrum analyzer.
+- **SpecAnn workflow:** Operational work for the saTech importer will follow after the individual PLL validation work wraps.
 - **Lock detect:** `readMuxout()` implementations can remain stubbed until post bring-up measurements dictate actual behavior.
