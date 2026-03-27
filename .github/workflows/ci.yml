@@ -16,6 +16,8 @@ jobs:
   # ---------------------------
   pio-native:
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
       - uses: actions/checkout@v4
 
@@ -61,6 +63,8 @@ jobs:
   # ---------------------------
   arduino-cli-uno:
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
       - uses: actions/checkout@v4
 
