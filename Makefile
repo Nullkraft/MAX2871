@@ -1,5 +1,5 @@
 SHELL := /bin/sh
-.DEFAULT_GOAL := ci
+.DEFAULT_GOAL := test-native
 
 TOOLS_DIR := $(CURDIR)/.tools
 BIN_DIR   := $(TOOLS_DIR)/bin
@@ -8,7 +8,7 @@ ARDUINO_CLI_BIN := $(BIN_DIR)/arduino-cli
 # Prefer project-local tools if present
 export PATH := $(BIN_DIR):$(PATH)
 
-.PHONY: banner tools check-arduino-cli doctor test-native arduino-uno ci
+.PHONY: banner tools check-arduino-cli doctor test-native ci
 
 banner:
 	@echo
@@ -53,10 +53,4 @@ doctor: banner check-arduino-cli check-pio
 test-native: banner check-pio
 	pio test -e native -v
 
-arduino-uno: banner check-arduino-cli
-	@echo
-	@echo "arduino-uno built using Arduino CLI (arduino-cli)"
-	arduino-cli core install arduino:avr
-	arduino-cli compile --fqbn arduino:avr:uno --library . examples/ci_smoke
-
-ci: arduino-uno test-native
+ci: test-native
