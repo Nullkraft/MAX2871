@@ -21,24 +21,6 @@ static MAX2871 lo(REF_MHZ, hal);
 void setUp() {}
 void tearDown() {}
 
-__attribute__((unused)) static void print_register(MAX2871 &lo, uint8_t regAddr) {
-    char buf[128];
-    snprintf(buf, sizeof(buf), "reg[%d] = 0x%08lX", regAddr, lo.Curr.Reg[regAddr]);
-    TEST_MESSAGE(buf);
-}
-
-__attribute__((unused)) static void print_registers(MAX2871 &lo) {
-    for (int regAddr = 0; regAddr <= 6; ++regAddr) {
-        print_register(lo, regAddr);
-    }
-}
-
-__attribute__((unused)) static void print_hex(uint32_t val) {
-    char buf[128];
-    snprintf(buf, sizeof(buf), "0x%08lX", val);
-    TEST_MESSAGE(buf);
-}
-
 // SPI speed note: AVR UNO tops out around ~8 MHz reliably.
 void test_begin_runs_on_hardware(void) {
     lo.outputPower(+2, RF_ALL);
@@ -74,8 +56,6 @@ void test_verify_frequency_calculations(void) {
 }
 
 void test_default_setup() {
-    // TEST_MESSAGE("*** Registers ***");
-    // print_registers(lo);
     pinMode(REF_EN1, OUTPUT);
     digitalWrite(REF_EN1, HIGH);
     float freq_in = 75.003;
@@ -102,7 +82,6 @@ void setup() {
 
 uint16_t freq;
 uint16_t timing = 1500;
-uint16_t m1, m2;
 void loop() {
     for (freq = 30; freq < 70; freq++) {
         lo.setFrequency(freq*1.0+0.005);

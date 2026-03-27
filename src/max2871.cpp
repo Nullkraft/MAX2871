@@ -28,7 +28,7 @@ const MAX2871::max2871Registers MAX2871::defaultRegisters = {{
 /* hal defaults to nullptr */
 // First use of _dirtyMask marks all 6 registers as requiring updates
 MAX2871::MAX2871(double refMHz, HAL& hal)
-    : _refMHz(refMHz), _hal(hal), fpfdHz(0.0), _rfEnPin(0), first_init(true), _dirtyMask(0x3F) {
+    : _refMHz(refMHz), _hal(hal), _rfEnPin(0), first_init(true), _dirtyMask(0x3F) {
 }
 
 void MAX2871::begin() {

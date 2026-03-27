@@ -12,10 +12,6 @@ public:
     uint32_t Reg[numRegisters];
   };
 
-  // ---- JUNK Delete Me When Done ----
-  uint32_t print_val1 = 0;
-  uint32_t print_val2 = 0;
-
   // explicit MAX2871(double refIn);
   explicit MAX2871(double refMHz, HAL& hal);
   MAX2871() = delete;                                       // Disallow empty constructor
@@ -49,7 +45,6 @@ public:
 private:
   double _refMHz;                   // Reference clock input frequency - defined
   HAL& _hal;
-  double fpfdHz;                    // phase detector frequency - calculated
   uint8_t _rfEnPin;
   bool first_init;
   uint8_t _dirtyMask;               // Track which registers require programming

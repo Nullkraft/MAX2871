@@ -10,7 +10,6 @@
 MockHAL hal;
 MAX2871 lo(66.0, hal);  // Reference clock = 66 MHz
 float tolerance = 0.002;        // +/- 1 kHz
-constexpr uint8_t NUM_REGS = MAX2871::max2871Registers::numRegisters;
 
 // --- Unity Test Fixtures ---
 void setUp(void) {
@@ -22,24 +21,6 @@ void setUp(void) {
 }
 
 void tearDown(void) {}
-
-__attribute__((unused)) static void print_register(MAX2871 &lo, uint8_t regAddr) {
-    char buf[128];
-    snprintf(buf, sizeof(buf), "reg[%d]=0x%08lX", regAddr, lo.Curr.Reg[regAddr]);
-    TEST_MESSAGE(buf);
-}
-
-__attribute__((unused)) static void print_registers(MAX2871 &lo) {
-    for (int regAddr = 0; regAddr <= 6; ++regAddr) {
-        print_register(lo, regAddr);
-    }
-}
-
-__attribute__((unused)) static void print_hex(uint32_t val) {
-    char buf[128];
-    snprintf(buf, sizeof(buf), "0x%08lX", val);
-    TEST_MESSAGE(buf);
-}
 
 // --- Round-trip Test for Known Case ---
 void test_round_trip_known(void) {
