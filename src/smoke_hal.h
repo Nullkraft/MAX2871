@@ -8,7 +8,6 @@ class SmokeHAL : public HAL {
 public:
     explicit SmokeHAL(uint8_t /*pinLE*/) {}
 
-    void doNothing() {}
     // --- GPIO (no-op) ---
     void pinMode(uint8_t /*pin*/, pin_mode /*mode*/) override {}
     void digitalWrite(uint8_t /*pin*/, pin_level /*val*/) override {}

@@ -30,12 +30,6 @@ public:
         }
     }
 
-    void logRegister(uint32_t value) {
-        if (writeCount < LOG_SIZE) {
-            writeLog[writeCount++] = value;
-        }
-    }
-    
     void setCEPin(bool) override {}
     bool readMuxout() override { return false; }
     uint16_t readADC(ADCChannel channel = ADC_COARSE) override { return 0; }
