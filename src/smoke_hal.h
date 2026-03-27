@@ -19,9 +19,6 @@ public:
     virtual void spiWriteRegister(uint32_t value) override {}
     virtual void setCEPin(bool enable) override {}
     virtual bool readMuxout() override { return 0; }
-
-    // ADC - ADS7826 (10-bit, returned left-justified in 12-bit field)
-    virtual uint16_t readADC(ADCChannel channel = ADC_COARSE) override { return 0; }
 };
 
 #endif // SMOKE_HAL_H

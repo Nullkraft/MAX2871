@@ -59,7 +59,6 @@ public:
     }
 
     bool readMuxout() { return true; }      // TODO: Implement testing muxOut
-    uint16_t readADC(ADCChannel channel = ADC_COARSE) override { return 0; }
 };
 
 #endif

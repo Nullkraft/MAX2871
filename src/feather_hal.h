@@ -1,6 +1,6 @@
 /* feather_hal.h
     Hardware Abstraction Layer for Adafruit Feather RP2040
-    - Talks to MAX2871 over hardware SPI
+    - Talks to the MAX2871 over hardware SPI
     - Mirrors the ArduinoHAL interface used in your MAX2871 driver
 
     (Spectrum Analyzer Production board)
@@ -41,9 +41,8 @@ public:
     // le  = MAX2871 LE (latch enable)
     // ce  = MAX2871 CE (chip enable)
     // mux = MAX2871 MUXOUT pin for lock detect
-    explicit FeatherHAL(uint8_t lePin, uint8_t cePin = 0xFF, uint8_t muxPin = 0xFF,
-                        uint8_t selAdc1 = 0xFF, uint8_t selAdc2 = 0xFF)
-        : _le(lePin), _ce(cePin), _mux(muxPin), _selAdc1(selAdc1), _selAdc2(selAdc2) {}
+    explicit FeatherHAL(uint8_t lePin, uint8_t cePin = 0xFF, uint8_t muxPin = 0xFF)
+        : _le(lePin), _ce(cePin), _mux(muxPin) {}
 
     // Call once from setup(): config pins and SPI
     void begin() {
@@ -52,7 +51,7 @@ public:
         if (_ce  != 0xFF) ::pinMode(_ce, OUTPUT), ::digitalWrite(_ce, LOW);   // keep LO off initially
         if (_mux != 0xFF) ::pinMode(_mux, INPUT);                             // MUXOUT (lock detect)
 
-        // Start SPI on default bus (SCK18/MOSI19/MISO16)
+        // Start SPI on the default bus (SCK18/MOSI19/MISO16)
         SPI.begin();
     }
 
@@ -112,33 +111,10 @@ public:
         return (::digitalRead(_mux) == HIGH);
     }
 
-    uint16_t readADC(ADCChannel channel = ADC_COARSE) override {
-        // ADS7826: 10-bit ADC, SPI Mode 1
-        // Caller must set appropriate SPI clock rate before calling (max 2.8 MHz)
-        // Returns 10-bit data left-justified in 12-bit field
-        uint8_t csPin = (channel == ADC_COARSE) ? _selAdc1 : _selAdc2;
-        if (csPin == 0xFF) return 0;
-
-        SPISettings settings(_spiHz, MSBFIRST, SPI_MODE1);
-        SPI.beginTransaction(settings);
-
-        ::digitalWrite(csPin, LOW);
-        uint16_t raw = SPI.transfer16(0);
-        ::digitalWrite(csPin, HIGH);
-
-        SPI.endTransaction();
-
-        // Bit alignment: 2 sample clocks, 1 null, 10 data bits, 3 trailing
-        // Data sits in bits [12:3], shift right 1 and mask to left-justify in 12-bit field
-        return (raw >> 1) & 0x0FFC;
-    }
-
 private:
     uint8_t _le;
     uint8_t _ce;
     uint8_t _mux;
-    uint8_t _selAdc1 = 0xFF;
-    uint8_t _selAdc2 = 0xFF;
     uint32_t _spiHz = 8000000UL;  // start conservatively; raise once validated
 };
 

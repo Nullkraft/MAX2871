@@ -25,7 +25,6 @@
 
 enum pin_mode { PINMODE_INPUT, PINMODE_INPUT_PULLUP, PINMODE_INPUT_PULLDOWN, PINMODE_OUTPUT };
 enum pin_level { PINLEVEL_LOW = 0, PINLEVEL_HIGH = 1 };
-enum ADCChannel { ADC_COARSE = 1, ADC_FINE = 2 };
 
 // --- Bitfield Utilities ---
 // Helper functions for register bit manipulation
@@ -61,9 +60,6 @@ public:
     virtual void spiWriteRegister(uint32_t value) = 0;
     virtual void setCEPin(bool enable) = 0;
     virtual bool readMuxout() = 0;
-
-    // ADC - ADS7826 (10-bit, returned left-justified in 12-bit field)
-    virtual uint16_t readADC(ADCChannel channel = ADC_COARSE) = 0;
 };
 
 #endif // HAL_H
