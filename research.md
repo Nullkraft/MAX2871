@@ -51,16 +51,14 @@
 - `platformio.ini` defines multiple environments:
   - `native`: PC tests (`test_pc`) with `MockHAL`.
   - `uno`/`mega`: AVR build targets with `MAX2871_STANDALONE`.
-  - `smoke`: Lightweight Arduino build bundling `examples/ci_smoke`.
   - `feather`: RP2040 standalone build target (`MAX2871_STANDALONE`).
 - `src/main_entry.cpp` neutralizes entry points depending on `PIO_UNIT_TESTING`, `ARDUINO`, and `MAX2871_STANDALONE` macros so PlatformIO/Arduino coexist.
-- `ci_smoke_wrapper.cpp` inlines the smoke sketch into a compilation unit for PlatformIO builds without needing Arduino’s sketch preprocessor.
+- GitHub Actions compiles `examples/ci_smoke/ci_smoke.ino` directly with Arduino CLI.
 - `unity_config.cpp/h` provide conditional serial output shims: when PlatformIO runs tests (`PIO_UNIT_TESTING` defined) its own transport takes over; otherwise, Arduino `Serial` or `stdout` is wired up.
 - `library.properties` advertises the library as `MAX2871_EvalBoard` version `0.1.0`, architecture `*`, with a short feature summary.
-- `Makefile` adds a non-PlatformIO workflow: downloads `arduino-cli` locally, provides `make ci` target that compiles the smoke sketch with Arduino CLI and runs native tests via `pio test`.
 
 ## Examples and Usage Patterns (`examples/`)
-- `ci_smoke/ci_smoke.ino`: Minimal smoke test to verify compilation linkage; instantiated via `ci_smoke_wrapper.cpp`.
+- `ci_smoke/ci_smoke.ino`: Minimal smoke test to verify compilation linkage for GitHub Actions.
 
 ## Test Coverage (`test/`)
 - `test_pc/test_max2871.cpp` (PlatformIO native target):
