@@ -105,7 +105,7 @@ public:
 
     bool readMuxout() override {
         if (_mux == 0xFF) return false;
-        return (::digitalRead(_mux) == HIGH);
+        return ::digitalRead(_mux) == HIGH;
     }
 
 private:

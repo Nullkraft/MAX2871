@@ -18,7 +18,7 @@ public:
     // MAX2871-specific
     virtual void spiWriteRegister(uint32_t value) override {}
     virtual void setCEPin(bool enable) override {}
-    virtual bool readMuxout() override { return 0; }
+    virtual bool readMuxout() override { return false; }
 };
 
 #endif // SMOKE_HAL_H
