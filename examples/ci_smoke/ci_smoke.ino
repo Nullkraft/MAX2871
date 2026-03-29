@@ -4,7 +4,7 @@
 
 void setup() {
     SmokeHAL hal(0);
-    MAX2871 lo(66.0, hal);
+    MAX2871 lo(66.0, hal, hal);
     (void) lo;
 }
 

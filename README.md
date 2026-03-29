@@ -42,9 +42,10 @@ Software Stack:
 |   - MAX2871 : I_PLLSynthesizer                                                   |
 |   - ADF4356 : I_PLLSynthesizer (future)                                          |
 |----------------------------------------------------------------------------------|
-| Board IO HAL (electrical primitives)                                             |
-|   - HAL (spiWriteRegister, digitalWrite, pinMode, delay, readMuxout, etc.)       |
-|   - ArduinoHAL implements HAL                                                    |
+| Board IO + transport                                                             |
+|   - IMCUHAL (generic GPIO, SPI primitives, delay, reads)                         |
+|   - I_MAX2871Transport (write register, read MUXOUT)                             |
+|   - ArduinoHAL implements both for the Arduino wiring                            |
 +----------------------------------------------------------------------------------+
 
 ## License
@@ -57,7 +58,7 @@ Copyright (c) 2025 Mark Stanley
 
 This library provides a clean, Arduino-friendly API for programming the MAX2871 frequency synthesizer chip. It includes:
 
-- **Hardware abstraction layer (HAL)** - Eval board uses IO pins but driver also supports hardware SPI
+- **Layered board abstraction** - pure MCU services plus a MAX2871 transport
 - **Simple frequency control** - just call `setFrequency(freq_MHz)`
 - **Output power control** - -4, -1, +2, +5 dBm
 - **PlatformIO project structure** - ready for testing and deployment
@@ -92,7 +93,7 @@ static constexpr uint8_t PIN_MUX = A2;      // Lock detect
 static constexpr double  REF_MHZ = 60.0;    // Reference clock
 
 ArduinoHAL hal(PIN_LE, RF_EN, PIN_MUX);
-MAX2871 lo(REF_MHZ, hal);
+MAX2871 lo(REF_MHZ, hal, hal);
 
 void setup() {
     hal.begin();
@@ -143,14 +144,18 @@ lo.outputPower(5);              // -4, -1, +2, or +5 dBm
 bool locked = lo.isLocked();    // Check PLL lock status
 ```
 
-## Hardware Abstraction Layer (HAL)
+## Hardware Layers
 
-The library supports multiple communication methods:
+The library separates:
 
-- **ArduinoHAL** - Hardware SPI peripheral
-- **MockHAL** - Testing on PC without hardware
+- **IMCUHAL** - generic controller services such as GPIO, SPI primitives, and delay
+- **I_MAX2871Transport** - MAX2871 wiring semantics such as register writes and MUXOUT reads
 
-All HALs implement the same interface, so switching is transparent to your application code.
+Concrete implementations used in this repo:
+
+- **ArduinoHAL** - real Arduino board implementation that satisfies both interfaces
+- **MockHAL** - native test double
+- **SmokeHAL** - compile-only stub
 
 ## Testing
 

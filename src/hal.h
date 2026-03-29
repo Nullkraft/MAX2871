@@ -1,12 +1,9 @@
 /* hal.h
-    (Hardware Abstraction Layer)
-    Purpose: Allows the use of different hardware platforms/communication methods
-    without changing your code. It abstracts HOW you communicate with the chip:
+    Shared low-level utilities for the hardware-facing layers.
 
-    ArduinoHAL - Uses Arduino's hardware SPI peripheral
-    MockHAL - Fake hardware for testing on PC
-
-    All talking to the SAME hardware, just different ways to send bits!
+    This file intentionally does not define a controller interface anymore.
+    It only provides common pin enums and bitfield helpers used by the MCU
+    and transport abstractions.
 
     (c) 2025 Mark Stanley, GPL-3.0-or-later
  */
@@ -41,23 +38,4 @@ inline uint32_t fieldValue(uint32_t value, uint8_t bit_hi, uint8_t bit_lo) {
     uint32_t mask = bitMask(bit_hi, bit_lo);
     return (value << bit_lo) & mask;
 }
-
-
-class HAL {
-public:
-    virtual ~HAL() {}
-
-    // GPIO
-    virtual void pinMode(uint8_t pin, pin_mode mode) = 0;
-    virtual void digitalWrite(uint8_t pin, pin_level val) = 0;
-
-    // Timing
-    virtual void delayMs(uint32_t ms) = 0;
-
-    // MAX2871-specific
-    virtual void spiWriteRegister(uint32_t value) = 0;
-    virtual void setCEPin(bool enable) = 0;
-    virtual bool readMuxout() = 0;
-};
-
 #endif // HAL_H

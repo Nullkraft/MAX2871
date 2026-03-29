@@ -14,9 +14,11 @@
 
 #include <Arduino.h>
 #include <SPI.h>
-#include "hal.h"   // defines pin_mode, pin_level, HAL base class
+#include "hal.h"
+#include "mcu_hal.h"
+#include "max2871_transport.h"
 
-class ArduinoHAL : public HAL {
+class ArduinoHAL : public IMCUHAL, public I_MAX2871Transport {
 public:
     // Construct with required control pins. You can pass 0xFF for any unused pin.
     // le  = MAX2871 LE (latch enable)
@@ -38,8 +40,6 @@ public:
     // Optional: pick a faster/slower SPI clock (Hz). Call before beginTransaction.
     void setSpiClockHz(uint32_t hz) { _spiHz = hz; }
 
-    // ---- HAL virtuals ----
-
     // GPIO
     void pinMode(uint8_t pin, pin_mode mode) override {
         switch (mode) {
@@ -55,30 +55,38 @@ public:
         ::digitalWrite(pin, (val == PINLEVEL_HIGH ? HIGH : LOW));
     }
 
+    int digitalRead(uint8_t pin) override {
+        return ::digitalRead(pin);
+    }
+
     // Timing
     void delayMs(uint32_t ms) override { ::delay(ms); }
+
+    void spiBegin() override {
+        SPI.beginTransaction(SPISettings(_spiHz, MSBFIRST, SPI_MODE0));
+    }
+
+    void spiEnd() override {
+        SPI.endTransaction();
+    }
+
+    void spiTransfer16(uint16_t value) override {
+        SPI.transfer16(value);
+    }
 
     // MAX2871 helpers
     void spiWriteRegister(uint32_t value) override {
         // MAX2871 write (MSB first, 32 bits, Mode 0)
-        SPISettings settings(_spiHz, MSBFIRST, SPI_MODE0);
-        SPI.beginTransaction(settings);
-
-        // Drive LE low for shift phase
+        spiBegin();
         ::digitalWrite(_le, LOW);
-
-        // Transfer 32 bits MSB-first
-        SPI.transfer16((value >> 16) & 0xFFFF);
-        SPI.transfer16(value & 0xFFFF);
-
-        // Latch on LE rising edge
+        spiTransfer16((value >> 16) & 0xFFFF);
+        spiTransfer16(value & 0xFFFF);
         ::digitalWrite(_le, HIGH);
         ::digitalWrite(_le, LOW);
-
-        SPI.endTransaction();
+        spiEnd();
     }
 
-    void setCEPin(bool enable) override {
+    void setCEPin(bool enable) {
         if (_ce != 0xFF) {
             ::digitalWrite(_ce, enable ? HIGH : LOW);
         }

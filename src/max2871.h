@@ -3,7 +3,8 @@
 
 #include <math.h>
 #include "I_PLLSynthesizer.h"   // Common PLL interface
-#include "hal.h"
+#include "mcu_hal.h"
+#include "max2871_transport.h"
 
 class MAX2871 : public I_PLLSynthesizer {
 public:
@@ -13,7 +14,7 @@ public:
   };
 
   // explicit MAX2871(double refIn);
-  explicit MAX2871(double refMHz, HAL& hal);
+  explicit MAX2871(double refMHz, I_MAX2871Transport& transport, IDelayProvider& timing);
   MAX2871() = delete;                                       // Disallow empty constructor
   void begin() override;
   void reset();
@@ -44,8 +45,8 @@ public:
 
 private:
   double _refMHz;                   // Reference clock input frequency - defined
-  HAL& _hal;
-  uint8_t _rfEnPin;
+  I_MAX2871Transport& _transport;
+  IDelayProvider& _timing;
   bool first_init;
   uint8_t _dirtyMask;               // Track which registers require programming
 

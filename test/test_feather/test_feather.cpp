@@ -15,7 +15,7 @@ static constexpr double  REF_MHZ = 66.0; // 66 MHz reference
 
 // CE is tied HIGH on evaluation board
 static ArduinoHAL hal(PIN_LE, 0xFF /*CE unused*/, PIN_MUX);
-static MAX2871 lo(REF_MHZ, hal);
+static MAX2871 lo(REF_MHZ, hal, hal);
 
 // Unity hooks
 void setUp() {}
