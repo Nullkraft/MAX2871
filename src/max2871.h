@@ -15,6 +15,8 @@ public:
 
   // explicit MAX2871(double refIn);
   explicit MAX2871(double refMHz, I_MAX2871Transport& transport, IDelayProvider& timing);
+  MAX2871(double refMHz, I_MAX2871Transport& transport, IDelayProvider& timing,
+          const max2871Registers& startupRegisters);
   MAX2871() = delete;                                       // Disallow empty constructor
   void begin() override;
   void reset();
@@ -47,6 +49,7 @@ private:
   double _refMHz;                   // Reference clock input frequency - defined
   I_MAX2871Transport& _transport;
   IDelayProvider& _timing;
+  max2871Registers _startupRegisters;
   bool first_init;
   uint8_t _dirtyMask;               // Track which registers require programming
 

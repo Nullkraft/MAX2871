@@ -29,7 +29,22 @@ const MAX2871::max2871Registers MAX2871::defaultRegisters = {{
 /* hal defaults to nullptr */
 // First use of _dirtyMask marks all 6 registers as requiring updates
 MAX2871::MAX2871(double refMHz, I_MAX2871Transport& transport, IDelayProvider& timing)
-    : _refMHz(refMHz), _transport(transport), _timing(timing), first_init(true), _dirtyMask(0x3F) {
+    : _refMHz(refMHz),
+      _transport(transport),
+      _timing(timing),
+      _startupRegisters(defaultRegisters),
+      first_init(true),
+      _dirtyMask(0x3F) {
+}
+
+MAX2871::MAX2871(double refMHz, I_MAX2871Transport& transport, IDelayProvider& timing,
+                 const max2871Registers& startupRegisters)
+    : _refMHz(refMHz),
+      _transport(transport),
+      _timing(timing),
+      _startupRegisters(startupRegisters),
+      first_init(true),
+      _dirtyMask(0x3F) {
 }
 
 void MAX2871::begin() {
@@ -196,7 +211,7 @@ void MAX2871::updateRegisters() {
 // Reset working copy of registers, Curr, from the defaultRegisters
 void MAX2871::reset() {
     first_init = true;          // Flag to run the clean-clock startup once
-    Curr = defaultRegisters;    // Reset all registers to their default values
+    Curr = _startupRegisters;   // Reset all registers to this instance's startup values
     updateRegisters();          // Performs clean-clock startup sequence
     first_init = false;         // Done running clean-clock startup
 }
