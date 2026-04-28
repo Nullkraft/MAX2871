@@ -9,6 +9,7 @@
 .vscode/
 .maxlib/
 .tools/
+.codex
 .editorconfig
 
 docs/
