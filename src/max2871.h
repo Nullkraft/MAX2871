@@ -32,18 +32,6 @@ public:
   void outputSelect(RFOutPort port = RF_ALL) override;          // A, B, both, or off
   void outputPower(int dBm, RFOutPort port = RF_ALL) override;  // -4, -1, +2, +5 dBm
 
-  // WN2A command operation numbers for MAX2871 targets.
-  static constexpr uint8_t CmdGeneral = 0;
-  static constexpr uint8_t CmdRfOff = 1;
-  static constexpr uint8_t CmdRfPowerMinus4 = 2;
-  static constexpr uint8_t CmdRfPowerMinus1 = 3;
-  static constexpr uint8_t CmdRfPowerPlus2 = 4;
-  static constexpr uint8_t CmdRfPowerPlus5 = 5;
-  static constexpr uint8_t CmdSetFrequency = 6;
-  static constexpr uint8_t CmdMuxTriState = 7;
-  static constexpr uint8_t CmdMuxDigitalLockDetect = 8;
-  static constexpr uint8_t CmdDivaMode = 9;
-
   // Default registers - Read-only
   static const max2871Registers defaultRegisters;
   // Working registers - Read/Write
