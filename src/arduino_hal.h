@@ -82,7 +82,6 @@ public:
         spiTransfer16((value >> 16) & 0xFFFF);
         spiTransfer16(value & 0xFFFF);
         ::digitalWrite(_le, HIGH);
-        ::digitalWrite(_le, LOW);
         spiEnd();
     }
 
