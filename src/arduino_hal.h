@@ -76,13 +76,9 @@ public:
 
     // MAX2871 helpers
     void spiWriteRegister(uint32_t value) override {
-        // MAX2871 write (MSB first, 32 bits, Mode 0)
-        spiBegin();
-        ::digitalWrite(_le, LOW);
+        // MAX2871 register payload transfer (MSB first, 32 bits).
         spiTransfer16((value >> 16) & 0xFFFF);
         spiTransfer16(value & 0xFFFF);
-        ::digitalWrite(_le, HIGH);
-        spiEnd();
     }
 
     void setCEPin(bool enable) {

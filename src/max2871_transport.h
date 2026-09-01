@@ -2,8 +2,7 @@
    MAX2871-specific transport contract.
 
    This interface sits between the pure MCU HAL and the MAX2871 driver.
-   It owns board-wiring concerns such as LE pulsing, CE control, and
-   reading the pin wired to MUXOUT.
+   The caller owns SPI transactions and LE timing around register transfers.
  */
 
 #ifndef MAX2871_TRANSPORT_H
