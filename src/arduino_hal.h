@@ -72,12 +72,6 @@ public:
         SPI.transfer16(value & 0xFFFF);
     }
 
-    void setCEPin(bool enable) {
-        if (_ce != 0xFF) {
-            ::digitalWrite(_ce, enable ? HIGH : LOW);
-        }
-    }
-
     bool readMuxout() override {
         if (_mux == 0xFF) return false;
         return ::digitalRead(_mux) == HIGH;
