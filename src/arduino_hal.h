@@ -20,12 +20,9 @@
 
 class ArduinoHAL : public IMCUHAL, public I_MAX2871Transport {
 public:
-    // Construct with required control pins. You can pass 0xFF for any unused pin.
-    // le  = MAX2871 LE (latch enable)
-    // ce  = MAX2871 CE (chip enable)
-    // mux = MAX2871 MUXOUT pin for lock detect
-    explicit ArduinoHAL(uint8_t lePin, uint8_t cePin = 0xFF, uint8_t muxPin = 0xFF)
-        : _le(lePin), _ce(cePin), _mux(muxPin) {}
+    // Construct with optional MUXOUT pin for lock detect.
+    explicit ArduinoHAL(uint8_t, uint8_t = 0xFF, uint8_t muxPin = 0xFF)
+        : _mux(muxPin) {}
 
     void begin() {
         // Start SPI on the default bus
@@ -74,8 +71,6 @@ public:
     }
 
 private:
-    uint8_t _le;
-    uint8_t _ce;
     uint8_t _mux;
     uint32_t _spiHz = 8000000UL;    // Default: Arduino Uno max = 8 MHz
 };
