@@ -28,11 +28,6 @@ public:
         : _le(lePin), _ce(cePin), _mux(muxPin) {}
 
     void begin() {
-        // Basic pin config
-        if (_le  != 0xFF) ::pinMode(_le, OUTPUT), ::digitalWrite(_le, LOW);
-        if (_ce  != 0xFF) ::pinMode(_ce, OUTPUT), ::digitalWrite(_ce, LOW);   // keep LO off initially
-        if (_mux != 0xFF) ::pinMode(_mux, INPUT);                             // MUXOUT (lock detect)
-
         // Start SPI on the default bus
         SPI.begin();
     }
