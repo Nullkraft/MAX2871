@@ -46,10 +46,6 @@ public:
         }
     }
 
-    void digitalWrite(uint8_t pin, pin_level val) override {
-        ::digitalWrite(pin, (val == PINLEVEL_HIGH ? HIGH : LOW));
-    }
-
     int digitalRead(uint8_t pin) override {
         return ::digitalRead(pin);
     }
