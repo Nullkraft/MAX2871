@@ -24,7 +24,6 @@ public:
 
     // GPIO
     virtual void pinMode(uint8_t pin, pin_mode mode) = 0;
-    virtual void digitalWrite(uint8_t pin, pin_level val) = 0;
     virtual int digitalRead(uint8_t pin) = 0;
 
     // SPI primitives
