@@ -70,15 +70,11 @@ public:
         SPI.endTransaction();
     }
 
-    void spiTransfer16(uint16_t value) override {
-        SPI.transfer16(value);
-    }
-
     // MAX2871 helpers
     void spiWriteRegister(uint32_t value) override {
         // MAX2871 register payload transfer (MSB first, 32 bits).
-        spiTransfer16((value >> 16) & 0xFFFF);
-        spiTransfer16(value & 0xFFFF);
+        SPI.transfer16((value >> 16) & 0xFFFF);
+        SPI.transfer16(value & 0xFFFF);
     }
 
     void setCEPin(bool enable) {

@@ -30,7 +30,6 @@ public:
     // SPI primitives
     virtual void spiBegin() = 0;
     virtual void spiEnd() = 0;
-    virtual void spiTransfer16(uint16_t value) = 0;
 };
 
 #endif // MCU_HAL_H
