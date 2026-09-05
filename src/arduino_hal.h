@@ -18,45 +18,20 @@
 #include "mcu_hal.h"
 #include "max2871_transport.h"
 
-class ArduinoHAL : public IMCUHAL, public I_MAX2871Transport {
+class ArduinoHAL : public IDelayProvider, public I_MAX2871Transport {
 public:
     // Construct with optional MUXOUT pin for lock detect.
     explicit ArduinoHAL(uint8_t, uint8_t = 0xFF, uint8_t muxPin = 0xFF)
         : _mux(muxPin) {}
 
     void begin() {
-        // Start SPI on the default bus
-        SPI.begin();
     }
 
     // Optional: pick a faster/slower SPI clock (Hz). Call before beginTransaction.
     void setSpiClockHz(uint32_t hz) { _spiHz = hz; }
 
-    // GPIO
-    void pinMode(uint8_t pin, pin_mode mode) override {
-        switch (mode) {
-            case pin_mode::PINMODE_INPUT:           ::pinMode(pin, INPUT); break;
-            case pin_mode::PINMODE_OUTPUT:          ::pinMode(pin, OUTPUT); break;
-            case pin_mode::PINMODE_INPUT_PULLUP:    ::pinMode(pin, INPUT_PULLUP); break;
-            case pin_mode::PINMODE_INPUT_PULLDOWN:  ::pinMode(pin, HAL_INPUT_PULLDOWN); break;
-            default: ::pinMode(pin, INPUT); break;
-        }
-    }
-
-    int digitalRead(uint8_t pin) override {
-        return ::digitalRead(pin);
-    }
-
     // Timing
     void delayMs(uint32_t ms) override { ::delay(ms); }
-
-    void spiBegin() override {
-        SPI.beginTransaction(SPISettings(_spiHz, MSBFIRST, SPI_MODE0));
-    }
-
-    void spiEnd() override {
-        SPI.endTransaction();
-    }
 
     // MAX2871 helpers
     void spiWriteRegister(uint32_t value) override {

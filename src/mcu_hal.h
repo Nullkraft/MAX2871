@@ -18,17 +18,4 @@ public:
     virtual void delayMs(uint32_t ms) = 0;
 };
 
-class IMCUHAL : public IDelayProvider {
-public:
-    virtual ~IMCUHAL() {}
-
-    // GPIO
-    virtual void pinMode(uint8_t pin, pin_mode mode) = 0;
-    virtual int digitalRead(uint8_t pin) = 0;
-
-    // SPI primitives
-    virtual void spiBegin() = 0;
-    virtual void spiEnd() = 0;
-};
-
 #endif // MCU_HAL_H
