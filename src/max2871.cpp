@@ -28,8 +28,8 @@ const MAX2871::max2871Registers MAX2871::defaultRegisters = {{
 
 /* hal defaults to nullptr */
 // First use of _dirtyMask marks all 6 registers as requiring updates
-MAX2871::MAX2871(double refMHz, I_MAX2871Transport& transport, IDelayProvider& timing)
-    : _refMHz(refMHz),
+MAX2871::MAX2871(uint32_t refKHz, I_MAX2871Transport& transport, IDelayProvider& timing)
+    : _refKHz(refKHz),
       _transport(transport),
       _timing(timing),
       _startupRegisters(defaultRegisters),
@@ -37,9 +37,9 @@ MAX2871::MAX2871(double refMHz, I_MAX2871Transport& transport, IDelayProvider& t
       _dirtyMask(0x3F) {
 }
 
-MAX2871::MAX2871(double refMHz, I_MAX2871Transport& transport, IDelayProvider& timing,
+MAX2871::MAX2871(uint32_t refKHz, I_MAX2871Transport& transport, IDelayProvider& timing,
                  const max2871Registers& startupRegisters)
-    : _refMHz(refMHz),
+    : _refKHz(refKHz),
       _transport(transport),
       _timing(timing),
       _startupRegisters(startupRegisters),
@@ -53,8 +53,8 @@ void MAX2871::begin() {
 
 // ---- Frequency Control ----
 
-void MAX2871::setFrequency(double freqMHz) {
-    freq2FMN(freqMHz);
+void MAX2871::setFrequency(uint32_t freqKHz) {
+    freq2FMN(freqKHz);
     setRegisterField(1, 14,  3, M);
     setRegisterField(0, 14,  3, Frac);
     setRegisterField(0, 30, 15, N);
@@ -74,23 +74,22 @@ void MAX2871::setFrequency(uint32_t fmn, uint8_t diva) {
     updateRegisters();
 }
 
-void MAX2871::freq2FMN(float target_freq_MHz) {
+void MAX2871::freq2FMN(uint32_t targetFreqKHz) {
     R = 1;
-    Fpfd = _refMHz / R;                // Phase Frequency Detector input frequency
-    uint32_t Fvco_kHz = static_cast<uint32_t>(round(target_freq_MHz * 1000.0));
-    const uint32_t Fpfd_kHz = static_cast<uint32_t>(round(Fpfd * 1000.0));
+    Fpfd = _refKHz / R;                 // Phase Frequency Detector input frequency
+    uint32_t FvcoKHz = targetFreqKHz;
 
     // Adjust Fvco to be within 3000 to 6000 MHz range and calculate DIVA accordingly
     DIVA = 0;                           // Re-initialize DIVA (divide by 1)
-    while (Fvco_kHz < 3000000) {
-        Fvco_kHz *= 2;                  // Double until VCO is in valid range
+    while (FvcoKHz < 3000000) {
+        FvcoKHz *= 2;                   // Double until VCO is in valid range
         DIVA += 1;                      // Track doublings to determine DIVA
     }
 
-    N = Fvco_kHz / Fpfd_kHz;
-    const uint32_t targetNumerator = Fvco_kHz % Fpfd_kHz;
+    N = FvcoKHz / Fpfd;
+    const uint32_t targetNumerator = FvcoKHz % Fpfd;
     uint32_t euclidNumerator = targetNumerator;
-    uint32_t euclidDenominator = Fpfd_kHz;
+    uint32_t euclidDenominator = Fpfd;
     uint64_t f0 = 0;
     uint64_t m0 = 1;
     uint64_t f1 = 1;
@@ -121,11 +120,11 @@ void MAX2871::freq2FMN(float target_freq_MHz) {
         const uint64_t f2 = f0 + multiplier * f1;
         const uint64_t m2 = m0 + multiplier * m1;
         const uint64_t convergentLeft = targetNumerator * m1;
-        const uint64_t convergentRight = f1 * Fpfd_kHz;
+        const uint64_t convergentRight = f1 * Fpfd;
         const uint64_t convergentDifference = convergentLeft >= convergentRight
             ? convergentLeft - convergentRight : convergentRight - convergentLeft;
         const uint64_t semiconvergentLeft = targetNumerator * m2;
-        const uint64_t semiconvergentRight = f2 * Fpfd_kHz;
+        const uint64_t semiconvergentRight = f2 * Fpfd;
         const uint64_t semiconvergentDifference = semiconvergentLeft >= semiconvergentRight
             ? semiconvergentLeft - semiconvergentRight : semiconvergentRight - semiconvergentLeft;
         if (convergentDifference * m2 <= semiconvergentDifference * m1) {
@@ -154,10 +153,10 @@ void MAX2871::freq2FMN(float target_freq_MHz) {
     M = static_cast<uint16_t>(bestM);
 }
 
-double MAX2871::fmn2freq() {
-    double fVCO = Fpfd * (N + (double)Frac / M);
-    double fout = fVCO / (1 << DIVA);
-    return fout;
+uint32_t MAX2871::fmn2freq() {
+    const uint64_t numerator = static_cast<uint64_t>(Fpfd) * (static_cast<uint32_t>(N) * M + Frac);
+    const uint32_t denominator = static_cast<uint32_t>(M) * (1UL << DIVA);
+    return static_cast<uint32_t>((numerator + denominator / 2) / denominator);
 }
 
 // ---- Output Control ----

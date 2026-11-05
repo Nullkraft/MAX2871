@@ -11,11 +11,11 @@
 static constexpr uint8_t PIN_LE  = 3;    // LO2 Latch Enable (was A3)
 static constexpr uint8_t PIN_MUX = A0;   // MAX2871 MUXOUT (read-only)
 static constexpr uint8_t REF_EN1 = 8;    // Reference clock select
-static constexpr double  REF_MHZ = 66.0; // 66 MHz reference
+static constexpr uint32_t REF_KHZ = 66000; // 66 MHz reference
 
 // CE is tied HIGH on evaluation board
 static ArduinoHAL hal(PIN_LE, 0xFF /*CE unused*/, PIN_MUX);
-static MAX2871 lo(REF_MHZ, hal, hal);
+static MAX2871 lo(REF_KHZ, hal, hal);
 
 // Unity hooks
 void setUp() {}
@@ -47,18 +47,18 @@ void test_observe_muxout_level(void) {
 void test_verify_frequency_calculations(void) {
     pinMode(REF_EN1, OUTPUT);
     digitalWrite(REF_EN1, HIGH);
-    float freq_in = 3213.579;
+    uint32_t freq_in = 3213579;
     lo.setFrequency(freq_in);
-    float freq_from_fmn = lo.fmn2freq();
+    uint32_t freq_from_fmn = lo.fmn2freq();
     lo.outputSelect(RF_ALL);
     lo.outputPower(+5, RF_A);
-    TEST_ASSERT_EQUAL_FLOAT_MESSAGE(freq_in, freq_from_fmn, "*** Verify frequency calculations ***");
+    TEST_ASSERT_EQUAL_UINT32_MESSAGE(freq_in, freq_from_fmn, "*** Verify frequency calculations ***");
 }
 
 void test_default_setup() {
     pinMode(REF_EN1, OUTPUT);
     digitalWrite(REF_EN1, HIGH);
-    float freq_in = 75.003;
+    uint32_t freq_in = 75003;
     lo.setFrequency(freq_in);
 }
 
@@ -84,11 +84,11 @@ uint16_t freq;
 uint16_t timing = 1500;
 void loop() {
     for (freq = 30; freq < 70; freq++) {
-        lo.setFrequency(freq*1.0+0.005);
+        lo.setFrequency(freq * 1000UL + 5);
         delay(timing);
     }
     for (freq = 70; freq > 30; freq--) {
-        lo.setFrequency(freq*1.0+0.005);
+        lo.setFrequency(freq * 1000UL + 5);
         delay(timing);
     }
 }

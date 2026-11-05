@@ -26,7 +26,7 @@ public:
     virtual void begin() = 0;
 
     //  Frequency Control 
-    virtual void setFrequency(double freqMHz) = 0;              // calculates FMN+DIVA
+    virtual void setFrequency(uint32_t freqKHz) = 0;            // calculates FMN+DIVA
     virtual void setFrequency(uint32_t fmn, uint8_t diva) = 0;  // bypass math
 
     //  Output Control 

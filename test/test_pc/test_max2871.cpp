@@ -8,13 +8,13 @@
 
 // Shared test object
 MockHAL hal;
-MAX2871 lo(66.0, hal, hal);  // Reference clock = 66 MHz
-float tolerance = 0.002;        // +/- 1 kHz
+MAX2871 lo(66000, hal, hal);  // Reference clock = 66 MHz
+uint32_t tolerance = 2;       // +/- 2 kHz
 
 // --- Unity Test Fixtures ---
 void setUp(void) {
     // Baseline frequency for the member-variable tests
-    lo.freq2FMN(4129.392);  
+    lo.freq2FMN(4129392);
 #ifdef ARDUINO
     Serial.begin(115200);
 #endif
@@ -24,60 +24,60 @@ void tearDown(void) {}
 
 // --- Round-trip Test for Known Case ---
 void test_round_trip_known(void) {
-    double freq = 4129.392;
+    uint32_t freq = 4129392;
     lo.freq2FMN(freq);
-    TEST_ASSERT_FLOAT_WITHIN(tolerance, freq, lo.fmn2freq());
+    TEST_ASSERT_UINT32_WITHIN(tolerance, freq, lo.fmn2freq());
 }
 
 // --- Boundary Tests ---
 void test_lowest_freq(void) {
-    double freq = 23.5;   // min device spec
+    uint32_t freq = 23500;   // min device spec
     lo.freq2FMN(freq);
-    TEST_ASSERT_FLOAT_WITHIN(tolerance, freq, lo.fmn2freq());
+    TEST_ASSERT_UINT32_WITHIN(tolerance, freq, lo.fmn2freq());
 }
 
 void test_highest_freq(void) {
-    double freq = 6000.0; // max device spec
+    uint32_t freq = 6000000; // max device spec
     lo.freq2FMN(freq);
-    TEST_ASSERT_FLOAT_WITHIN(tolerance, freq, lo.fmn2freq());
+    TEST_ASSERT_UINT32_WITHIN(tolerance, freq, lo.fmn2freq());
 }
 
 // --- Integer-N Edge Case ---
 void test_integerN_case(void) {
-    double freq = 2970.0;   // 90 * 33 MHz = integer-N
+    uint32_t freq = 2970000;   // 90 * 33 MHz = integer-N
     lo.freq2FMN(freq);
     TEST_ASSERT_EQUAL_UINT32(0, lo.Frac);  // Frac = 0 in integer-N
-    TEST_ASSERT_FLOAT_WITHIN(tolerance, freq, lo.fmn2freq());
+    TEST_ASSERT_UINT32_WITHIN(tolerance, freq, lo.fmn2freq());
 }
 
 // --- Parameterized Round-trip Tests ---
 struct FreqTest {
-    double freq;
+    uint32_t freq;
 };
 
 FreqTest freq_cases[] = {
-    {100.0},
-    {915.0},
-    {1420.0},   // hydrogen line :)
-    {2400.0},
-    {3600.0},
-    {5800.0}
+    {100000},
+    {915000},
+    {1420000},   // hydrogen line :)
+    {2400000},
+    {3600000},
+    {5800000}
 };
 
 void test_param_round_trip(void) {
     for (auto &tc : freq_cases) {
         lo.freq2FMN(tc.freq);
-        TEST_ASSERT_FLOAT_WITHIN(tolerance, tc.freq, lo.fmn2freq());
+        TEST_ASSERT_UINT32_WITHIN(tolerance, tc.freq, lo.fmn2freq());
     }
 }
 
 // Interface Test
 void test_interface_begin_and_setFrequency(void) {
     MockHAL hal;
-    I_PLLSynthesizer* lo_if = new MAX2871(66.0, hal, hal);
+    I_PLLSynthesizer* lo_if = new MAX2871(66000, hal, hal);
     lo_if->begin();
 
-    lo_if->setFrequency(4192.392);          // exercise interface to setFrequency()
+    lo_if->setFrequency(4192392);           // exercise interface to setFrequency()
     TEST_ASSERT_FALSE(lo_if->isLocked());   // MockHAL returns false
 }
 
@@ -86,7 +86,7 @@ void test_outputSelect_marks_R4_only_and_sets_expected_bits(void) {
      * 1) By default both outputs are enabled ==> outputSelect(RF_ALL)
      */
     uint32_t reg4_RF_AB_mask = 0x120;
-    MAX2871 lo(66e6, hal, hal);
+    MAX2871 lo(66000, hal, hal);
     lo.reset();
     uint32_t before = lo.Curr.Reg[4] & reg4_RF_AB_mask; // Should equal RF_ALL, default
     uint32_t after;
