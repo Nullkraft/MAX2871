@@ -75,44 +75,83 @@ void MAX2871::setFrequency(uint32_t fmn, uint8_t diva) {
 }
 
 void MAX2871::freq2FMN(float target_freq_MHz) {
-    float floatFrac;
     R = 1;
     Fpfd = _refMHz / R;                // Phase Frequency Detector input frequency
-    float max_error = pow(2, 32);      // Large initial error
-    float Fvco = target_freq_MHz;
+    uint32_t Fvco_kHz = static_cast<uint32_t>(round(target_freq_MHz * 1000.0));
+    const uint32_t Fpfd_kHz = static_cast<uint32_t>(round(Fpfd * 1000.0));
 
     // Adjust Fvco to be within 3000 to 6000 MHz range and calculate DIVA accordingly
     DIVA = 0;                           // Re-initialize DIVA (divide by 1)
-    while (Fvco < 3000.0) {
-        Fvco *= 2;                      // Double until VCO is in valid range
+    while (Fvco_kHz < 3000000) {
+        Fvco_kHz *= 2;                  // Double until VCO is in valid range
         DIVA += 1;                      // Track doublings to determine DIVA
     }
 
-    float NdotF = Fvco / Fpfd;
-    N = static_cast<uint8_t>(NdotF);    // Integer portion (N of NdotF)
-    floatFrac = NdotF - N;              // Fractional portion
-    uint16_t best_F = 0;
-    uint16_t best_M = 0;
-
-    // Loop through M from 4095 down to 2
-    for (uint16_t M_candidate = 4095; M_candidate > 1; --M_candidate) {
-        float F_candidate = static_cast<uint16_t>(floatFrac * float(M_candidate));
-        float FvcoCalculated = Fpfd * (N + F_candidate / M_candidate);
-        float err = fabs(Fvco - FvcoCalculated);
-        if (err == 0) {
-            best_F = F_candidate;       // Perfect match found
-            best_M = M_candidate;
+    N = Fvco_kHz / Fpfd_kHz;
+    const uint32_t targetNumerator = Fvco_kHz % Fpfd_kHz;
+    uint32_t euclidNumerator = targetNumerator;
+    uint32_t euclidDenominator = Fpfd_kHz;
+    uint64_t f0 = 0;
+    uint64_t m0 = 1;
+    uint64_t f1 = 1;
+    uint64_t m1 = 0;
+    while (euclidDenominator != 0) {
+        const uint32_t coefficient = euclidNumerator / euclidDenominator;
+        const uint32_t remainder = euclidNumerator % euclidDenominator;
+        const uint64_t m2 = m0 + coefficient * m1;
+        if (m2 > 4095) {
             break;
         }
-        if (err <= max_error) {
-            max_error = err;
-            best_F = F_candidate;
-            best_M = M_candidate;
+        const uint64_t f2 = f0 + coefficient * f1;
+        f0 = f1;
+        m0 = m1;
+        f1 = f2;
+        m1 = m2;
+        euclidNumerator = euclidDenominator;
+        euclidDenominator = remainder;
+    }
+
+    uint64_t bestF;
+    uint64_t bestM;
+    if (euclidDenominator == 0) {
+        bestF = f1;
+        bestM = m1;
+    } else {
+        const uint64_t multiplier = (4095 - m0) / m1;
+        const uint64_t f2 = f0 + multiplier * f1;
+        const uint64_t m2 = m0 + multiplier * m1;
+        const uint64_t convergentLeft = targetNumerator * m1;
+        const uint64_t convergentRight = f1 * Fpfd_kHz;
+        const uint64_t convergentDifference = convergentLeft >= convergentRight
+            ? convergentLeft - convergentRight : convergentRight - convergentLeft;
+        const uint64_t semiconvergentLeft = targetNumerator * m2;
+        const uint64_t semiconvergentRight = f2 * Fpfd_kHz;
+        const uint64_t semiconvergentDifference = semiconvergentLeft >= semiconvergentRight
+            ? semiconvergentLeft - semiconvergentRight : semiconvergentRight - semiconvergentLeft;
+        if (convergentDifference * m2 <= semiconvergentDifference * m1) {
+            bestF = f1;
+            bestM = m1;
+        } else {
+            bestF = f2;
+            bestM = m2;
         }
     }
 
-    Frac = static_cast<uint16_t>(round(best_F));
-    M = best_M;
+    if (bestM == 1) {
+        if (bestF == 0) {
+            bestM = 2;
+        } else if (N < 0xFF) {
+            ++N;
+            bestF = 0;
+            bestM = 2;
+        } else {
+            bestF = 4094;
+            bestM = 4095;
+        }
+    }
+
+    Frac = static_cast<uint16_t>(bestF);
+    M = static_cast<uint16_t>(bestM);
 }
 
 double MAX2871::fmn2freq() {
