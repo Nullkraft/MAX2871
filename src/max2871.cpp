@@ -90,18 +90,18 @@ void MAX2871::freq2FMN(uint32_t targetFreqKHz) {
     const uint32_t targetNumerator = FvcoKHz % Fpfd;
     uint32_t euclidNumerator = targetNumerator;
     uint32_t euclidDenominator = Fpfd;
-    uint64_t f0 = 0;
-    uint64_t m0 = 1;
-    uint64_t f1 = 1;
-    uint64_t m1 = 0;
+    uint32_t f0 = 0;
+    uint32_t m0 = 1;
+    uint32_t f1 = 1;
+    uint32_t m1 = 0;
     while (euclidDenominator != 0) {
         const uint32_t coefficient = euclidNumerator / euclidDenominator;
         const uint32_t remainder = euclidNumerator % euclidDenominator;
-        const uint64_t m2 = m0 + coefficient * m1;
+        const uint32_t m2 = m0 + coefficient * m1;
         if (m2 > 4095) {
             break;
         }
-        const uint64_t f2 = f0 + coefficient * f1;
+        const uint32_t f2 = f0 + coefficient * f1;
         f0 = f1;
         m0 = m1;
         f1 = f2;
@@ -110,24 +110,25 @@ void MAX2871::freq2FMN(uint32_t targetFreqKHz) {
         euclidDenominator = remainder;
     }
 
-    uint64_t bestF;
-    uint64_t bestM;
+    uint32_t bestF;
+    uint32_t bestM;
     if (euclidDenominator == 0) {
         bestF = f1;
         bestM = m1;
     } else {
-        const uint64_t multiplier = (4095 - m0) / m1;
-        const uint64_t f2 = f0 + multiplier * f1;
-        const uint64_t m2 = m0 + multiplier * m1;
-        const uint64_t convergentLeft = targetNumerator * m1;
-        const uint64_t convergentRight = f1 * Fpfd;
-        const uint64_t convergentDifference = convergentLeft >= convergentRight
+        const uint32_t multiplier = (4095 - m0) / m1;
+        const uint32_t f2 = f0 + multiplier * f1;
+        const uint32_t m2 = m0 + multiplier * m1;
+        const uint32_t convergentLeft = targetNumerator * m1;
+        const uint32_t convergentRight = f1 * Fpfd;
+        const uint32_t convergentDifference = convergentLeft >= convergentRight
             ? convergentLeft - convergentRight : convergentRight - convergentLeft;
-        const uint64_t semiconvergentLeft = targetNumerator * m2;
-        const uint64_t semiconvergentRight = f2 * Fpfd;
-        const uint64_t semiconvergentDifference = semiconvergentLeft >= semiconvergentRight
+        const uint32_t semiconvergentLeft = targetNumerator * m2;
+        const uint32_t semiconvergentRight = f2 * Fpfd;
+        const uint32_t semiconvergentDifference = semiconvergentLeft >= semiconvergentRight
             ? semiconvergentLeft - semiconvergentRight : semiconvergentRight - semiconvergentLeft;
-        if (convergentDifference * m2 <= semiconvergentDifference * m1) {
+        if (static_cast<uint64_t>(convergentDifference) * m2
+            <= static_cast<uint64_t>(semiconvergentDifference) * m1) {
             bestF = f1;
             bestM = m1;
         } else {
@@ -154,9 +155,13 @@ void MAX2871::freq2FMN(uint32_t targetFreqKHz) {
 }
 
 uint32_t MAX2871::fmn2freq() {
-    const uint64_t numerator = static_cast<uint64_t>(Fpfd) * (static_cast<uint32_t>(N) * M + Frac);
-    const uint32_t denominator = static_cast<uint32_t>(M) * (1UL << DIVA);
-    return static_cast<uint32_t>((numerator + denominator / 2) / denominator);
+    const uint32_t outputDivider = 1UL << DIVA;
+    const uint32_t integerVcoKHz = Fpfd * N;
+    const uint32_t integerOutputKHz = integerVcoKHz / outputDivider;
+    const uint32_t remainder = integerVcoKHz % outputDivider;
+    const uint32_t denominator = static_cast<uint32_t>(M) * outputDivider;
+    const uint32_t fractionalNumerator = remainder * M + Fpfd * Frac;
+    return integerOutputKHz + (fractionalNumerator + denominator / 2) / denominator;
 }
 
 // ---- Output Control ----
