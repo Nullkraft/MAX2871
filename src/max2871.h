@@ -14,8 +14,8 @@ public:
   };
 
   // explicit MAX2871(double refIn);
-  explicit MAX2871(double refMHz, I_MAX2871Transport& transport, IDelayProvider& timing);
-  MAX2871(double refMHz, I_MAX2871Transport& transport, IDelayProvider& timing,
+  explicit MAX2871(uint32_t refKHz, I_MAX2871Transport& transport, IDelayProvider& timing);
+  MAX2871(uint32_t refKHz, I_MAX2871Transport& transport, IDelayProvider& timing,
           const max2871Registers& startupRegisters);
   MAX2871() = delete;                                       // Disallow empty constructor
   void begin() override;
@@ -23,10 +23,10 @@ public:
   bool isLocked() override;
 
   // ---- Frequency Control ----
-  void setFrequency(double freqMHz) override;               // calculates FMN+DIVA
+  void setFrequency(uint32_t freqKHz) override;             // calculates FMN+DIVA
   void setFrequency(uint32_t fmn, uint8_t diva) override;   // bypass math
-  void freq2FMN(float target_freq_MHz);                     // calculate F,M,N,DIVA
-  double fmn2freq();                                        // reverse calc
+  void freq2FMN(uint32_t targetFreqKHz);                    // calculate F,M,N,DIVA
+  uint32_t fmn2freq();                                      // reverse calc in kHz
 
   // ---- Output Control ----
   void outputSelect(RFOutPort port = RF_ALL) override;          // A, B, both, or off
@@ -42,11 +42,11 @@ public:
   uint16_t M;
   uint16_t N;
   uint8_t DIVA;
-  double Fpfd;
+  uint32_t Fpfd;
   int R;
 
 private:
-  double _refMHz;                   // Reference clock input frequency - defined
+  uint32_t _refKHz;                 // Reference clock input frequency
   I_MAX2871Transport& _transport;
   IDelayProvider& _timing;
   max2871Registers _startupRegisters;
