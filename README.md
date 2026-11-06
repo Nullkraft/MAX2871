@@ -121,11 +121,6 @@ pio run -e uno
 pio run -e uno --target upload
 ```
 
-### Run PC-native tests
-```bash
-pio test -e native
-```
-
 ## API Reference
 
 ### Basic Frequency Control
@@ -154,15 +149,11 @@ The library separates:
 Concrete implementations used in this repo:
 
 - **ArduinoHAL** - real Arduino board implementation that satisfies both interfaces
-- **MockHAL** - native test double
 - **SmokeHAL** - compile-only stub
 
 ## Testing
 
-The project includes comprehensive tests using Unity test framework:
-
-- **PC-native tests** - Run on your development machine
-- **Hardware tests** - Run on supported Arduino hardware
+The project includes hardware tests using the Unity test framework.
 
 ## Contributing
 
