@@ -42,6 +42,13 @@ void test_highest_freq(void) {
     TEST_ASSERT_UINT32_WITHIN(tolerance, freq, lo.fmn2freq());
 }
 
+void test_out_of_range_freq(void) {
+    TEST_ASSERT_FALSE(lo.freq2FMN(0));
+    TEST_ASSERT_FALSE(lo.freq2FMN(23499));
+    TEST_ASSERT_FALSE(lo.freq2FMN(6000001));
+    TEST_ASSERT_FALSE(lo.freq2FMN(6001001));
+}
+
 // --- Integer-N Edge Case ---
 void test_integerN_case(void) {
     uint32_t freq = 2970000;   // 90 * 33 MHz = integer-N
@@ -107,6 +114,7 @@ void runAllTests(void) {
     RUN_TEST(test_round_trip_known);
     RUN_TEST(test_lowest_freq);
     RUN_TEST(test_highest_freq);
+    RUN_TEST(test_out_of_range_freq);
     RUN_TEST(test_integerN_case);
     RUN_TEST(test_param_round_trip);
     RUN_TEST(test_interface_begin_and_setFrequency);

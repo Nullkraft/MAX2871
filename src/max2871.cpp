@@ -54,7 +54,7 @@ void MAX2871::begin() {
 // ---- Frequency Control ----
 
 void MAX2871::setFrequency(uint32_t freqKHz) {
-    freq2FMN(freqKHz);
+    if (!freq2FMN(freqKHz)) return;
     setRegisterField(1, 14,  3, M);
     setRegisterField(0, 14,  3, Frac);
     setRegisterField(0, 30, 15, N);
@@ -62,34 +62,57 @@ void MAX2871::setFrequency(uint32_t freqKHz) {
     updateRegisters();
 }
 
-void MAX2871::setFrequency(uint32_t fmn, uint8_t diva) {
-    Frac = (fmn >> 20) & 0xFFF;
-    M = (fmn >> 8) & 0xFFF;
-    N = fmn & 0xFF;
+bool MAX2871::setFrequency(uint16_t frac, uint16_t modulus, uint16_t n, uint8_t diva) {
+    const bool integerN = (_startupRegisters.Reg[0] & 0x80000000UL) != 0;
+    const uint32_t maxPfdKHz = integerN ? 140000UL : 125000UL;
+    if (_refKHz < 10000 || _refKHz > maxPfdKHz ||
+        modulus < 2 || modulus > 4095 || frac >= modulus || diva > 7 ||
+        (integerN && (frac != 0 || n < 16)) ||
+        (!integerN && (n < 19 || n > 4091))) return false;
+
+    R = 1;
+    Fpfd = _refKHz;
+    Frac = frac;
+    M = modulus;
+    N = n;
     DIVA = diva;
     setRegisterField(1, 14,  3, M);
     setRegisterField(0, 14,  3, Frac);
     setRegisterField(0, 30, 15, N);
     setRegisterField(4, 22, 20, DIVA);
     updateRegisters();
+    return true;
 }
 
-void MAX2871::freq2FMN(uint32_t targetFreqKHz) {
-    R = 1;
-    Fpfd = _refKHz / R;                 // Phase Frequency Detector input frequency
+bool MAX2871::freq2FMN(uint32_t targetFreqKHz) {
+    const bool integerN = (_startupRegisters.Reg[0] & 0x80000000UL) != 0;
+    const uint32_t maxPfdKHz = integerN ? 140000UL : 125000UL;
+    if (targetFreqKHz < 23500 || targetFreqKHz > 6000000 ||
+        _refKHz < 10000 || _refKHz > maxPfdKHz) return false;
+
     uint32_t FvcoKHz = targetFreqKHz;
+    uint8_t calculatedDiva = 0;
 
     // Adjust Fvco to be within 3000 to 6000 MHz range and calculate DIVA accordingly
-    DIVA = 0;                           // Re-initialize DIVA (divide by 1)
     while (FvcoKHz < 3000000) {
         FvcoKHz *= 2;                   // Double until VCO is in valid range
-        DIVA += 1;                      // Track doublings to determine DIVA
+        ++calculatedDiva;               // Track doublings to determine DIVA
     }
 
-    N = FvcoKHz / Fpfd;
-    const uint32_t targetNumerator = FvcoKHz % Fpfd;
-    uint32_t euclidNumerator = targetNumerator;
-    uint32_t euclidDenominator = Fpfd;
+    uint32_t calculatedN = FvcoKHz / _refKHz;
+    uint32_t euclidNumerator = FvcoKHz % _refKHz;
+    if (integerN) {
+        if (euclidNumerator != 0 || calculatedN < 16 || calculatedN > 65535) return false;
+        R = 1;
+        Fpfd = _refKHz;
+        Frac = 0;
+        M = 2;
+        N = static_cast<uint16_t>(calculatedN);
+        DIVA = calculatedDiva;
+        return true;
+    }
+
+    uint32_t euclidDenominator = _refKHz;
     uint32_t f0 = 0;
     uint32_t m0 = 1;
     uint32_t f1 = 1;
@@ -97,6 +120,7 @@ void MAX2871::freq2FMN(uint32_t targetFreqKHz) {
     while (euclidDenominator != 0) {
         const uint32_t coefficient = euclidNumerator / euclidDenominator;
         const uint32_t remainder = euclidNumerator % euclidDenominator;
+        // Flip all the fractions
         const uint32_t m2 = m0 + coefficient * m1;
         if (m2 > 4095) {
             break;
@@ -119,16 +143,10 @@ void MAX2871::freq2FMN(uint32_t targetFreqKHz) {
         const uint32_t multiplier = (4095 - m0) / m1;
         const uint32_t f2 = f0 + multiplier * f1;
         const uint32_t m2 = m0 + multiplier * m1;
-        const uint32_t convergentLeft = targetNumerator * m1;
-        const uint32_t convergentRight = f1 * Fpfd;
-        const uint32_t convergentDifference = convergentLeft >= convergentRight
-            ? convergentLeft - convergentRight : convergentRight - convergentLeft;
-        const uint32_t semiconvergentLeft = targetNumerator * m2;
-        const uint32_t semiconvergentRight = f2 * Fpfd;
-        const uint32_t semiconvergentDifference = semiconvergentLeft >= semiconvergentRight
-            ? semiconvergentLeft - semiconvergentRight : semiconvergentRight - semiconvergentLeft;
-        if (static_cast<uint64_t>(convergentDifference) * m2
-            <= static_cast<uint64_t>(semiconvergentDifference) * m1) {
+        const uint32_t convergentDifference = euclidDenominator;
+        const uint32_t semiconvergentDifference =
+            euclidNumerator - multiplier * euclidDenominator;
+        if (convergentDifference * m2 <= semiconvergentDifference * m1) {
             bestF = f1;
             bestM = m1;
         } else {
@@ -140,18 +158,25 @@ void MAX2871::freq2FMN(uint32_t targetFreqKHz) {
     if (bestM == 1) {
         if (bestF == 0) {
             bestM = 2;
-        } else if (N < 0xFF) {
-            ++N;
+        } else if (calculatedN < 4091) {
+            ++calculatedN;
             bestF = 0;
             bestM = 2;
         } else {
-            bestF = 4094;
-            bestM = 4095;
+            return false;
         }
     }
 
+    if (calculatedN < 19 || calculatedN > 4091 ||
+        bestM < 2 || bestM > 4095 || bestF >= bestM) return false;
+
+    R = 1;
+    Fpfd = _refKHz;
     Frac = static_cast<uint16_t>(bestF);
     M = static_cast<uint16_t>(bestM);
+    N = static_cast<uint16_t>(calculatedN);
+    DIVA = calculatedDiva;
+    return true;
 }
 
 uint32_t MAX2871::fmn2freq() {

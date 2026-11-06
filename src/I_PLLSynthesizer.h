@@ -27,7 +27,6 @@ public:
 
     //  Frequency Control 
     virtual void setFrequency(uint32_t freqKHz) = 0;            // calculates FMN+DIVA
-    virtual void setFrequency(uint32_t fmn, uint8_t diva) = 0;  // bypass math
 
     //  Output Control 
     virtual void outputSelect(RFOutPort port) = 0;     // A, B, both, or off
