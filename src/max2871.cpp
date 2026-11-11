@@ -107,12 +107,12 @@ void MAX2871::freq2FMN(uint32_t targetFreqKHz) {
     DIVA = calculatedDiva;
 
     uint32_t calculatedN = FvcoKHz / _refKHz;
-    uint32_t euclidNumerator = FvcoKHz % _refKHz;
-    uint32_t euclidDenominator = _refKHz;
-    uint32_t f0 = 0;
-    uint32_t m0 = 1;
-    uint32_t f1 = 1;
-    uint32_t m1 = 0;
+    uint32_t euclidNumerator = _refKHz;
+    uint32_t euclidDenominator = FvcoKHz % _refKHz;
+    uint32_t f0 = 1;
+    uint32_t m0 = 0;
+    uint32_t f1 = 0;
+    uint32_t m1 = 1;
     while (euclidDenominator != 0) {
         const uint32_t coefficient = euclidNumerator / euclidDenominator;
         const uint32_t remainder = euclidNumerator % euclidDenominator;
@@ -137,7 +137,6 @@ void MAX2871::freq2FMN(uint32_t targetFreqKHz) {
         bestM = m1;
     } else {
         const uint32_t multiplier = (4095 - m0) / m1;
-        const uint32_t f2 = f0 + multiplier * f1;
         const uint32_t m2 = m0 + multiplier * m1;
         const uint32_t convergentDifference = euclidDenominator;
         const uint32_t semiconvergentDifference =
@@ -146,7 +145,7 @@ void MAX2871::freq2FMN(uint32_t targetFreqKHz) {
             bestF = f1;
             bestM = m1;
         } else {
-            bestF = f2;
+            bestF = f0 + multiplier * f1;
             bestM = m2;
         }
     }
