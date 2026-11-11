@@ -93,8 +93,6 @@ bool MAX2871::setFrequency(uint16_t frac, uint16_t modulus, uint16_t n, uint8_t 
 }
 
 void MAX2871::freq2FMN(uint32_t targetFreqKHz) {
-    const bool integerN = (_startupRegisters.Reg[0] & 0x80000000UL) != 0;
-
     uint32_t FvcoKHz = targetFreqKHz;
     uint8_t calculatedDiva = 0;
 
@@ -110,13 +108,6 @@ void MAX2871::freq2FMN(uint32_t targetFreqKHz) {
 
     uint32_t calculatedN = FvcoKHz / _refKHz;
     uint32_t euclidNumerator = FvcoKHz % _refKHz;
-    if (integerN) {
-        Frac = 0;
-        M = 2;
-        N = static_cast<uint16_t>(calculatedN);
-        return;
-    }
-
     uint32_t euclidDenominator = _refKHz;
     uint32_t f0 = 0;
     uint32_t m0 = 1;
