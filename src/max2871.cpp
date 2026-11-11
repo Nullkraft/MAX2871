@@ -153,12 +153,10 @@ void MAX2871::freq2FMN(uint32_t targetFreqKHz) {
     // normalization of a continued-fraction boundary result
     // M=1 is invalid; normalize 0/1 to 0/2 or carry 1/1 into N as (N+1)+0/2.
     if (bestM == 1) {
-        if (bestF == 0) {
-            bestM = 2;
-        } else {
+        bestM = 2;
+        if (bestF != 0) {
             ++calculatedN;
             bestF = 0;
-            bestM = 2;
         }
     }
 
