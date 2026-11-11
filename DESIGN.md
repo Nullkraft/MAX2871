@@ -236,6 +236,14 @@ The startup delay after register 5 is sourced from `IDelayProvider::delayMs(20)`
 
 ## Frequency calculation algorithm
 
+### Frequency calculation contract
+
+- The application derives each LO target frequency from RF input and is responsible for requesting a frequency representable by the selected synthesizer mode.
+- `setFrequency()` validates the target against the MAX2871 operating range. An out-of-range target leaves the hardware-defined `R` value unchanged, clears `Fpfd`, `Frac`, `M`, `N`, and `DIVA`, and does not update the registers.
+- For an in-range target, `setFrequency()` calls `freq2FMN()`, trusts the resulting member values, writes them to the shadow registers, and updates the device.
+- `freq2FMN()` has no return value. It assumes a valid, representable target and only calculates and assigns `R`, `Fpfd`, `Frac`, `M`, `N`, and `DIVA`; it does not validate, clear, or report status.
+- Other code that reads the calculated members is responsible for handling their current values, including the cleared state after an out-of-range request.
+
 The project uses a simple fractional-N search implemented in `freq2FMN(float target_freq_MHz)`.
 
 Recreate it exactly as follows:
