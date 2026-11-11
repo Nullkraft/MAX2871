@@ -25,7 +25,7 @@ public:
   // ---- Frequency Control ----
   void setFrequency(uint32_t freqKHz) override;             // calculates FMN+DIVA
   bool setFrequency(uint16_t frac, uint16_t modulus, uint16_t n, uint8_t diva);
-  bool freq2FMN(uint32_t targetFreqKHz);                    // calculate F,M,N,DIVA
+  void freq2FMN(uint32_t targetFreqKHz);                    // calculate F,M,N,DIVA
   uint32_t fmn2freq();                                      // reverse calc in kHz
 
   // ---- Output Control ----

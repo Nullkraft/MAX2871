@@ -54,7 +54,15 @@ void MAX2871::begin() {
 // ---- Frequency Control ----
 
 void MAX2871::setFrequency(uint32_t freqKHz) {
-    if (!freq2FMN(freqKHz)) return;
+    if (freqKHz < 23500 || freqKHz > 6000000) {
+        Fpfd = 0;
+        Frac = 0;
+        M = 0;
+        N = 0;
+        DIVA = 0;
+        return;
+    }
+    freq2FMN(freqKHz);
     setRegisterField(1, 14,  3, M);
     setRegisterField(0, 14,  3, Frac);
     setRegisterField(0, 30, 15, N);
@@ -84,11 +92,8 @@ bool MAX2871::setFrequency(uint16_t frac, uint16_t modulus, uint16_t n, uint8_t 
     return true;
 }
 
-bool MAX2871::freq2FMN(uint32_t targetFreqKHz) {
+void MAX2871::freq2FMN(uint32_t targetFreqKHz) {
     const bool integerN = (_startupRegisters.Reg[0] & 0x80000000UL) != 0;
-    const uint32_t maxPfdKHz = integerN ? 140000UL : 125000UL;
-    if (targetFreqKHz < 23500 || targetFreqKHz > 6000000 ||
-        _refKHz < 10000 || _refKHz > maxPfdKHz) return false;
 
     uint32_t FvcoKHz = targetFreqKHz;
     uint8_t calculatedDiva = 0;
@@ -99,17 +104,17 @@ bool MAX2871::freq2FMN(uint32_t targetFreqKHz) {
         ++calculatedDiva;               // Track doublings to determine DIVA
     }
 
+    R = 1;
+    Fpfd = _refKHz;
+    DIVA = calculatedDiva;
+
     uint32_t calculatedN = FvcoKHz / _refKHz;
     uint32_t euclidNumerator = FvcoKHz % _refKHz;
     if (integerN) {
-        if (euclidNumerator != 0 || calculatedN < 16 || calculatedN > 65535) return false;
-        R = 1;
-        Fpfd = _refKHz;
         Frac = 0;
         M = 2;
         N = static_cast<uint16_t>(calculatedN);
-        DIVA = calculatedDiva;
-        return true;
+        return;
     }
 
     uint32_t euclidDenominator = _refKHz;
@@ -158,28 +163,20 @@ bool MAX2871::freq2FMN(uint32_t targetFreqKHz) {
     if (bestM == 1) {
         if (bestF == 0) {
             bestM = 2;
-        } else if (calculatedN < 4091) {
+        } else {
             ++calculatedN;
             bestF = 0;
             bestM = 2;
-        } else {
-            return false;
         }
     }
 
-    if (calculatedN < 19 || calculatedN > 4091 ||
-        bestM < 2 || bestM > 4095 || bestF >= bestM) return false;
-
-    R = 1;
-    Fpfd = _refKHz;
     Frac = static_cast<uint16_t>(bestF);
     M = static_cast<uint16_t>(bestM);
     N = static_cast<uint16_t>(calculatedN);
-    DIVA = calculatedDiva;
-    return true;
 }
 
 uint32_t MAX2871::fmn2freq() {
+    if (M == 0) return 0;
     const uint32_t outputDivider = 1UL << DIVA;
     const uint32_t integerVcoKHz = Fpfd * N;
     const uint32_t integerOutputKHz = integerVcoKHz / outputDivider;

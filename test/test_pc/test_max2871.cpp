@@ -43,10 +43,24 @@ void test_highest_freq(void) {
 }
 
 void test_out_of_range_freq(void) {
-    TEST_ASSERT_FALSE(lo.freq2FMN(0));
-    TEST_ASSERT_FALSE(lo.freq2FMN(23499));
-    TEST_ASSERT_FALSE(lo.freq2FMN(6000001));
-    TEST_ASSERT_FALSE(lo.freq2FMN(6001001));
+    const uint32_t invalidFrequencies[] = {0, 23499, 6000001, 6001001};
+    for (auto freq : invalidFrequencies) {
+        lo.freq2FMN(4129392);
+        const int r = lo.R;
+        const MAX2871::max2871Registers registers = lo.Curr;
+
+        lo.setFrequency(freq);
+
+        TEST_ASSERT_EQUAL_INT(r, lo.R);
+        TEST_ASSERT_EQUAL_UINT32(0, lo.Fpfd);
+        TEST_ASSERT_EQUAL_UINT16(0, lo.Frac);
+        TEST_ASSERT_EQUAL_UINT16(0, lo.M);
+        TEST_ASSERT_EQUAL_UINT16(0, lo.N);
+        TEST_ASSERT_EQUAL_UINT8(0, lo.DIVA);
+        TEST_ASSERT_EQUAL_UINT32(0, lo.fmn2freq());
+        TEST_ASSERT_EQUAL_UINT32_ARRAY(registers.Reg, lo.Curr.Reg,
+                                       MAX2871::max2871Registers::numRegisters);
+    }
 }
 
 // --- Integer-N Edge Case ---
